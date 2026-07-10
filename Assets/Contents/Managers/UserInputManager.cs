@@ -1,0 +1,79 @@
+using Core;
+using Core.EventBus;
+using Core.EventBus.Event;
+using Core.Interface;
+using Core.Manager;
+using System;
+using System.Collections;
+using UnityEngine;
+using UnityEngine.InputSystem;
+
+public enum InputMapType
+{
+    Ui,
+    Player,
+}
+
+public class UserInputManager : BaseInputManager<UserInputActions>, IManager, IPlayerInputProvider
+{
+    #region Polling
+    public Vector2 Move
+    { 
+        get
+        {
+            return inputAction.Player.Move.ReadValue<Vector2>();
+        }
+    }
+
+    public Vector2 Look
+    {
+        get
+        {
+            return inputAction.Player.Look.ReadValue<Vector2>();
+        }
+    }
+
+    public float ScrollY
+    {
+        get
+        {
+            return inputAction.Player.Scroll.ReadValue<Vector2>().y;
+        }
+    }
+    #endregion
+
+    public override void Exit()
+    {
+        base.Exit();
+        EventBus<ControllerSettingEvent>.Unsubscribe(OnControllerCall);
+    }
+
+    public override IEnumerator Initialize(IModuleHub hub)
+    {
+        yield return base.Initialize(hub);
+        EventBus<ControllerSettingEvent>.Subscribe(OnControllerCall);
+    }
+
+    private void OnUseItemInput(InputAction.CallbackContext context)
+    {
+
+    }
+
+    public void SwitchMap(InputMapType mapType)
+    {
+        inputAction.Disable();
+
+        switch (mapType)
+        {
+            case InputMapType.Player: inputAction.Player.Enable(); break;
+            case InputMapType.Ui: inputAction.UI.Enable(); break;
+            default: Debug.LogWarning($"{mapType}은 정의되지 않은 Input Action"); break;
+        }
+    }
+    private void OnControllerCall(ControllerSettingEvent evt)
+    {
+        evt.controller.SetInputProvider(this);
+    }
+
+    // DOTO: 선입력 시스템(Input Buffering) 넣을지 고려 필요함
+}

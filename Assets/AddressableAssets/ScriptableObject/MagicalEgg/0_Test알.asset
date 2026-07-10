@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0e6afba6906e2b742b3b3cd41c30ba58, type: 3}
+  m_Name: "0_Test\uC54C"
+  m_EditorClassIdentifier: Assembly-CSharp::MagicalEggData
+  index: 0
+  nameTag: "Test\uC54C"
+  description: "\uB300\uCDA9\uC124\uBA85"
+  icon: {fileID: 0}
+  questIndexs: 0000000001000000020000000300000004000000
+  reward: {fileID: 0}

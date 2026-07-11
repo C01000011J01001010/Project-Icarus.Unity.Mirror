@@ -24,7 +24,7 @@ namespace Core.Hub
             EventBus<UnregisterActorEvent<TGroup>>.Unsubscribe(OnUnregisterRequest);
         }
 
-        private void Awake()
+        public void AwakeFromContext()
         {
             EventBus<RegisterActorEvent<TGroup>>.Subscribe(OnRegisterRequest);
             EventBus<UnregisterActorEvent<TGroup>>.Subscribe(OnUnregisterRequest);
@@ -64,6 +64,8 @@ namespace Core.Hub
                 list.Remove(actor);
             }
         }
+
+        
         #endregion
     }
 }

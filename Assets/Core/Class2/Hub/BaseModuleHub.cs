@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Core.EventBus;
+using Core.EventBus.Event;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -10,6 +12,8 @@ namespace Core.Hub
     {
         // 단일 매니저들을 담아두는 딕셔너리
         protected Dictionary<Type, TModule> moduleDict = new();
+
+        public abstract void AwakeFromContext();
 
         public override void Exit()
         {

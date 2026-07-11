@@ -11,49 +11,64 @@ namespace Core.EventBus
     /// </summary>
     public abstract class BaseEventListener_Automatic : MonoBehaviour
     {
-        // 중복 등록 방지용 해시셋
-        private HashSet<object> _subscribedHandlers = new();
+        // 💡 핵심: 등록된 델리게이트(Key)와 그에 매칭되는 static 해제 액션(Value)을 쌍으로 관리합니다.
+        private readonly Dictionary<Delegate, Action> _registeredEvents = new Dictionary<Delegate, Action>();
 
-        // '구독 해제 로직'을 담아둘 리스트
-        private List<Action> _unsubscribeActions = new();
-
-        // 1. 자식 클래스에서 이벤트를 등록할 때 호출하는 함수
+        /// <summary>
+        /// 1. 특정 이벤트를 구독합니다. (중복 등록 방지 포함)
+        /// </summary>
         protected void SubscribeTo<T>(Action<T> handler) where T : struct, IEvent
         {
-            // 중복 등록을 예방
-            if (_subscribedHandlers.Add(handler))
+            if (handler == null) return;
+
+            // 이미 등록된 핸들러라면 중복 등록하지 않음
+            if (!_registeredEvents.ContainsKey(handler))
             {
-                // 이벤트 버스에 실제 등록
                 EventBus<T>.Subscribe(handler);
 
-                // 이 이벤트를 해제하는 '익명 함수(Closure)'를 만들어 리스트에 보관
-                _unsubscribeActions.Add(() =>
-                {
-                    EventBus<T>.Unsubscribe(handler);
-                    _subscribedHandlers.Remove(handler); // 깔끔한 상태 초기화
-                });
+                // 해제할 때 호출할 static 제네릭 메서드를 익명 함수로 래핑하여 보관
+                _registeredEvents[handler] = () => EventBus<T>.Unsubscribe(handler);
             }
         }
 
-        // 자식 클래스에게 강제하는 추상 메서드
-        protected abstract void RegisterEvents();
-
-        private void OnEnable()
+        /// <summary>
+        /// 2. 구독했던 특정 이벤트를 개별적으로 해제합니다.
+        /// </summary>
+        protected void UnsubscribeFrom<T>(Action<T> handler) where T : struct, IEvent
         {
-            RegisterEvents();
+            if (handler == null) return;
+
+            // 등록된 장바구니에서 해당 핸들러를 찾아 해제 액션을 실행
+            if (_registeredEvents.TryGetValue(handler, out Action unsubscribeAction))
+            {
+                unsubscribeAction?.Invoke();
+                _registeredEvents.Remove(handler);
+            }
         }
 
-        private void OnDisable()
+        /// <summary>
+        /// 3. 이 객체에 등록된 모든 이벤트를 한 번에 해제합니다.
+        /// </summary>
+        protected void UnsubscribeAll()
         {
-            // 자식 클래스가 해제를 신경 쓸 필요 없이
-            // 부모클래스가 알아서 전부 해제함
-            foreach (var unsubscribeAction in _unsubscribeActions)
+            if (_registeredEvents.Count == 0) return;
+
+            // 보관 중인 모든 해제 액션을 순회하며 실행
+            foreach (var unsubscribeAction in _registeredEvents.Values)
             {
                 unsubscribeAction?.Invoke();
             }
 
-            // 리스트 비우기
-            _unsubscribeActions.Clear();
+            _registeredEvents.Clear();
+        }
+
+        /// <summary>
+        /// 💡 멀티플레이 환경에서 메모리 누수(Static EventBus의 고질적 문제)를 막기 위한 최후의 안전장치
+        /// </summary>
+        protected virtual void OnDisable()
+        {
+            // 개발자가 깜빡하고 해제하지 않았더라도, 객체가 비활성화되거나 풀에 반환될 때 완전히 청소합니다.
+            UnsubscribeAll();
         }
     }
 }

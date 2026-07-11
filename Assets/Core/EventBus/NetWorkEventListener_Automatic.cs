@@ -7,7 +7,7 @@ namespace Core.EventBus
     /// <summary>
     /// FishNet 멀티플레이 환경에서 EventBus의 구독 및 해제를 수동/자동으로 관리하는 베이스 클래스
     /// </summary>
-    public abstract class NetWorkEventListener_Automatic : NetworkBehaviour
+    public abstract class NetworkEventListener_Automatic : NetworkBehaviour
     {
         // 💡 핵심: 등록된 델리게이트(Key)와 그에 매칭되는 static 해제 액션(Value)을 쌍으로 관리합니다.
         private readonly Dictionary<Delegate, Action> _registeredEvents = new Dictionary<Delegate, Action>();
@@ -59,6 +59,8 @@ namespace Core.EventBus
 
             _registeredEvents.Clear();
         }
+
+
 
         /// <summary>
         /// 💡 멀티플레이 환경에서 메모리 누수(Static EventBus의 고질적 문제)를 막기 위한 최후의 안전장치

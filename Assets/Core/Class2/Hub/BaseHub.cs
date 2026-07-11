@@ -5,7 +5,7 @@ namespace Core.Hub
 {
     public abstract class BaseHub : MonoBehaviour, IInitialize, ILateInitialize
     {
-        private void OnDestroy()
+        protected virtual void OnDestroy()
         {
             Exit();
         }

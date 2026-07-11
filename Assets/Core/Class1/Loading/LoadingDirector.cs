@@ -14,7 +14,7 @@ public class LoadingDirector : BaseEventListener_Automatic
     private Coroutine fadeCoroutine;
 
     // 2. OnEnable / OnDisable을 직접 쓰지 않고 RegisterEvents를 오버라이드합니다.
-    protected override void RegisterEvents()
+    private void OnEnable()
     {
         SubscribeTo<SystemLoadingEvent>(OnLoadingEventReceived);
     }

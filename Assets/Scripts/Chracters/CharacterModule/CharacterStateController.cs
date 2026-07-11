@@ -7,13 +7,14 @@ using Core;
 
 
 
-public class CharacterStateController : BaseStateController<CharacterState>, IModule,
+public class CharacterStateController : BaseStateController<CharacterState>, ICharacterModule,
     ILateInitialize
 {
     public BaseCharacter Owner { get; private set; }
 
     public bool IsActive { get; private set; }
 
+    public BaseCharacter Character => throw new NotImplementedException();
 
     public event Action<bool> Evnet_OnSetActive;
 

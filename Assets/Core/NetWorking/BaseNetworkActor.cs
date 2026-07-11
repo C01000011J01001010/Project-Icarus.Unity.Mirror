@@ -7,7 +7,7 @@ namespace Core.Network
 {
     // 멀티플레이 객체용 3계층 Leaf 기본 클래스
 
-    public abstract class BaseNetworkActor<TActorGroup> : NetWorkEventListener_Automatic, IActor<TActorGroup>
+    public abstract class BaseNetworkActor<TActorGroup> : NetworkEventListener_Automatic, IActor<TActorGroup>
         where TActorGroup : struct, Enum
     {
         public abstract TActorGroup GroupType { get; }

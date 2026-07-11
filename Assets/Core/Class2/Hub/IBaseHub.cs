@@ -12,5 +12,7 @@ namespace Core.Hub
 
         //// 허브 내부 객체들의 로직 정리가 끝난 후 호출 (선택적)
         //public abstract IEnumerator LateInitialize();
+
+        public void AwakeFromContext();
     }
 }

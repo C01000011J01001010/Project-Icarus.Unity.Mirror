@@ -13,9 +13,11 @@ namespace Core.EventBus.Example
         [SerializeField] private Image _hpSliderImage;
 
         // 🎯 컴파일러가 강제하는 이벤트 등록 함수
-        protected override void RegisterEvents()
+
+        private void OnEnable()
         {
             SubscribeTo<ExampleEvent_PlayerDamaged>(OnPlayerDamaged);
+
         }
 
         // 이벤트가 들어왔을 때 실행될 로직

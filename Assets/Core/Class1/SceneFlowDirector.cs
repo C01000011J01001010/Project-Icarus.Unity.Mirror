@@ -10,8 +10,7 @@ public sealed class SceneFlowDirector : BaseEventListener_Automatic
     private static Scene currentScene;
     private static AsyncOperation sceneChangeProgress;
 
-    // 2. Awake 대신 RegisterEvents를 오버라이드하여 씬 전환 요청 이벤트를 듣습니다.
-    protected override void RegisterEvents()
+    private void OnEnable()
     {
         // ProjectContext나 UI 버튼 등에서 씬 로드를 요청하면 여기서 듣고 실행합니다.
         SubscribeTo<SceneLoadRequestEvent>(OnSceneLoadRequest);
@@ -22,8 +21,9 @@ public sealed class SceneFlowDirector : BaseEventListener_Automatic
         SceneManager.activeSceneChanged += CALLBACK_ActiveSceneChanged;
     }
 
-    private void OnDestroy()
+    protected override void OnDisable()
     {
+        base.OnDisable();
         // 부모 클래스에서 EventBus 해제는 알아서 해주므로, SceneManager 이벤트만 수동 해제합니다.
         SceneManager.sceneLoaded -= CALLBACK_SceneLoaded;
         SceneManager.sceneUnloaded -= CALLBACK_SceneUnloaded;

@@ -32,7 +32,7 @@ public class PlayerInputSender : BaseNetworkActor<ControllerType>, IControllerSe
     public override void OnStopClient()
     {
         base.OnStopClient();
-        if (base.IsOwner && _inputProvider != null)
+        if (IsOwner && _inputProvider != null)
         {
             UpdateManager.UPDATE_OnController -= Tick;
         }
@@ -82,6 +82,7 @@ public class PlayerInputSender : BaseNetworkActor<ControllerType>, IControllerSe
         if(inputProvider != null)
         {
             _inputProvider = inputProvider;
+            UpdateManager.UPDATE_OnController -= Tick;
             UpdateManager.UPDATE_OnController += Tick;
         }
     }

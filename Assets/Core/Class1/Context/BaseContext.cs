@@ -28,20 +28,37 @@ namespace Core
 
         protected virtual void Awake()
         {
+            #region Singleton
             T thisInstance = this as T;
             if (!thisInstance.TryMakeSingleton(ref _instance))
             {
                 Destroy(gameObject);
                 return;
             }
+            #endregion
 
             managerHub = GetComponent<ManagerHub>();
             uiHub = GetComponent<UiHub>();
 
+            // 액터허브를 찾은 후 정렬
             var foundActorHubs = GetComponents<IActorHub>();
-
-            // 유저님이 제안하신 IPriority 규칙에 맞춰 우선순위(낮은 순) 정렬 후 리스트에 정착시킵니다.
             _actorHubs = foundActorHubs.OrderBy(hub => hub.Priority).ToList();
+
+            AwakeToss();
+        }
+
+        public void AwakeToss()
+        {
+            // 가장 처음 시작하는 Context가 책임지고 Hub를 Awake
+            // managerHub -> ActorHub -> uiHub
+            // ActorHub는 IPriority에 따라 정렬되어있음
+            // 나머지 leaf는 3번째 순서로 알아서 Awake됨
+            managerHub?.AwakeFromContext();
+            foreach (var hub in _actorHubs)
+            {
+                hub.AwakeFromContext();
+            }
+            uiHub.AwakeFromContext();
         }
 
         protected virtual void OnDestroy()

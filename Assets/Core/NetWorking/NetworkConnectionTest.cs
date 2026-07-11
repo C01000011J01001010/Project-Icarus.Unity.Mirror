@@ -1,3 +1,5 @@
+using Core.EventBus;
+using Core.NetWorking;
 using FishNet;
 using UnityEngine;
 
@@ -15,6 +17,8 @@ namespace Core.Network
                 // 서버와 로컬 클라이언트를 동시에 켭니다.
                 InstanceFinder.ServerManager.StartConnection();
                 InstanceFinder.ClientManager.StartConnection();
+
+                EventBus<ServerStartEvent>.Publish(new ServerStartEvent());
             }
 
             if (GUI.Button(new Rect(10, 70, 150, 50), "손님으로 접속 (Client)"))

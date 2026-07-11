@@ -4,9 +4,11 @@ using Core.EventBus;
 using Core.EventBus.Event;
 using System.Collections.Generic;
 using Core.Network;
+using FishNet.Component.Transforming;
 
 [RequireComponent(typeof(Rigidbody))]
-public class SharedActor : BaseNetworkActor<CharacterType>
+[RequireComponent(typeof(NetworkTransform))]
+public class SharedActor : BaseNetworkActor<CharacterType>, IFixedTickable
 {
     public override CharacterType GroupType => CharacterType.CapsuleMan;
 
@@ -29,16 +31,18 @@ public class SharedActor : BaseNetworkActor<CharacterType>
 
     public override void OnStartServer()
     {
-        base.OnStartServer();
+        ServerManager.Spawn(gameObject);
         // 서버가 켜질 때, 허공에 떠도는 '이동 이벤트'를 구독합니다.
         SubscribeTo<SharedActorMoveEvent>(OnSharedActorMove);
+        UpdateManager.UPDATE_Physics -= FixedTick;
+        UpdateManager.UPDATE_Physics += FixedTick;
     }
 
     public override void OnStopServer()
     {
-        base.OnStopServer();
         // 서버가 꺼질 때 안전하게 구독을 해제합니다.
         UnsubscribeAll();
+        UpdateManager.UPDATE_Physics -= FixedTick;
     }
 
     // 클라이언트들이 ServerRpc로 쏜 패킷이 EventBus를 타고 여기로 들어옵니다.
@@ -53,10 +57,10 @@ public class SharedActor : BaseNetworkActor<CharacterType>
     // ⚙️ 물리 연산 영역
     // =========================================================
 
-    private void FixedUpdate()
+    public void FixedTick(float fixedDeltaTime)
     {
         // 💡 핵심: 물리 연산은 "절대로" 클라이언트에서 실행되면 안 됩니다.
-        if (!base.IsServerInitialized) return;
+        if (!IsServerInitialized) return;
 
         Vector2 combinedInput = Vector2.zero;
 
@@ -69,13 +73,13 @@ public class SharedActor : BaseNetworkActor<CharacterType>
         // 누군가 밀고 있다면 힘을 가합니다.
         if (combinedInput != Vector2.zero)
         {
-            // 4명이 한 방향으로 밀면 4배 빨라지게 할지, 최대 속도를 제한할지는 기획에 따라 결정
-            // (여기서는 단순 합산으로 4명이 합심하면 엄청 빨라지는 구조입니다)
+            combinedInput = combinedInput.normalized; // 크기 1로 정규화
 
             // 2D 입력(Vector2)을 3D 월드의 XZ 평면 힘(Vector3)으로 변환
-            Vector3 force = new Vector3(combinedInput.x, 0, combinedInput.y) * moveSpeed;
-
-            _rigidbody.AddForce(force, ForceMode.Force);
+            Vector3 movement = new Vector3(combinedInput.x, 0, combinedInput.y) * moveSpeed;
+            
+            _rigidbody.AddForce(movement, ForceMode.Force);
+            // NetworkTransform이 객체 이동을 자동 판단후 클라이언트에 적용시킴
         }
     }
 }

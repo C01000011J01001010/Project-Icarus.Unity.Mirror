@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 using static Constants;
+using Core.Manager;
 
 // 매니저 클래스중 가장 마지막에 초기화
 public class TimeManager : BaseGlobalManager, IGlobalManager

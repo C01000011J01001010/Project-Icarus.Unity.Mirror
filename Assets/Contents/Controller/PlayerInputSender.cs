@@ -3,9 +3,8 @@ using FishNet.Object; // FishNet 필수 네임스페이스
 using Core.Interface;
 using Core.EventBus;
 using Core.EventBus.Event;
-using FishNet.Connection;
-using Core;
 using Core.Network;
+using Core.Manager;
 
 
 // 서버 전용: 클라이언트의 입력을 SharedActor에게 전달하는 이벤트

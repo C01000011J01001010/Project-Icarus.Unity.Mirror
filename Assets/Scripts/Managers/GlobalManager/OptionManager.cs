@@ -1,3 +1,4 @@
+using Core.EventBus;
 using System;
 using System.Collections;
 using UnityEngine;
@@ -57,6 +58,12 @@ public struct GraphicOptionValues
 }
 
 public delegate void DelegateGraphicOptionChanged(GraphicOptionValues value);
+
+public struct GraphicOptionChangedEvent : IEvent
+{
+    GraphicOptionValues optionValues;
+    public GraphicOptionChangedEvent(GraphicOptionValues optionValues) { this.optionValues = optionValues; }
+}
 
 public class OptionManager : BaseGlobalManager, IGlobalManager
 {

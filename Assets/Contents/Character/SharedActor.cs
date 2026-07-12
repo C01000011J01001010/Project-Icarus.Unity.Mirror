@@ -24,6 +24,19 @@ public class SharedActor : BaseNetworkActor<CharacterType>, IFixedTickable
         _rigidbody = GetComponent<Rigidbody>();
     }
 
+    public override void OnStartClient()
+    {
+        base.OnStartClient();
+
+        // 💡 핵심: 내가 방장(호스트/서버)이 아닌 순수 클라이언트라면?
+        if (!base.IsServerInitialized)
+        {
+            // 클라이언트 쪽의 물리 엔진(중력, 관성 등)을 완전히 꺼버립니다.
+            // 이제 클라이언트는 제멋대로 움직이지 않고, 오직 서버가 보내주는 위치로만 이동합니다!
+            _rigidbody.isKinematic = true;
+        }
+    }
+
     public override void OnStartServer()
     {
         ServerManager.Spawn(gameObject);

@@ -111,7 +111,7 @@ MonoBehaviour:
   _initializeOrder: 0
   _preventDespawnOnDisconnect: 0
   _defaultDespawnType: 0
-  _initializedTimestamp: -8584177398965310577
+  _initializedTimestamp: -8584177389255508980
   _localLevelOfDetailCalculationType: 0
   _useLevelOfDetail: 0
   _useRootLevelOfDetail: 1
@@ -228,8 +228,8 @@ MonoBehaviour:
   _addedNetworkObject: {fileID: 1421060152581575441}
   _networkObjectCache: {fileID: 1421060152581575441}
   moveSpeed: 20
-  flapForce: 10
-  flapTorque: 0.5
+  flapForce: 8
+  flapTorque: 0.6
 --- !u!114 &923561929043110711
 MonoBehaviour:
   m_ObjectHideFlags: 0

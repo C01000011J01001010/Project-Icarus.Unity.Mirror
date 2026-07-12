@@ -66,7 +66,7 @@ public class SharedActor : BaseNetworkActor<CharacterType>, IFixedTickable
         if (!IsServerInitialized) return;
 
         // 1. 🚀 위로 향하는 순간적인 힘 가하기 (Impulse 모드는 질량을 고려해 툭 쳐줍니다)
-        _rigidbody.AddForce(Vector3.up * flapForce, ForceMode.Impulse);
+        _rigidbody.AddForce(transform.up * flapForce, ForceMode.Impulse);
 
         // 2. 🔄 짝수/홀수 ClientId에 따른 토크(회전력) 방향 계산
         // 💡 Unity 3D 좌표계 규칙 (Y축 기준)

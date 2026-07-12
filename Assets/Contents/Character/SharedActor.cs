@@ -16,6 +16,8 @@ public class SharedActor : BaseNetworkActor<CharacterType>, IFixedTickable
     [Header("🪽 날갯짓 물리 세팅")]
     public float flapForce = 8f;   // 위로 솟구치는 순간적인 힘 (Impulse)
     public float flapTorque = 5f;  // 순간적인 회전력 (Impulse)
+    public float timeDelay = 2f;
+    private float timeCount;
 
     private Dictionary<int, Vector2> _clientInputs = new Dictionary<int, Vector2>();
 
@@ -78,12 +80,21 @@ public class SharedActor : BaseNetworkActor<CharacterType>, IFixedTickable
 
         // 3. 회전력 적용 (Impulse)
         _rigidbody.AddTorque(appliedTorque, ForceMode.Impulse);
+
+        timeCount = 0;
     }
 
     public void FixedTick(float fixedDeltaTime)
     {
         if (!IsServerInitialized) return;
+        Move(fixedDeltaTime);
 
+        StabilizeRotation(fixedDeltaTime);
+
+    }
+
+    public void Move(float fixedDeltaTime)
+    {
         Vector2 combinedInput = Vector2.zero;
         foreach (var input in _clientInputs.Values)
         {
@@ -96,5 +107,30 @@ public class SharedActor : BaseNetworkActor<CharacterType>, IFixedTickable
             Vector3 movement = new Vector3(combinedInput.x, 0, combinedInput.y) * moveSpeed;
             _rigidbody.AddForce(movement, ForceMode.Force); // 지속적인 이동은 Force 모드
         }
+    }
+
+    [Header("⚖️ 균형(오뚝이) 보정 세팅")]
+    public float pGain = 20f;  // 복원력 (얼마나 강력하게 돌아올 것인가)
+    public float dGain = 5f;   // 제동력 (얼마나 빠르게 멈출 것인가)
+
+    private void StabilizeRotation(float fixedDeltaTime)
+    {
+        if(timeCount <= timeDelay)
+        {
+            timeCount += fixedDeltaTime;
+            return;
+        }
+        
+
+        // 1. 회전 오차 계산 (현재 캐릭터 up vs 월드 up)
+        Vector3 error = Vector3.Cross(transform.up, Vector3.up);
+
+        // 2. PD 제어 로직
+        // (오차 * P값) - (현재 각속도 * D값)
+        // - 오차가 클수록 강력하게 회전
+        // - 회전 속도가 빠를수록 반대 방향으로 브레이크
+        Vector3 torque = (error * pGain) - (_rigidbody.angularVelocity * dGain);
+
+        _rigidbody.AddTorque(torque, ForceMode.Force);
     }
 }

@@ -21,6 +21,16 @@ public struct SharedActorMoveEvent : IEvent
     }
 }
 
+public struct SharedActorFlapEvent : IEvent
+{
+    public int ClientId; // 누가 날개를 펄럭였는가?
+
+    public SharedActorFlapEvent(int clientId)
+    {
+        ClientId = clientId;
+    }
+}
+
 public class PlayerInputSender : BaseNetworkActor<ControllerType>, IControllerSetter, ITickable
 {
     private IPlayerInputProvider _inputProvider;
@@ -35,6 +45,7 @@ public class PlayerInputSender : BaseNetworkActor<ControllerType>, IControllerSe
         if (IsOwner && _inputProvider != null)
         {
             UpdateManager.UPDATE_OnController -= Tick;
+            EventBus<OnWingFlappedEvent>.Unsubscribe(OnLocalFlapPerformed);
         }
     }
     public override void OnStartClient()
@@ -45,6 +56,7 @@ public class PlayerInputSender : BaseNetworkActor<ControllerType>, IControllerSe
         if (IsOwner)
         {
             EventBus<ControllerSettingEvent>.Publish(new ControllerSettingEvent(this));
+            EventBus<OnWingFlappedEvent>.Subscribe(OnLocalFlapPerformed);
         }
     }
 
@@ -65,6 +77,11 @@ public class PlayerInputSender : BaseNetworkActor<ControllerType>, IControllerSe
         ServerCmdSendMove(currentMove);
     }
 
+    private void OnLocalFlapPerformed(OnWingFlappedEvent evt)
+    {
+        ServerRpcFlap();
+    }
+
     // =========================================================
     // 🌐 SERVER 영역 (호스트/서버에서만 실행되는 함수)
     // =========================================================
@@ -75,6 +92,13 @@ public class PlayerInputSender : BaseNetworkActor<ControllerType>, IControllerSe
         // 💡 핵심 4: 클라이언트가 보낸 입력을 서버 공간에 도착하자마자 EventBus로 방송합니다!
         // base.OwnerId는 FishNet이 보장하는 클라이언트 고유 식별 번호입니다.
         EventBus<SharedActorMoveEvent>.Publish(new SharedActorMoveEvent(OwnerId, moveInput));
+    }
+
+    [ServerRpc]
+    private void ServerRpcFlap()
+    {
+        // 서버: "오케이, X번 클라이언트가 날갯짓을 했군."
+        EventBus<SharedActorFlapEvent>.Publish(new SharedActorFlapEvent(OwnerId));
     }
 
     public void SetInputProvider(IPlayerInputProvider inputProvider)

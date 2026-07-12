@@ -14,8 +14,15 @@ public enum InputMapType
     Player,
 }
 
+public struct OnWingFlappedEvent : IEvent
+{
+
+}
+
 public class UserInputManager : BaseInputManager<UserInputActions>, IManager, IPlayerInputProvider
 {
+    UserInputActions.PlayerActions Player;
+    UserInputActions.UIActions Ui;
     #region Polling
     public Vector2 Move
     { 
@@ -45,19 +52,43 @@ public class UserInputManager : BaseInputManager<UserInputActions>, IManager, IP
     public override void Exit()
     {
         base.Exit();
+
         EventBus<ControllerSettingEvent>.Unsubscribe(OnControllerCall);
+        PlayerInputUnsubscribe();
     }
 
     public override IEnumerator Initialize(IModuleHub hub)
     {
         yield return base.Initialize(hub);
+        Player = inputAction.Player;
+        Ui = inputAction.UI;
+
         EventBus<ControllerSettingEvent>.Subscribe(OnControllerCall);
+        PlayerInputSubScribe();
+
+        SwitchMap(InputMapType.Player);
     }
 
-    private void OnUseItemInput(InputAction.CallbackContext context)
+    private void PlayerInputSubScribe()
     {
-
+        PlayerInputUnsubscribe();
+        Player.Flap.started += OnWingFalpped;
     }
+
+    private void PlayerInputUnsubscribe()
+    {
+        Player.Flap.started -= OnWingFalpped;
+    }
+
+    private void OnWingFalpped(InputAction.CallbackContext context)
+    {
+        EventBus<OnWingFlappedEvent>.Publish(new OnWingFlappedEvent());
+    }
+
+    //private void OnUseItemInput(InputAction.CallbackContext context)
+    //{
+
+    //}
 
     public void SwitchMap(InputMapType mapType)
     {

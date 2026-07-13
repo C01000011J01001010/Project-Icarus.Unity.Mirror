@@ -8,11 +8,13 @@ using Core.EventBus;
 
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(NetworkTransform))]
-public class SharedActor : BaseNetworkActor<CharacterType>, IFixedTickable
+public class SharedActor : BaseActorNetworked<CharacterType>, IFixedTickable
 {
     public override CharacterType GroupType => CharacterType.CapsuleMan;
 
     public FixedTickGroup FixedTickGroup => FixedTickGroup.Physics;
+
+    protected override NetworkTickTarget networkTickTarget => NetworkTickTarget.ServerOnly;
 
     private Rigidbody _rigidbody;
     public float moveSpeed = 50f;

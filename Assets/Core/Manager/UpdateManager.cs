@@ -75,7 +75,7 @@ namespace Core.Manager
     }
     #endregion
 
-    public class UpdateManager : BaseManager
+    public sealed class UpdateManager : BaseManager
     {
         #region Runner
         private interface IRunner { void Run(float dt); }
@@ -177,11 +177,37 @@ namespace Core.Manager
         private LateTickRunner[] _lateTickRunners;
         private FixedTickRunner[] _fixedTickRunners;
 
-        protected void Awake()
+        // 글로벌 틱 가동 여부 플래그
+        private bool _isTickingAllowed = false;
+
+        // SceneContext가 초기화를 완료한 후 호출할 진입점
+        public void StartTicking()
+        {
+            _isTickingAllowed = true;
+            Debug.Log("[UpdateManager] 글로벌 업데이트 루프가 가동되었습니다.");
+        }
+
+        public void StopTicking()
+        {
+            _isTickingAllowed = false;
+        }
+
+        private void OnDestroy()
+        {
+            EventBus<R_TickEvent>.Unsubscribe(OnRegisterTick);
+            EventBus<R_LateTickEvent>.Unsubscribe(OnRegisterLateTick);
+            EventBus<R_FixedTickEvent>.Unsubscribe(OnRegisterFixedTick);
+        }
+
+        private void Awake()
         {
             _tickRunners = CreateRunners<TickGroup, TickRunner>();
             _lateTickRunners = CreateRunners<LateTickGroup, LateTickRunner>();
             _fixedTickRunners = CreateRunners<FixedTickGroup, FixedTickRunner>();
+
+            EventBus<R_TickEvent>.Subscribe(OnRegisterTick);
+            EventBus<R_LateTickEvent>.Subscribe(OnRegisterLateTick);
+            EventBus<R_FixedTickEvent>.Subscribe(OnRegisterFixedTick);
         }
 
         private TRunner[] CreateRunners<TGroup, TRunner>()
@@ -197,22 +223,6 @@ namespace Core.Manager
             for (int i = 1; i < groupCount; i++) runners[i] = new TRunner();
 
             return runners;
-        }
-
-        protected override void OnEnable()
-        {
-            base.OnEnable();
-            EventBus<R_TickEvent>.Subscribe(OnRegisterTick);
-            EventBus<R_LateTickEvent>.Subscribe(OnRegisterLateTick);
-            EventBus<R_FixedTickEvent>.Subscribe(OnRegisterFixedTick);
-        }
-
-        protected override void OnDisable()
-        {
-            base.OnDisable();
-            EventBus<R_TickEvent>.Unsubscribe(OnRegisterTick);
-            EventBus<R_LateTickEvent>.Unsubscribe(OnRegisterLateTick);
-            EventBus<R_FixedTickEvent>.Unsubscribe(OnRegisterFixedTick);
         }
 
         // 이벤트 수신 시 해당 그룹의 인덱스를 찾아 Runner에게 위임
@@ -244,16 +254,19 @@ namespace Core.Manager
 
         private void Update()
         {
-            Run(_tickRunners, Time.deltaTime);
+            if(_isTickingAllowed)
+                Run(_tickRunners, Time.deltaTime);
         }
         private void LateUpdate()
         {
-            Run(_lateTickRunners, Time.deltaTime);
+            if (_isTickingAllowed)
+                Run(_lateTickRunners, Time.deltaTime);
         }
 
         private void FixedUpdate()
         {
-            Run(_fixedTickRunners, Time.fixedDeltaTime);
+            if (_isTickingAllowed)
+                Run(_fixedTickRunners, Time.fixedDeltaTime);
         }
 
         private void Run(IRunner[] runner, float dt)

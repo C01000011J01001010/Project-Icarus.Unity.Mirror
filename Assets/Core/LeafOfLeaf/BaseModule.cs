@@ -12,13 +12,13 @@ public abstract class BaseModule<TOnwer> : IModule
         throw new System.NotImplementedException();
     }
 
-    public IEnumerator Initialize(IModuleHub owner)
+    public virtual IEnumerator Initialize(IModuleHub owner)
     {
         Onwer = owner.AsOrThrow<TOnwer>();
         yield break;
     }
 
-    public void SetActive(bool active)
+    public virtual void SetActive(bool active)
     {
         IsActive = active;
     }

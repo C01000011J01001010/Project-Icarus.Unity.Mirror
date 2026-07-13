@@ -30,13 +30,15 @@ public struct SharedActorFlapEvent : IEvent
     }
 }
 
-public class PlayerInputSender : BaseNetworkActor<ControllerType>, IControllerSetter, ITickable
+public class PlayerInputSender : BaseActorNetworked<ControllerType>, IControllerSetter, ITickable
 {
     private IPlayerInputProvider _inputProvider;
 
     public override ControllerType GroupType => ControllerType.InputSender;
 
-    public TickGroup TickGroup => throw new System.NotImplementedException();
+    protected override NetworkTickTarget networkTickTarget => NetworkTickTarget.OwnerOnly;
+    public TickGroup TickGroup => TickGroup.Controller;
+
 
     private Vector2 _lastSentMove;
 
@@ -45,7 +47,7 @@ public class PlayerInputSender : BaseNetworkActor<ControllerType>, IControllerSe
         base.OnStopClient();
         if (IsOwner && _inputProvider != null)
         {
-            EventBus<R_TickEvent>.Publish(new R_TickEvent(this, TickGroup.Controller, false));
+            //EventBus<R_TickEvent>.Publish(new R_TickEvent(this, TickGroup.Controller, false));
             EventBus<OnWingFlappedEvent>.Unsubscribe(OnLocalFlapPerformed);
         }
     }
@@ -58,17 +60,18 @@ public class PlayerInputSender : BaseNetworkActor<ControllerType>, IControllerSe
         {
             EventBus<ControllerSettingEvent>.Publish(new ControllerSettingEvent(this));
 
-            if(_inputProvider != null)
-            {
-                EventBus<R_TickEvent>.Publish(new R_TickEvent(this, TickGroup.Controller, true));
-            }
+            //if(_inputProvider != null)
+            //{
+            //    EventBus<R_TickEvent>.Publish(new R_TickEvent(this, TickGroup.Controller, true));
+            //}
             EventBus<OnWingFlappedEvent>.Subscribe(OnLocalFlapPerformed);
         }
     }
 
     public void Tick(float deltaTime)
     {
-        InputMove();
+        if(_inputProvider != null)
+            InputMove();
     }
 
     private void InputMove()

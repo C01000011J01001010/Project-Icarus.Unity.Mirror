@@ -1,33 +1,37 @@
 ﻿using Core.EventBus;
 using Core.Update;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace Core.Manager
 {
     #region Tcik구별을 위한 enum
-    // enum 순서를 Update 순서에 사용
+    // None을 제외한 enum 순서를 Update 순서에 사용
     public enum TickGroup 
     { 
+        None,
         Initial, 
-        OnController, 
-        OnCharacter, 
+        Controller, 
+        Character, 
         Object 
     }
     public enum LateTickGroup 
     { 
+        None,
         Camera,
         Post 
     }
     public enum FixedTickGroup 
     { 
+        None,
         Physics 
     }
     #endregion
 
     #region Tick 등록 이벤트
-    public struct RegisterTickEvent : IEvent
+    public struct R_TickEvent : IEvent
     {
         public ITickable Target;
         /// <summary>
@@ -39,9 +43,9 @@ namespace Core.Manager
         /// <para>false: 구독취소</para> 
         /// </summary>
         public bool IsAdd;
-        public RegisterTickEvent(ITickable target, TickGroup group, bool isAdd) { Target = target; Group = group; IsAdd = isAdd; }
+        public R_TickEvent(ITickable target, TickGroup group, bool isAdd) { Target = target; Group = group; IsAdd = isAdd; }
     }
-    public struct RegisterLateTickEvent : IEvent
+    public struct R_LateTickEvent : IEvent
     {
         public ILateTickable Target;
         /// <summary>
@@ -53,9 +57,9 @@ namespace Core.Manager
         /// <para>false: 구독취소</para> 
         /// </summary>
         public bool IsAdd;
-        public RegisterLateTickEvent(ILateTickable target, LateTickGroup group, bool isAdd) { Target = target; Group = group; IsAdd = isAdd; }
+        public R_LateTickEvent(ILateTickable target, LateTickGroup group, bool isAdd) { Target = target; Group = group; IsAdd = isAdd; }
     }
-    public struct RegisterFixedTickEvent : IEvent
+    public struct R_FixedTickEvent : IEvent
     {
         public IFixedTickable Target;
         /// <summary>
@@ -67,14 +71,15 @@ namespace Core.Manager
         /// <para>false: 구독취소</para> 
         /// </summary>
         public bool IsAdd;
-        public RegisterFixedTickEvent(IFixedTickable target, FixedTickGroup group, bool isAdd) { Target = target; Group = group; IsAdd = isAdd; }
+        public R_FixedTickEvent(IFixedTickable target, FixedTickGroup group, bool isAdd) { Target = target; Group = group; IsAdd = isAdd; }
     }
     #endregion
 
-    public class UpdateManager : MonoBehaviour
+    public class UpdateManager : BaseManager
     {
         #region Runner
-        private abstract class BaseRunner<TInterface>
+        private interface IRunner { void Run(float dt); }
+        private abstract class BaseRunner<TInterface> : IRunner
         {
             protected readonly HashSet<TInterface> _active = new HashSet<TInterface>(100);
             private readonly List<TInterface> _pendingAdds = new List<TInterface>(20);
@@ -98,6 +103,25 @@ namespace Core.Manager
 
             protected abstract void Execute(float dt);
 
+            protected bool TryHandleInvalidTarget(TInterface target)
+            {
+                if (target is UnityEngine.Object unityObj && unityObj == null)
+                {
+                    // 💥 개발 중에 발생하면 반드시 고쳐야 할 버그입니다!
+                    Debug.LogError($"[UpdateManager] 시스템 오류: 틱 리스트에 Destroy된 객체가 남아있습니다.");
+                    _pendingRemoves.Add(target);
+                    return true;
+                }
+                // 2. 일반 C# 객체인 경우
+                else if (target == null)
+                {
+                    Debug.LogError($"[UpdateManager] 시스템 오류: 틱 리스트에 Null 객체가 있습니다.");
+                    _pendingRemoves.Add(target);
+                    return true;
+                }
+                return false;
+            }
+
             public void Run(float dt)
             {
                 _isUpdating = true;
@@ -119,7 +143,8 @@ namespace Core.Manager
             {
                 foreach (var target in _active)
                 {
-                    if (target != null) target.Tick(dt);
+                    if(!TryHandleInvalidTarget(target))
+                        target.Tick(dt);
                 }
             }
         }
@@ -129,7 +154,8 @@ namespace Core.Manager
             {
                 foreach (var target in _active)
                 {
-                    if (target != null) target.FixedTick(dt);
+                    if (!TryHandleInvalidTarget(target))
+                        target.FixedTick(dt);
                 }
             }
         }
@@ -138,7 +164,10 @@ namespace Core.Manager
             protected override void Execute(float dt)
             {
                 foreach (var target in _active)
-                    if (target != null) target.LateTick(dt);
+                {
+                    if (!TryHandleInvalidTarget(target)) 
+                        target.LateTick(dt);
+                }
             }
         }
         #endregion
@@ -148,7 +177,7 @@ namespace Core.Manager
         private LateTickRunner[] _lateTickRunners;
         private FixedTickRunner[] _fixedTickRunners;
 
-        private void Awake()
+        protected void Awake()
         {
             _tickRunners = CreateRunners<TickGroup, TickRunner, ITickable>();
             _lateTickRunners = CreateRunners<LateTickGroup, LateTickRunner, ILateTickable>();
@@ -161,33 +190,53 @@ namespace Core.Manager
         {
             int groupCount = Enum.GetNames(typeof(TGroup)).Length;
 
-            // 러너 수만큼 배열 할당
             TRunner[] runners = new TRunner[groupCount];
 
-            // 각 러너 생성
-            for (int i = 0; i < groupCount; i++) runners[i] = new TRunner();
+            // None을 제외한 각 러너 생성
+            // None은 배열의 한 공간은 차지하지만 실제 객체를 만들지는 않음
+            for (int i = 1; i < groupCount; i++) runners[i] = new TRunner();
 
             return runners;
         }
 
-        private void OnEnable()
+        protected override void OnEnable()
         {
-            EventBus<RegisterTickEvent>.Subscribe(OnRegisterTick);
-            EventBus<RegisterFixedTickEvent>.Subscribe(OnRegisterFixedTick);
+            base.OnEnable();
+            EventBus<R_TickEvent>.Subscribe(OnRegisterTick);
+            EventBus<R_LateTickEvent>.Subscribe(OnRegisterLateTick);
+            EventBus<R_FixedTickEvent>.Subscribe(OnRegisterFixedTick);
         }
 
-        private void OnDisable()
+        protected override void OnDisable()
         {
-            EventBus<RegisterTickEvent>.Unsubscribe(OnRegisterTick);
-            EventBus<RegisterFixedTickEvent>.Unsubscribe(OnRegisterFixedTick);
+            base.OnDisable();
+            EventBus<R_TickEvent>.Unsubscribe(OnRegisterTick);
+            EventBus<R_LateTickEvent>.Unsubscribe(OnRegisterLateTick);
+            EventBus<R_FixedTickEvent>.Unsubscribe(OnRegisterFixedTick);
         }
 
         // 이벤트 수신 시 해당 그룹의 인덱스를 찾아 Runner에게 위임
-        private void OnRegisterTick(RegisterTickEvent evt)
-            => _tickRunners[(int)evt.Group].Register(evt.Target, evt.IsAdd);
+        private void OnRegisterTick(R_TickEvent evt)
+        {
+            // None(0)이면 배열에 접근하기 전에 입구 컷!
+            if (evt.Group == TickGroup.None) return;
 
-        private void OnRegisterFixedTick(RegisterFixedTickEvent evt)
-            => _fixedTickRunners[(int)evt.Group].Register(evt.Target, evt.IsAdd);
+            _tickRunners[(int)evt.Group].Register(evt.Target, evt.IsAdd);
+        }
+
+        private void OnRegisterLateTick(R_LateTickEvent evt)
+        {
+            if (evt.Group == LateTickGroup.None) return;
+
+            _lateTickRunners[(int)evt.Group].Register(evt.Target, evt.IsAdd);
+        }
+
+        private void OnRegisterFixedTick(R_FixedTickEvent evt)
+        {
+            if (evt.Group == FixedTickGroup.None) return;
+
+            _fixedTickRunners[(int)evt.Group].Register(evt.Target, evt.IsAdd);
+        }
 
         // ==========================================
         // 유니티 생명주기 제어부 (순서 보장)
@@ -195,23 +244,25 @@ namespace Core.Manager
 
         private void Update()
         {
-            float dt = Time.deltaTime;
-            for (int i = 0; i < _tickRunners.Length; i++)
-                _tickRunners[i].Run(dt);
+            Run(_tickRunners, Time.deltaTime);
         }
-
         private void LateUpdate()
         {
-            float dt = Time.deltaTime;
-            for (int i = 0; i < _lateTickRunners.Length; i++)
-                _lateTickRunners[i].Run(dt);
+            Run(_lateTickRunners, Time.deltaTime);
         }
 
         private void FixedUpdate()
         {
-            float dt = Time.fixedDeltaTime;
-            for (int i = 0; i < _fixedTickRunners.Length; i++)
-                _fixedTickRunners[i].Run(dt);
+            Run(_fixedTickRunners, Time.fixedDeltaTime);
+        }
+
+        private void Run(IRunner[] runner, float dt)
+        {
+            // Runner가 생성되지 않은 None을 제외하고 순회
+            for (int i = 1; i < runner.Length; i++)
+            {
+                runner[i].Run(dt);
+            }
         }
     }
 }

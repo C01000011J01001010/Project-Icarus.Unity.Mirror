@@ -1,12 +1,14 @@
-using Core;
+using Core.Manager;
 using System.Collections;
 using Unity.Cinemachine;
 using UnityEngine;
 
 [RequireComponent(typeof(CinemachineCamera))]
-public abstract class VirtualCamera : MonoBehaviour, ITickable//, IInitializable
+public abstract class VirtualCamera : MonoBehaviour//, IInitializable
 {
     protected CinemachineCamera cinemachineCamera;
+
+    public LateTickGroup LateTickGroup => throw new System.NotImplementedException();
 
     public virtual void Exit()
     {
@@ -67,5 +69,5 @@ public abstract class VirtualCamera : MonoBehaviour, ITickable//, IInitializable
     /// 자식 클래스에서 상황별 업데이트 로직
     /// CameraManager에서 호출
     /// </summary>
-    public virtual void Tick(float deltaTime) { }
+    public virtual void LateTick(float dt) { }
 }

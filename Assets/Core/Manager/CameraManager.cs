@@ -1,5 +1,6 @@
 using Core;
 using Core.Manager;
+using Core.Update;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +8,7 @@ using UnityEngine;
 
 namespace Core.Manager
 {
-    public class CameraManager : BaseManager, ITickable//, IWorldInitializable
+    public class CameraManager : BaseManager, ILateTickable//, IWorldInitializable
     {
         [SerializeField] int _priority = -1;
         public int Priority => _priority;
@@ -17,13 +18,19 @@ namespace Core.Manager
         private List<VirtualCamera> _virtualCameras;
         private VirtualCamera _currentCamera;
 
+        // ILateTickable 구현
+        public LateTickGroup LateTickGroup => LateTickGroup.Camera;
+
+        public void LateTick(float dt)
+        {
+            _currentCamera?.LateTick(dt);
+        }
 
         public override void Exit()
         {
             OptionManager.OnGraphicOptionChanged -= OptionChanged;
-            UpdateManager.UPDATE_Camera -= Tick;
         }
-
+        
         public override IEnumerator Initialize(IModuleHub hub)
         {
             OptionManager.OnGraphicOptionChanged -= OptionChanged;
@@ -40,9 +47,6 @@ namespace Core.Manager
 
             SwitchCamera<ThirdPersonCamera>();
             ResetCamera();
-
-            UpdateManager.UPDATE_Camera -= Tick;
-            UpdateManager.UPDATE_Camera += Tick;
         }
 
         /// <summary>
@@ -95,11 +99,6 @@ namespace Core.Manager
         public void OptionChanged(GraphicOptionValues value)
         {
             _currentCamera.SetVerticalFOV(value.fileldOfView);
-        }
-
-        public void Tick(float deltaTime)
-        {
-            _currentCamera?.Tick(deltaTime);
         }
     }
 }

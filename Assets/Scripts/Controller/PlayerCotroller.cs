@@ -8,8 +8,11 @@ using Core.Manager;
 
 
 
-public class PlayerCotroller : BaseActor<ControllerType>, IControllerSetter
+public class PlayerCotroller : BaseActor<ControllerType>, IControllerSetter, ITickable
 {
+    public TickGroup TickGroup => TickGroup.Controller;
+
+
     IPlayerInputProvider _inputProvider;
 
     private UserInputManager inputManager;
@@ -27,20 +30,10 @@ public class PlayerCotroller : BaseActor<ControllerType>, IControllerSetter
 
     public override ControllerType GroupType => ControllerType.PlayerController;
 
+    
+
     //public static event System.Action<float/*마우스 휠 스크롤*/> OnQuickSlotScrollInput;
 
-    protected override void OnEnable()
-    {
-        base.OnEnable();
-        UpdateManager.UPDATE_OnController += Tick;
-        
-    }
-
-    protected override void OnDisable()
-    {
-        base.OnDisable();
-        UpdateManager.UPDATE_OnController -= Tick;
-    }
 
     public void Exit()
     {
@@ -93,7 +86,7 @@ public class PlayerCotroller : BaseActor<ControllerType>, IControllerSetter
         }
     }
 
-    private void Tick(float deltaTime)
+    public void Tick(float deltaTime)
     {
         InputMove();
         //InputSprint();
@@ -123,7 +116,6 @@ public class PlayerCotroller : BaseActor<ControllerType>, IControllerSetter
         }
     }
     #endregion
-
 
     #region Handle Ui
     public void HandleUI_QuickSlotClicked(int index)

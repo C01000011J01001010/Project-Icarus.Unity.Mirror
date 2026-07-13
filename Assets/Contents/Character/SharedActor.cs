@@ -4,12 +4,15 @@ using FishNet.Component.Transforming;
 using FishNet.Managing.Server;
 using System.Collections.Generic;
 using UnityEngine;
+using Core.EventBus;
 
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(NetworkTransform))]
 public class SharedActor : BaseNetworkActor<CharacterType>, IFixedTickable
 {
     public override CharacterType GroupType => CharacterType.CapsuleMan;
+
+    public FixedTickGroup FixedTickGroup => FixedTickGroup.Physics;
 
     private Rigidbody _rigidbody;
     public float moveSpeed = 50f;
@@ -48,14 +51,13 @@ public class SharedActor : BaseNetworkActor<CharacterType>, IFixedTickable
         SubscribeTo<SharedActorMoveEvent>(OnSharedActorMove);
         SubscribeTo<SharedActorFlapEvent>(OnSharedActorFlap);
 
-        UpdateManager.UPDATE_Physics -= FixedTick;
-        UpdateManager.UPDATE_Physics += FixedTick;
+        EventBus<R_FixedTickEvent>.Publish(new R_FixedTickEvent(this, FixedTickGroup.Physics, true));
     }
 
     public override void OnStopServer()
     {
         UnsubscribeAll();
-        UpdateManager.UPDATE_Physics -= FixedTick;
+        EventBus<R_FixedTickEvent>.Publish(new R_FixedTickEvent(this, FixedTickGroup.Physics, false));
     }
 
     private void OnSharedActorMove(SharedActorMoveEvent evt)

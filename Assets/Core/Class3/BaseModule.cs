@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Core
 {
-    public abstract class BaseModule : MonoBehaviour, IModule
+    public abstract class BaseModule : BaseLeaf, IModule
     {
         private bool isActive;
         public bool IsActive => isActive;

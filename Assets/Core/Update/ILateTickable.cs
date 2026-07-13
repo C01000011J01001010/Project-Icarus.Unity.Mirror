@@ -1,8 +1,13 @@
-﻿using System;
+﻿using Core.Manager;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Core.Update
 {
-    public interface ILateTickable { void LateTick(float dt); }
+    public interface ILateTickable 
+    { 
+        LateTickGroup LateTickGroup { get; }
+        void LateTick(float dt); 
+    }
 }

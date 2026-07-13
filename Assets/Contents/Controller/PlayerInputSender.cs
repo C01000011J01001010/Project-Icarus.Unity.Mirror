@@ -36,6 +36,8 @@ public class PlayerInputSender : BaseNetworkActor<ControllerType>, IControllerSe
 
     public override ControllerType GroupType => ControllerType.InputSender;
 
+    public TickGroup TickGroup => throw new System.NotImplementedException();
+
     private Vector2 _lastSentMove;
 
     public override void OnStopClient()
@@ -43,7 +45,7 @@ public class PlayerInputSender : BaseNetworkActor<ControllerType>, IControllerSe
         base.OnStopClient();
         if (IsOwner && _inputProvider != null)
         {
-            UpdateManager.UPDATE_OnController -= Tick;
+            EventBus<R_TickEvent>.Publish(new R_TickEvent(this, TickGroup.Controller, false));
             EventBus<OnWingFlappedEvent>.Unsubscribe(OnLocalFlapPerformed);
         }
     }
@@ -55,6 +57,11 @@ public class PlayerInputSender : BaseNetworkActor<ControllerType>, IControllerSe
         if (IsOwner)
         {
             EventBus<ControllerSettingEvent>.Publish(new ControllerSettingEvent(this));
+
+            if(_inputProvider != null)
+            {
+                EventBus<R_TickEvent>.Publish(new R_TickEvent(this, TickGroup.Controller, true));
+            }
             EventBus<OnWingFlappedEvent>.Subscribe(OnLocalFlapPerformed);
         }
     }
@@ -105,8 +112,6 @@ public class PlayerInputSender : BaseNetworkActor<ControllerType>, IControllerSe
         if(inputProvider != null)
         {
             _inputProvider = inputProvider;
-            UpdateManager.UPDATE_OnController -= Tick;
-            UpdateManager.UPDATE_OnController += Tick;
         }
     }
 

@@ -5,7 +5,7 @@ using static Constants;
 using Core.Manager;
 
 // 매니저 클래스중 가장 마지막에 초기화
-public class TimeManager : BaseGlobalManager, IGlobalManager
+public class TimeManager : BaseGlobalManager, IGlobalManager, ITickable
 {
     // 현실 24분(1440초) = 게임 내 하루
 
@@ -20,6 +20,8 @@ public class TimeManager : BaseGlobalManager, IGlobalManager
     /// </summary>
     public double TotalGameSeconds { get; private set; }
 
+    public TickGroup TickGroup => TickGroup.Initial;
+
     public event System.Action<int/*분*/> Event_OnGameMinutesPassed; // 현실 1초마다 발생
     public event System.Action<int/*분*/> Event_OnGameHoursPassed;   // 현실 1분마다 발생
 
@@ -28,16 +30,16 @@ public class TimeManager : BaseGlobalManager, IGlobalManager
 
     
 
-    public void Exit()
-    {
-        UpdateManager.UPDATE_Initial -= OnUpdate;
-    }
+    //public void Exit()
+    //{
+    //    UpdateManager.UPDATE_Initial -= OnUpdate;
+    //}
 
-    public IEnumerator Initialize()
-    {
-        UpdateManager.UPDATE_Initial += OnUpdate;
-        yield break;
-    }
+    //public IEnumerator Initialize()
+    //{
+    //    UpdateManager.UPDATE_Initial += OnUpdate;
+    //    yield break;
+    //}
 
     /// <summary>
     /// 타이틀 씬에서 플레이어 선택후 씬 전환시 실행
@@ -60,11 +62,6 @@ public class TimeManager : BaseGlobalManager, IGlobalManager
     {
         // TODO: 마지막 플레이 했던 날짜, 시간 데이터 로드
         return DateTime.UtcNow;
-    }
-
-    private void OnUpdate(float deltaTime)
-    {
-        UpdateTime(Time.unscaledDeltaTime);
     }
 
     private void OnPlayerSleep()
@@ -103,15 +100,8 @@ public class TimeManager : BaseGlobalManager, IGlobalManager
         DayLength = dayLength;
     }
 
-    //public IEnumerator EventLoopbyTime(int loopCount, float LoopIntervel, System.Action Event)
-    //{
-    //    int count = 0;
-    //    Debug.Log($"{loopCount}번의 Event({Event.Method.Name})루프 시작");
-    //    while (count < loopCount)
-    //    {
-    //        count++;
-    //        yield return new WaitForSecondsRealtime(LoopIntervel);
-    //        Event?.Invoke();
-    //    }
-    //}
+    public void Tick(float deltaTime)
+    {
+        UpdateTime(Time.unscaledDeltaTime);
+    }
 }

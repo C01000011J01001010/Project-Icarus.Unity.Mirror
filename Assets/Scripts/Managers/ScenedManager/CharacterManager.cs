@@ -1,38 +1,41 @@
+using Core;
+using Core.EventBus;
+using Core.Manager;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Core.Manager;
 
-public class CharacterManager : MonoBehaviour, IScenedManager
+public class CharacterManager : BaseManager, ITickable, IFixedTickable
 {
-    [SerializeField] private int _priority;
-    public int Priority => _priority;
+    //[SerializeField] private int _priority;
+    //public int Priority => _priority;
 
-    public bool IsActive => throw new System.NotImplementedException();
+    public TickGroup TickGroup => TickGroup.Character;
+
+    public FixedTickGroup FixedTickGroup => FixedTickGroup.Physics;
 
     List<BaseCharacter> _characterList;
 
-    public void Exit()
+    public override void Exit()
     {
-        UpdateManager.UPDATE_OnCharacter -= CALLBACK_Update;
-        UpdateManager.UPDATE_Physics -= CALLBACK_FixedUpdate;
+        EventBus<R_TickEvent>.Publish(new R_TickEvent(this, TickGroup.Character, false));
+        EventBus<R_FixedTickEvent>.Publish(new R_FixedTickEvent(this, FixedTickGroup.Physics, false));
     }
 
-    public IEnumerator Initialize()
+    public override IEnumerator Initialize(IModuleHub hub)
     {
         _characterList = new();
-        UpdateManager.UPDATE_OnCharacter -= CALLBACK_Update;
-        UpdateManager.UPDATE_OnCharacter += CALLBACK_Update;
-        UpdateManager.UPDATE_Physics -= CALLBACK_FixedUpdate;
-        UpdateManager.UPDATE_Physics += CALLBACK_FixedUpdate;
+
+        EventBus<R_TickEvent>.Publish(new R_TickEvent(this, TickGroup.Character, true));
+        EventBus<R_FixedTickEvent>.Publish(new R_FixedTickEvent(this, FixedTickGroup.Physics, true));
 
         yield return null;
     }
 
-    public IEnumerator LateInitialize()
-    {
-        yield break;
-    }
+    //public IEnumerator LateInitialize()
+    //{
+    //    yield break;
+    //}
 
     public void AddList(BaseCharacter character)
     {
@@ -47,29 +50,19 @@ public class CharacterManager : MonoBehaviour, IScenedManager
         _characterList.Remove(character);
     }
 
-    public virtual void CALLBACK_Update(float deltaTime)
+    public void Tick(float deltaTime)
     {
-        for(int i = _characterList.Count-1; i >= 0; --i)
+        for (int i = _characterList.Count - 1; i >= 0; --i)
         {
             _characterList[i].Tick(deltaTime);
         }
     }
 
-    public virtual void CALLBACK_FixedUpdate(float deltaTime)
+    public void FixedTick(float fixedDeltaTime)
     {
         for (int i = _characterList.Count - 1; i >= 0; --i)
         {
-            _characterList[i].FixedTick(deltaTime);
+            _characterList[i].FixedTick(fixedDeltaTime);
         }
-    }
-
-    public void SetActive(bool active)
-    {
-        throw new System.NotImplementedException();
-    }
-
-    public IEnumerator Initialize(IModuleHub hub)
-    {
-        throw new System.NotImplementedException();
     }
 }

@@ -74,7 +74,7 @@ class ThirdPersonCamera : VirtualCamera, ISetCharacter
         _targetZoomDistance = Mathf.Clamp(_targetZoomDistance, ZoomInLimit, ZoomOutLimit);
     }
 
-    public override void Tick(float deltaTime)
+    public override void LateTick(float deltaTime)
     {
         // Lerp는 근사값을 만드니 현재 속도와 목표속도의 차이가 offset 이하면 Lerp를 생략 
         float speedOffset = 0.1f;

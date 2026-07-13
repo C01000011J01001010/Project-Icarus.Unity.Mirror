@@ -1,3 +1,4 @@
+using Core.Manager;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -8,6 +9,10 @@ public abstract class TickableModuleHub: BaseModuleHub, IModuleHub, ITickable, I
     // 모듈 업데이트를 허브에서 처리하기 위해 ITickable, IFixedTickable 모듈을 별도로 관리
     private List<ITickModule> moduleTick = new();
     private List<IFixedTickModule> moduleFixedTick = new();
+
+    public abstract TickGroup TickGroup {  get;}
+
+    public abstract FixedTickGroup FixedTickGroup {  get;}
 
 
     // 1차 초기화: 하드코딩된 모듈 우선으로 구성하고, 탐색된 모듈을 뒤에 붙여 전체 리스트 구성 후 Initialize 호출

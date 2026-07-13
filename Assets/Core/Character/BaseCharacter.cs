@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.TextCore.Text;
 using Core;
+using Core.Manager;
 
 
 [RequireComponent(typeof(baseCharacterAnim))]
@@ -18,6 +19,9 @@ public class BaseCharacter : TickableModuleHub,
 
     public baseCharacterAnim anim {  get; protected set; }
 
+    public override TickGroup TickGroup => TickGroup.Character;
+
+    public override FixedTickGroup FixedTickGroup => FixedTickGroup.Physics;
 
     public Vector2 inputMove;
     public bool isMove;

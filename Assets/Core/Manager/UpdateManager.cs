@@ -179,16 +179,16 @@ namespace Core.Manager
 
         protected void Awake()
         {
-            _tickRunners = CreateRunners<TickGroup, TickRunner, ITickable>();
-            _lateTickRunners = CreateRunners<LateTickGroup, LateTickRunner, ILateTickable>();
-            _fixedTickRunners = CreateRunners<FixedTickGroup, FixedTickRunner, IFixedTickable>();
+            _tickRunners = CreateRunners<TickGroup, TickRunner>();
+            _lateTickRunners = CreateRunners<LateTickGroup, LateTickRunner>();
+            _fixedTickRunners = CreateRunners<FixedTickGroup, FixedTickRunner>();
         }
 
-        private TRunner[] CreateRunners<TGroup, TRunner, TInterface>()
+        private TRunner[] CreateRunners<TGroup, TRunner>()
             where TGroup : struct, Enum
-            where TRunner : BaseRunner<TInterface>, new()
+            where TRunner : IRunner, new()
         {
-            int groupCount = Enum.GetNames(typeof(TGroup)).Length;
+            int groupCount = Enum.GetValues(typeof(TGroup)).Length;
 
             TRunner[] runners = new TRunner[groupCount];
 

@@ -40,7 +40,7 @@ public class UserInputManager : BaseInputManager<UserInputActions>, IManager, IP
         }
     }
 
-    public float ScrollY
+    public float ScrollDelta
     {
         get
         {

@@ -29,9 +29,9 @@ public class Constants
     #endregion
 
     #region Scene이름
-    public const string SCENE_NAME_GlobalScene = "GlobalScene";
-    public const string SCENE_NAME_TitleScene = "TitleScene";
-    public const string SCENE_NAME_SampleScene = "SampleScene";
+    public const string SCENE_GlobalScene = "GlobalScene";
+    public const string SCENE_TitleScene = "TitleScene";
+    public const string SCENE_SampleScene = "SampleScene";
     #endregion
 
 

@@ -10,7 +10,7 @@ namespace Core.Hub
         public ContextScope scope { get;}
     }
 
-    public abstract class BaseHub<TRegistrationEvent> : MonoBehaviour, IInitialize, ILateInitialize
+    public abstract class BaseHub<TRegistrationEvent> : MonoBehaviour//, IInitialize, ILateInitialize
         where TRegistrationEvent : IEvent, IRegistration
     {
         public ContextScope myScope { get; private set; }
@@ -21,13 +21,8 @@ namespace Core.Hub
             myScope = scope;
         }
 
-        internal abstract void AwakeFromContext();
-
-        protected virtual void OnDestroy()
-        {
-            Exit();
-        }
-        public virtual void Exit() { }
+        internal virtual void AwakeFromContext() { }
+        internal virtual void OnDestroyFromContext() {}
 
         public virtual IEnumerator Initialize() { yield return null; }
 

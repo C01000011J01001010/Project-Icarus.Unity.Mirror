@@ -192,15 +192,17 @@ namespace Core.Manager
             _isTickingAllowed = false;
         }
 
-        private void OnDestroy()
+        protected override void OnDestroy()
         {
+            base.OnDestroy();
             EventBus<R_TickEvent>.Unsubscribe(OnRegisterTick);
             EventBus<R_LateTickEvent>.Unsubscribe(OnRegisterLateTick);
             EventBus<R_FixedTickEvent>.Unsubscribe(OnRegisterFixedTick);
         }
 
-        private void Awake()
+        protected override void Awake()
         {
+            base.Awake();
             _tickRunners = CreateRunners<TickGroup, TickRunner>();
             _lateTickRunners = CreateRunners<LateTickGroup, LateTickRunner>();
             _fixedTickRunners = CreateRunners<FixedTickGroup, FixedTickRunner>();

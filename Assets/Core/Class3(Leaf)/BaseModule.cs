@@ -19,17 +19,17 @@ namespace Core
             isActive = active;
         }
 
-        protected override void OnEnable()
+        protected virtual void Awake()
         {
-            base.OnEnable();
-
             var evt = new ModuleRegistrationEvent(this, true, myScope);
             EventBus<ModuleRegistrationEvent>.Publish(evt);
         }
 
-        protected override void OnDisable()
+
+        
+        protected virtual void OnDestroy()
         {
-            base.OnDisable();
+            // 만약 Hub가 먼저 사라졌다해도 문제 없음
             var evt = new ModuleRegistrationEvent(this, false, myScope);
             EventBus<ModuleRegistrationEvent>.Publish(evt);
         }

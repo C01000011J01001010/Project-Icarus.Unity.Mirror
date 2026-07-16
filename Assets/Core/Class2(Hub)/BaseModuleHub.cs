@@ -42,22 +42,37 @@ namespace Core.Hub
 
         internal override void AwakeFromContext()
         {
+            base.AwakeFromContext();
+
             // 모듈이 등록할 수 있도록 Context로부터 시작하는 가장 빠른 Awake 사용하여 구독
             EventBus<ModuleRegistrationEvent>.Subscribe(OnLeafRegistration);
         }
-        
 
-
-        public override void Exit()
+        internal override void OnDestroyFromContext()
         {
+            base.OnDestroyFromContext();
+
             var modules = moduleDict.Values.ToArray();
             foreach (var module in modules)
             {
-                
-                module?.Exit();
+                if (!isUnityNull(module)) module.Exit();
             }
-            // 모듈들이 등록취소하길 기다린 후 나도 구독취소
+            // 모듈들정리를 끝낸 후 나도 구독취소
+            // Hub가 어차피 사라질것이니 모듈들의 관리도 필요가 없어짐
             EventBus<ModuleRegistrationEvent>.Unsubscribe(OnLeafRegistration);
+
+            // 게임이 종료 중이면 나머지 객체는 알아서 정리됨
+            if (IsAppQuitting) return;
+
+            foreach (var module in modules)
+            {
+                // 허브와 다른씬에 남아서 살아남을 수도 있으니
+                if (!isUnityNull(module) && module is MonoBehaviour asMono)
+                {
+                    Debug.Log($"Hub에서 module {asMono.name}을 수동 삭제함");
+                    Destroy(asMono.gameObject);
+                }
+            }
         }
 
         public override IEnumerator Initialize()

@@ -122,3 +122,4 @@ MonoBehaviour:
   _componentIndexCache: 0
   _addedNetworkObject: {fileID: 1752968200985450229}
   _networkObjectCache: {fileID: 1752968200985450229}
+  myScope: 1

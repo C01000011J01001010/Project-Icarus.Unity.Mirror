@@ -33,7 +33,7 @@ public class SceneTester : MonoBehaviour
     void Start()
     {
         if(SceneManager.sceneCount == 1)
-            SceneManager.LoadSceneAsync(Constants.SCENE_NAME_GlobalScene, LoadSceneMode.Additive);
+            SceneManager.LoadSceneAsync(Constants.SCENE_GlobalScene, LoadSceneMode.Additive);
     }
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)

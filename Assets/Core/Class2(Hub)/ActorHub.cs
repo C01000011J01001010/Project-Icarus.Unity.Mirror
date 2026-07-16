@@ -42,11 +42,13 @@ namespace Core.Hub
 
         internal override void AwakeFromContext()
         {
+            base.AwakeFromContext();
             EventBus<ActorRegistrationEvent>.Subscribe(OnLeafRegistration);
         }
 
-        public override void Exit()
+        internal override void OnDestroyFromContext()
         {
+            base.OnDestroyFromContext();
             EventBus<ActorRegistrationEvent>.Unsubscribe(OnLeafRegistration);
             _actorRegistry.Clear();
         }

@@ -1,5 +1,50 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &1209159578657044982
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2077654016941898100}
+  - component: {fileID: 7232005818235394998}
+  m_Layer: 0
+  m_Name: CameraTarget
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2077654016941898100
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1209159578657044982}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.5, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4370832847619979300}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7232005818235394998
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1209159578657044982}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f270b14e27729ab48a9679beb35c3401, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Project_Icarus.CameraTargetProvider
+  _targetTransform: {fileID: 2077654016941898100}
 --- !u!1001 &3992945286500415637
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -57,7 +102,10 @@ PrefabInstance:
     - {fileID: 8528236026062785121, guid: bae7dafd02b707846b8390b2bce63321, type: 3}
     - {fileID: 1144943452750277966, guid: bae7dafd02b707846b8390b2bce63321, type: 3}
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 847129471433703601, guid: bae7dafd02b707846b8390b2bce63321, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2077654016941898100}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 1856871421391184497, guid: bae7dafd02b707846b8390b2bce63321, type: 3}
       insertIndex: -1
@@ -114,7 +162,7 @@ MonoBehaviour:
   _initializeOrder: 0
   _preventDespawnOnDisconnect: 0
   _defaultDespawnType: 0
-  _initializedTimestamp: -8584175161892814554
+  _initializedTimestamp: -8584173699032461676
   _localLevelOfDetailCalculationType: 0
   _useLevelOfDetail: 0
   _useRootLevelOfDetail: 1
@@ -245,6 +293,7 @@ MonoBehaviour:
   _componentIndexCache: 1
   _addedNetworkObject: {fileID: 1421060152581575441}
   _networkObjectCache: {fileID: 1421060152581575441}
+  myScope: 2
   moveSpeed: 20
   flapForce: 8
   flapTorque: 0.5
@@ -263,3 +312,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 101c2a4df18ea11498957a3ae3947f8d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MeshCCTV
+--- !u!4 &4370832847619979300 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 847129471433703601, guid: bae7dafd02b707846b8390b2bce63321, type: 3}
+  m_PrefabInstance: {fileID: 3992945286500415637}
+  m_PrefabAsset: {fileID: 0}

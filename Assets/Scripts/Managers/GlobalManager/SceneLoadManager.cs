@@ -38,7 +38,7 @@ public sealed class SceneLoadManager : BaseGlobalManager, IGlobalManager
 
 #if UNITY_EDITOR
         // SceneTester에서 적용시 사용
-        Scene globalScene = SceneManager.GetSceneByName(Constants.SCENE_NAME_GlobalScene);
+        Scene globalScene = SceneManager.GetSceneByName(Constants.SCENE_GlobalScene);
         // GlobalScene제외
         for (int i = 0; i < SceneManager.sceneCount; i++)
         {

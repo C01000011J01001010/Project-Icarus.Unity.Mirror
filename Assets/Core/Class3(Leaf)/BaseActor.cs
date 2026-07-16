@@ -28,12 +28,5 @@ namespace Core
             var evt = new ActorRegistrationEvent(this, false, myScope);
             EventBus<ActorRegistrationEvent>.Publish(evt);
         }
-
-        
-
-
-        public abstract void OnDespawn();
-
-        public abstract void OnSpawn();
     }
 }

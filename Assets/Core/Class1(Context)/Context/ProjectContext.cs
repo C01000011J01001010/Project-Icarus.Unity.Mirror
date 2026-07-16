@@ -3,36 +3,39 @@ using UnityEngine;
 using Core;
 using Core.EventBus;
 
-public struct ProjectContextProgressEvent : IEvent
+namespace Core
 {
-    // 로딩 화면에 띄워줄 메시지 (예: "Global Managers 초기화 중...")
-    public string Message;
-
-    // 0.0f ~ 1.0f 사이의 진행도 (필요 없다면 제거 가능)
-    public float Progress;
-
-    public ProjectContextProgressEvent(string message, float progress)
+    public struct ProjectContextProgressEvent : IEvent
     {
-        Message = message;
-        Progress = progress;
+        // 로딩 화면에 띄워줄 메시지 (예: "Global Managers 초기화 중...")
+        public string Message;
+
+        // 0.0f ~ 1.0f 사이의 진행도 (필요 없다면 제거 가능)
+        public float Progress;
+
+        public ProjectContextProgressEvent(string message, float progress)
+        {
+            Message = message;
+            Progress = progress;
+        }
     }
-}
 
-/// <summary>
-/// GlobalScene에 상주하며 게임 종료 시까지 파괴되지 않는 전역 컨텍스트
-/// GlobalScene은 Additive 방식으로 언로드되지 않으므로 
-/// 자연스럽게 앱 종료 시점까지 생존이 보장
-/// </summary>
-internal class ProjectContext : BaseContext<ProjectContext>
-{
-    protected override ContextScope myScope => ContextScope.Project;
-
-    private IEnumerator Start()
+    /// <summary>
+    /// GlobalScene에 상주하며 게임 종료 시까지 파괴되지 않는 전역 컨텍스트
+    /// GlobalScene은 Additive 방식으로 언로드되지 않으므로 
+    /// 자연스럽게 앱 종료 시점까지 생존이 보장
+    /// </summary>
+    internal class ProjectContext : BaseContext<ProjectContext>
     {
-        // BaseContext의 초기화를 실행 (내부에서 0.3, 0.6, 0.9 순서로 이벤트가 발송됨)
-        yield return Initialize();
+        protected override ContextScope myScope => ContextScope.Project;
 
-        // 모든 전역 시스템 세팅이 끝났으므로, 첫 씬을 로드하라고 허공에 외침 (EventBus)
-        EventBus<SceneLoadRequestEvent>.Publish(new SceneLoadRequestEvent(Constants.SCENE_NAME_SampleScene));
+        private IEnumerator Start()
+        {
+            // BaseContext의 초기화를 실행 (내부에서 0.3, 0.6, 0.9 순서로 이벤트가 발송됨)
+            yield return Initialize();
+
+            // 모든 전역 시스템 세팅이 끝났으므로, 첫 씬을 로드하라고 허공에 외침 (EventBus)
+            EventBus<SceneLoadRequestEvent>.Publish(new SceneLoadRequestEvent(Constants.SCENE_SampleScene));
+        }
     }
 }

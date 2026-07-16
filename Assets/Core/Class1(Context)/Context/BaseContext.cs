@@ -70,10 +70,19 @@ namespace Core
 
         protected virtual void OnDestroy()
         {
+            OnDestroyToss();
             if (_instance == this)
             {
                 _instance = null;
             }
+        }
+
+        public void OnDestroyToss()
+        {
+            // 초기화의 반대 순서로 정리될수 있도록 보장
+            uiHub?.OnDestroyFromContext();
+            actorHub?.OnDestroyFromContext();
+            managerHub?.OnDestroyFromContext();
         }
 
         public virtual IEnumerator Initialize()

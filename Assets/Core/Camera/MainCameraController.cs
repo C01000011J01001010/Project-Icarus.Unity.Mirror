@@ -4,6 +4,8 @@ using System.Linq;
 using Unity.Cinemachine;
 using UnityEngine;
 
+
+
 [RequireComponent(typeof(Camera))]
 [RequireComponent(typeof(CinemachineBrain))]
 public class MainCameraController : MonoBehaviour//, IInitializable

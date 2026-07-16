@@ -1,57 +1,77 @@
 ﻿using Core.EventBus;
-using Core.EventBus.Event;
+using Core;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using UnityEngine;
+using static Core.Utility;
+using UnityEditor.Experimental.GraphView;
 
 namespace Core.Hub
 {
     /// <summary>
     /// Manager, Ui 등 단일객체 모듈을 위한 등록, 해제 이벤트
     /// </summary>
-    public struct ModuleRegistrationEvent : IEvent
+    public struct ModuleRegistrationEvent : IEvent, IRegistration
     {
         public IModule module;
-        public bool isAdd;
-        public ModuleRegistrationEvent(IModule module, bool isAdd)
+        public bool isAdd { get; private set; } // 등록할 것인가, 해제할것인가
+        public ContextScope scope { get; private set; } // 어느 Context 산하로 들어갈 것인가
+
+
+        public ModuleRegistrationEvent(IModule module, bool isAdd, ContextScope scope)
         {
             this.module = module;
             this.isAdd = isAdd;
+            this.scope = scope;
         }
     }
 
-    internal abstract class BaseModuleHub<TModule> : BaseHub, IBaseHub
+    internal abstract class BaseModuleHub<TModule> : BaseHub<ModuleRegistrationEvent>
         where TModule : class, IModule
     {
         // 단일 매니저들을 담아두는 딕셔너리
         protected Dictionary<Type, TModule> moduleDict = new();
-        protected bool _isInitComplete = false; // Hub의 초기화 완료 상태
+        protected abstract bool moduleEnabled { get; } //Hub에서 초기화 후 module의 active 결정
+        
 
-        public virtual void AwakeFromContext()
+        private bool _isInitStarted = false;
+        private TModule[] _startInitModules;
+
+        internal override void AwakeFromContext()
         {
             // 모듈이 등록할 수 있도록 Context로부터 시작하는 가장 빠른 Awake 사용하여 구독
-            EventBus<ModuleRegistrationEvent>.Subscribe(OnModuleRegistration);
+            EventBus<ModuleRegistrationEvent>.Subscribe(OnLeafRegistration);
         }
+        
+
 
         public override void Exit()
         {
-            foreach (var module in moduleDict.Values)
+            var modules = moduleDict.Values.ToArray();
+            foreach (var module in modules)
             {
                 
                 module?.Exit();
             }
             // 모듈들이 등록취소하길 기다린 후 나도 구독취소
-            EventBus<ModuleRegistrationEvent>.Unsubscribe(OnModuleRegistration);
+            EventBus<ModuleRegistrationEvent>.Unsubscribe(OnLeafRegistration);
         }
 
         public override IEnumerator Initialize()
         {
+            // 초기화 열차는 이미 떠났음을 알림
+            _isInitStarted = true;
+
+            // Initialize -> LateInitialize 사이에 추가되는 Module 이 LateInitialize만 실행하는것 방지
+            _startInitModules = moduleDict.Values.ToArray();
+
             yield return base.Initialize();
-            foreach(var module in moduleDict.Values)
+            foreach(var module in _startInitModules)
             {
-                yield return module?.Initialize(this);
+                yield return module?.Initialize();
                 yield return null;
             }
             
@@ -60,53 +80,51 @@ namespace Core.Hub
         public override IEnumerator LateInitialize()
         {
             yield return base.LateInitialize();
-            foreach (var module in moduleDict.Values)
+            foreach (var module in _startInitModules)
             {
                 if(module is ILateInitialize lateModule)
                 {
                     yield return lateModule?.LateInitialize();
                     yield return null;
                 }
+                // 상세 클래스에서 모듈 초기화 후 active를 결정
+                module.SetActive(moduleEnabled);
             }
 
-            // Context로 인한 초기화 완료
-            _isInitComplete = true;
+            // 다 썼으니 반환
+            _startInitModules = null;
         }
 
-        private void OnModuleRegistration(ModuleRegistrationEvent evt)
+        protected override void OnLeafRegistration(ModuleRegistrationEvent evt)
         {
-            if(evt.module is TModule module)
+            if (evt.module is TModule module)
             {
-                if (evt.isAdd)
-                {
-                    RegisterModule(module);
-                }
-                else
-                {
-                    UnregisterModule(module);
-                }
+                base.OnLeafRegistration(evt);
             }
         }
 
-        private void RegisterModule(TModule module)
+        protected override void RegisterLeaf(ModuleRegistrationEvent evt)
         {
+            TModule module = evt.module as TModule;
+
             // 등록한적이 없거나 등록했던 객체가 페이크 널일때
             Type typeKey = module.GetType();
-            if (!moduleDict.TryGetValue(typeKey, out TModule old) ||
-                (old as UnityEngine.Object) == null)
+            if (!moduleDict.TryGetValue(typeKey, out TModule old) || isUnityNull(old))
             {
                 moduleDict[typeKey] = module;
             }
 
-            // Context 주도의 초기화가 이미 끝났는데 등장한 모듈의 경우
-            if (_isInitComplete)
+            // Hub의 직렬초기화 열차는 떠났으니 알아서 초기화 하렴
+            if (_isInitStarted)
             {
-                CatchUpModule(module);
+                StartCoroutine(CatchUpRoutine(module));
             }
         }
 
-        private void UnregisterModule(TModule module)
+        protected override void UnregisterLeaf(ModuleRegistrationEvent evt)
         {
+            TModule module = evt.module as TModule;
+
             Type typeKey = module.GetType();
             if (moduleDict.ContainsKey(typeKey))
             {
@@ -114,21 +132,20 @@ namespace Core.Hub
             }
         }
 
-        public void CatchUpModule(TModule tardyModule)
+        private IEnumerator CatchUpRoutine(TModule tardyModule)
         {
-            // 이미 전체 초기화가 끝난 상태에서 들어온 '지각생'이라면?
-            // 리스트에 넣는 것에 그치지 않고, 그 즉시 개별 초기화를 진행
-            if (_isInitComplete)
-            {
-                // 코루틴으로 단일 객체만 즉시 초기화 실행
-                StartCoroutine(tardyModule.Initialize(this));
+            // 1. Initialize가 완전히 끝날 때까지 대기
+            yield return tardyModule.Initialize();
 
-                // LateInitialize가 있다면 이어서 호출
-                if (tardyModule is ILateInitialize lateModule)
-                {
-                    lateModule.LateInitialize();
-                }
+            // 2. 이어서 LateInitialize 대기
+            if (tardyModule is ILateInitialize lateModule)
+            {
+                yield return lateModule.LateInitialize();
             }
+
+            // 3. 모든 초기화가 끝난 후 안전하게 Active 상태 세팅
+            // (hardcoded true 대신 Hub의 정책인 moduleEnabled를 따르도록 수정!)
+            tardyModule.SetActive(moduleEnabled);
         }
 
         // [수정된 부분] 

@@ -12,6 +12,8 @@ using UnityEngine.SceneManagement;
 /// </summary>
 internal class SceneContext : BaseContext<SceneContext>
 {
+    protected override ContextScope myScope => ContextScope.Scene;
+
     UpdateManager updateManager;
     // Start()를 구현하지 않습니다! 
     // 자기 멋대로 초기화를 시작하면 SceneLoadManager의 통제를 벗어나기 때문입니다.

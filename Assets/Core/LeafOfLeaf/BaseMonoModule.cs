@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine;
-using Core;
-public abstract class BaseMonoModule<TOnwer> : MonoBehaviour, IModule
+
+public abstract class BaseMonoModule<TOnwer> : MonoBehaviour//, IModule
     where TOnwer : MonoBehaviour, IModuleHub
 {
     public TOnwer Owner { get; private set; }

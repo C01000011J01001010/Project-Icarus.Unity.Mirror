@@ -1,10 +1,26 @@
-﻿using Core.EventBus;
+﻿using Core;
+using Core.EventBus;
 using Core.Manager;
 using Core.Update;
 using UnityEngine;
 
 public abstract class BaseLeaf : MonoBehaviour
 {
+    // 어느 Context 산하로 들어갈지 결정
+    [SerializeField] protected ContextScope myScope;
+
+    public void SetScope(ContextScope scope)
+    {
+        myScope = scope;
+        OnSetScope(scope);
+    }
+
+    protected virtual void OnSetScope(ContextScope scope)
+    {
+
+    }
+
+
     protected virtual void OnEnable() => RegisterTick();
     protected virtual void OnDisable() => UnregisterTick();
 

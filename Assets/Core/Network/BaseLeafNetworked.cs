@@ -42,7 +42,6 @@ namespace Core.Network
         // ==========================================
         // 2. FishNet 네트워크 생명주기 제어 (진입점)
         // ==========================================
-
         // 서버로서 스폰되었을 때
         public override void OnStartServer() => TryRegisterTick();
         public override void OnStopServer() => TryUnregisterTick();
@@ -102,7 +101,7 @@ namespace Core.Network
             return networkTickTarget switch
             {
                 NetworkTickTarget.None => false,
-                NetworkTickTarget.ServerOnly => base.IsServerInitialized, // 💡 FishNet 최신 API (IsServer 대신 권장됨)
+                NetworkTickTarget.ServerOnly => base.IsServerInitialized,
                 NetworkTickTarget.ClientOnly => base.IsClientInitialized,
                 NetworkTickTarget.OwnerOnly => base.IsOwner,
                 NetworkTickTarget.ServerAndClient => base.IsServerInitialized || base.IsClientInitialized,

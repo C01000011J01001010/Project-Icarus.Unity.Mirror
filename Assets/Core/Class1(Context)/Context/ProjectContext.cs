@@ -25,6 +25,8 @@ public struct ProjectContextProgressEvent : IEvent
 /// </summary>
 internal class ProjectContext : BaseContext<ProjectContext>
 {
+    protected override ContextScope myScope => ContextScope.Project;
+
     private IEnumerator Start()
     {
         // BaseContext의 초기화를 실행 (내부에서 0.3, 0.6, 0.9 순서로 이벤트가 발송됨)

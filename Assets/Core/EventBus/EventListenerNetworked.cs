@@ -68,6 +68,7 @@ namespace Core.EventBus
         /// </summary>
         protected override void OnDisable()
         {
+            base.OnDisable();
             // 개발자가 깜빡하고 해제하지 않았더라도, 객체가 비활성화되거나 풀에 반환될 때 완전히 청소합니다.
             UnsubscribeAll();
         }

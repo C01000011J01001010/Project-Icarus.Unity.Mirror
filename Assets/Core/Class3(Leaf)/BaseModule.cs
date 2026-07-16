@@ -11,7 +11,7 @@ namespace Core
 
         public virtual void Exit() { }
 
-        public virtual IEnumerator Initialize(IModuleHub hub) { yield return null; }
+        public virtual IEnumerator Initialize() { yield return null; }
 
         public virtual void SetActive(bool active)
         {
@@ -23,14 +23,14 @@ namespace Core
         {
             base.OnEnable();
 
-            var evt = new ModuleRegistrationEvent(this, true);
+            var evt = new ModuleRegistrationEvent(this, true, myScope);
             EventBus<ModuleRegistrationEvent>.Publish(evt);
         }
 
         protected override void OnDisable()
         {
             base.OnDisable();
-            var evt = new ModuleRegistrationEvent(this, false);
+            var evt = new ModuleRegistrationEvent(this, false, myScope);
             EventBus<ModuleRegistrationEvent>.Publish(evt);
         }
     }

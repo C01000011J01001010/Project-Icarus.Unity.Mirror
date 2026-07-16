@@ -2,9 +2,10 @@
 using FishNet.Object; // FishNet 필수 네임스페이스
 using Core.Interface;
 using Core.EventBus;
-using Core.EventBus.Event;
 using Core.Network;
 using Core.Manager;
+using Core;
+using static Core.Utility;
 
 
 // 서버 전용: 클라이언트의 입력을 SharedActor에게 전달하는 이벤트
@@ -30,11 +31,9 @@ public struct SharedActorFlapEvent : IEvent
     }
 }
 
-public class PlayerInputSender : BaseActorNetworked<ControllerType>, IControllerSetter, ITickable
+public class PlayerInputSender : BaseActorNetworked, ITickable//, IControllerSetter
 {
     private IPlayerInputProvider _inputProvider;
-
-    public override ControllerType GroupType => ControllerType.InputSender;
 
     protected override NetworkTickTarget networkTickTarget => NetworkTickTarget.OwnerOnly;
     public TickGroup TickGroup => TickGroup.Controller;
@@ -45,9 +44,8 @@ public class PlayerInputSender : BaseActorNetworked<ControllerType>, IController
     public override void OnStopClient()
     {
         base.OnStopClient();
-        if (IsOwner && _inputProvider != null)
+        if (IsOwner && !isUnityNull(_inputProvider))
         {
-            //EventBus<R_TickEvent>.Publish(new R_TickEvent(this, TickGroup.Controller, false));
             EventBus<OnWingFlappedEvent>.Unsubscribe(OnLocalFlapPerformed);
         }
     }
@@ -58,13 +56,12 @@ public class PlayerInputSender : BaseActorNetworked<ControllerType>, IController
         // 다른 유저의 껍데기가 내 키보드 입력을 빼앗아가는 것을 방지합니다.
         if (IsOwner)
         {
-            EventBus<ControllerSettingEvent>.Publish(new ControllerSettingEvent(this));
-
-            //if(_inputProvider != null)
-            //{
-            //    EventBus<R_TickEvent>.Publish(new R_TickEvent(this, TickGroup.Controller, true));
-            //}
-            EventBus<OnWingFlappedEvent>.Subscribe(OnLocalFlapPerformed);
+            _inputProvider = CoreFacade.GetManager<UserInputManager>();
+            //EventBus<ControllerSettingEvent>.Publish(new ControllerSettingEvent(this));
+            if(!isUnityNull(_inputProvider))
+            {
+                EventBus<OnWingFlappedEvent>.Subscribe(OnLocalFlapPerformed);
+            }
         }
     }
 
@@ -110,13 +107,13 @@ public class PlayerInputSender : BaseActorNetworked<ControllerType>, IController
         EventBus<SharedActorFlapEvent>.Publish(new SharedActorFlapEvent(OwnerId));
     }
 
-    public void SetInputProvider(IPlayerInputProvider inputProvider)
-    {
-        if(inputProvider != null)
-        {
-            _inputProvider = inputProvider;
-        }
-    }
+    //public void SetInputProvider(IPlayerInputProvider inputProvider)
+    //{
+    //    if(inputProvider != null)
+    //    {
+    //        _inputProvider = inputProvider;
+    //    }
+    //}
 
     
 }

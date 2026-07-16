@@ -10,8 +10,8 @@ namespace Core.Manager
 {
     public class CameraManager : BaseManager, ILateTickable//, IWorldInitializable
     {
-        [SerializeField] int _priority = -1;
-        public int Priority => _priority;
+        //[SerializeField] int _priority = -1;
+        //public int Priority => _priority;
 
         MainCameraController _mainCamera;
 
@@ -31,7 +31,7 @@ namespace Core.Manager
             OptionManager.OnGraphicOptionChanged -= OptionChanged;
         }
         
-        public override IEnumerator Initialize(IModuleHub hub)
+        public override IEnumerator Initialize()
         {
             OptionManager.OnGraphicOptionChanged -= OptionChanged;
             OptionManager.OnGraphicOptionChanged += OptionChanged;

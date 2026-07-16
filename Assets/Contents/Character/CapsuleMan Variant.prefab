@@ -67,6 +67,9 @@ PrefabInstance:
       addedObject: {fileID: 3966903496011059636}
     - targetCorrespondingSourceObject: {fileID: 1856871421391184497, guid: bae7dafd02b707846b8390b2bce63321, type: 3}
       insertIndex: -1
+      addedObject: {fileID: 7600448259134167755}
+    - targetCorrespondingSourceObject: {fileID: 1856871421391184497, guid: bae7dafd02b707846b8390b2bce63321, type: 3}
+      insertIndex: -1
       addedObject: {fileID: 2189914698620036566}
     - targetCorrespondingSourceObject: {fileID: 1856871421391184497, guid: bae7dafd02b707846b8390b2bce63321, type: 3}
       insertIndex: -1
@@ -107,11 +110,11 @@ MonoBehaviour:
   RuntimeChildNetworkBehaviours: []
   _isNetworked: 1
   _isSpawnable: 1
-  _isGlobal: 1
+  _isGlobal: 0
   _initializeOrder: 0
   _preventDespawnOnDisconnect: 0
   _defaultDespawnType: 0
-  _initializedTimestamp: -8584177373102840495
+  _initializedTimestamp: -8584175161892814554
   _localLevelOfDetailCalculationType: 0
   _useLevelOfDetail: 0
   _useRootLevelOfDetail: 1
@@ -185,6 +188,21 @@ MonoBehaviour:
     X: 0
     Y: 0
     Z: 0
+--- !u!114 &7600448259134167755
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3363384272826522340}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c71fd7f855ec523429999fc4e14a1928, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FishNet.Runtime::FishNet.Observing.NetworkObserver
+  _overrideType: 3
+  _updateHostVisibility: 1
+  _observerConditions: []
 --- !u!54 &2189914698620036566
 Rigidbody:
   m_ObjectHideFlags: 0

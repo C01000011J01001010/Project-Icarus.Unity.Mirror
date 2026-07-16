@@ -30,8 +30,7 @@ namespace Core.Network
         [SerializeField] private Button serverButton;
         [SerializeField] private Button clientButton;
 
-
-        private void Start()
+        private void Awake()
         {
             // 1. 기본값 세팅 (입력칸이 비어있을 때를 대비)
             portInputField.text = "7770";      // FishNet 기본 포트
@@ -157,16 +156,6 @@ namespace Core.Network
             hostButton.interactable = false;
             serverButton.interactable = false;
             clientButton.interactable = false;
-        }
-
-        public override void Exit()
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public override IEnumerator Initialize(IModuleHub hub)
-        {
-            throw new System.NotImplementedException();
         }
     }
 }

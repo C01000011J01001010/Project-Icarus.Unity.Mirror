@@ -1,6 +1,6 @@
 using Core;
 using Core.EventBus;
-using Core.EventBus.Event;
+
 using Core.Interface;
 using Core.Manager;
 using System;
@@ -52,21 +52,21 @@ public class UserInputManager : BaseInputManager<UserInputActions>, IManager, IP
     public override void Exit()
     {
         base.Exit();
-
-        EventBus<ControllerSettingEvent>.Unsubscribe(OnControllerCall);
+        //EventBus<ControllerSettingEvent>.Unsubscribe(OnControllerCall);
         PlayerInputUnsubscribe();
     }
 
-    public override IEnumerator Initialize(IModuleHub hub)
+    public override IEnumerator Initialize()
     {
-        yield return base.Initialize(hub);
+        yield return base.Initialize();
         Player = inputAction.Player;
         Ui = inputAction.UI;
 
-        EventBus<ControllerSettingEvent>.Subscribe(OnControllerCall);
+        //EventBus<ControllerSettingEvent>.Subscribe(OnControllerCall);
         PlayerInputSubScribe();
 
         SwitchMap(InputMapType.Player);
+        yield return null;
     }
 
     private void PlayerInputSubScribe()
@@ -101,10 +101,10 @@ public class UserInputManager : BaseInputManager<UserInputActions>, IManager, IP
             default: Debug.LogWarning($"{mapType}은 정의되지 않은 Input Action"); break;
         }
     }
-    private void OnControllerCall(ControllerSettingEvent evt)
-    {
-        evt.controller.SetInputProvider(this);
-    }
+    //private void OnControllerCall(ControllerSettingEvent evt)
+    //{
+    //    evt.controller.SetInputProvider(this);
+    //}
 
     // DOTO: 선입력 시스템(Input Buffering) 넣을지 고려 필요함
 }

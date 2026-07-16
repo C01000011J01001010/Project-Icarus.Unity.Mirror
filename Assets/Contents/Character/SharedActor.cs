@@ -8,10 +8,8 @@ using Core.EventBus;
 
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(NetworkTransform))]
-public class SharedActor : BaseActorNetworked<CharacterType>, IFixedTickable
+public class SharedActor : BaseActorNetworked, IFixedTickable
 {
-    public override CharacterType GroupType => CharacterType.CapsuleMan;
-
     public FixedTickGroup FixedTickGroup => FixedTickGroup.Physics;
 
     protected override NetworkTickTarget networkTickTarget => NetworkTickTarget.ServerOnly;

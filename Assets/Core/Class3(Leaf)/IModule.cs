@@ -11,7 +11,7 @@ namespace Core
 
         #region 모듈 생명주기
 
-        IEnumerator Initialize(IModuleHub hub);
+        IEnumerator Initialize();
 
         //필요에 따라 인터페이스로 추가
         //IEnumerator LateInitialize();

@@ -1,5 +1,4 @@
 ﻿using Core.EventBus;
-using Core.EventBus.Event;
 
 namespace Core
 {

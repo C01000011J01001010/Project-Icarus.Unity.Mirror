@@ -1,3 +1,4 @@
+using Core;
 using Core.Camera;
 using Core.EventBus;
 using Core.Manager;
@@ -17,6 +18,7 @@ public class SharedActor : BaseActorNetworked, IFixedTickable
 
     private Rigidbody _rigidbody;
     public float moveSpeed = 50f;
+    public float rotationSpeed = 1.0f;
 
     [Header("🪽 날갯짓 물리 세팅")]
     public float flapForce = 8f;   // 위로 솟구치는 순간적인 힘 (Impulse)
@@ -104,6 +106,7 @@ public class SharedActor : BaseActorNetworked, IFixedTickable
     public void FixedTick(float fixedDeltaTime)
     {
         if (!IsServerInitialized) return;
+        
         Move(fixedDeltaTime);
 
         StabilizeRotation(fixedDeltaTime);
@@ -120,9 +123,12 @@ public class SharedActor : BaseActorNetworked, IFixedTickable
 
         if (combinedInput != Vector2.zero)
         {
-            combinedInput = combinedInput.normalized;
-            Vector3 movement = new Vector3(combinedInput.x, 0, combinedInput.y) * moveSpeed;
-            _rigidbody.AddForce(movement, ForceMode.Force); // 지속적인 이동은 Force 모드
+            // 이동하는 방향 바라보고
+            Vector3 moveDir = new Vector3(combinedInput.x, 0, combinedInput.y).normalized;
+            Utility.SmoothLookAt(_rigidbody, moveDir, rotationSpeed, fixedDeltaTime);
+
+            // 출발
+            _rigidbody.AddForce(moveDir * moveSpeed, ForceMode.Force); // 지속적인 이동은 Force 모드
         }
     }
 

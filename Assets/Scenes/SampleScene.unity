@@ -601,10 +601,10 @@ MonoBehaviour:
     zoomRate: 0.2
     zoomSpeed: 10
     zoomInLimit: 2
-    zoomOutLimit: 10
+    zoomOutLimit: 18
   _rotationHandler:
-    horizontalSpeed: 150
-    verticalSpeed: 100
+    horizontalSpeed: 70
+    verticalSpeed: 70
     minPitch: -30
     maxPitch: 60
     invertY: 0

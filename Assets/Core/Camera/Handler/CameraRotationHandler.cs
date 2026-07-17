@@ -4,7 +4,7 @@ using UnityEngine;
 namespace Core.Camera
 {
     [Serializable]
-    public class CameraRotationHandler_ThirdPerson
+    public class CameraRotationHandler
     {
         [Header("Rotation Speed")]
         [Tooltip("좌우 회전 속도 (Yaw)")]

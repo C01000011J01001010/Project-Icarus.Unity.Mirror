@@ -1,5 +1,6 @@
 using Core;
 using Core.Camera;
+using Core.EventBus;
 using Core.Interface;
 using Core.Manager;
 using Unity.Cinemachine;
@@ -12,10 +13,11 @@ namespace Core.Camera
     {
         // 💡 Has-A (합성) 구조: 부품들을 레고처럼 들고 있습니다.
         [SerializeField] private CameraZoomHandler _zoomHandler = new();
-        [SerializeField] private CameraRotationHandler_ThirdPerson _rotationHandler = new();
+        [SerializeField] private CameraRotationHandler _rotationHandler = new();
 
         private CinemachineThirdPersonFollow _thirdPersonFollow;
         private IPlayerInputProvider _inputProvider;
+        private bool isMouseLock = true;
 
         protected override void Awake()
         {
@@ -40,6 +42,18 @@ namespace Core.Camera
             base.OnEnable();
             // CoreFacade를 통해 안전하게 의존성 주입 (입력 가져오기)
             _inputProvider = CoreFacade.GetManager<UserInputManager>();
+            EventBus<ToggleMouseLockEvent>.Subscribe(OnToggleMouseLock);
+        }
+
+        protected override void OnDisable()
+        {
+            base.OnDisable();
+            EventBus<ToggleMouseLockEvent>.Unsubscribe(OnToggleMouseLock);
+        }
+
+        private void OnToggleMouseLock(ToggleMouseLockEvent evt)
+        {
+            isMouseLock = evt.IsMouseLock;
         }
 
         protected override Transform FindTrackingTarget() => null;
@@ -60,7 +74,7 @@ namespace Core.Camera
             _zoomHandler.ProcessZoom(_thirdPersonFollow, deltaTime);
 
             // 3. 회전(Rotation) Worker에게 역할 위임 및 결과 적용
-            if (TrackingTarget != null)
+            if (isMouseLock && !Utility.isUnityNull(TrackingTarget))
             {
                 // 핸들러는 순수하게 '계산된 회전값'만 반환합니다. (Side-Effect 없음)
                 Quaternion newRotation = _rotationHandler.ProcessRotation(lookInput, deltaTime);

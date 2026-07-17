@@ -5,6 +5,7 @@ using Core.Interface;
 using Core.Manager;
 using System;
 using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -17,6 +18,12 @@ public enum InputMapType
 public struct OnWingFlappedEvent : IEvent
 {
 
+}
+
+public struct ToggleMouseLockEvent : IEvent
+{
+    public bool IsMouseLock { get; }
+    public ToggleMouseLockEvent(bool isMouseLock) => this.IsMouseLock = isMouseLock;
 }
 
 public class UserInputManager : BaseInputManager<UserInputActions>, IManager, IPlayerInputProvider
@@ -65,6 +72,7 @@ public class UserInputManager : BaseInputManager<UserInputActions>, IManager, IP
         //EventBus<ControllerSettingEvent>.Subscribe(OnControllerCall);
         PlayerInputSubScribe();
 
+
         SwitchMap(InputMapType.Player);
         yield return null;
     }
@@ -72,18 +80,36 @@ public class UserInputManager : BaseInputManager<UserInputActions>, IManager, IP
     private void PlayerInputSubScribe()
     {
         PlayerInputUnsubscribe();
-        Player.Flap.started += OnWingFalpped;
+        Player.Flap.started += OnWingFlapped;
+        Player.MouseLockOff.started += OnMouseLock;
+        Player.MouseLockOff.canceled += OnMouseLock;
     }
 
     private void PlayerInputUnsubscribe()
     {
-        Player.Flap.started -= OnWingFalpped;
+        Player.Flap.started -= OnWingFlapped;
+        Player.MouseLockOff.started -= OnMouseLock;
+        Player.MouseLockOff.canceled -= OnMouseLock;
     }
 
-    private void OnWingFalpped(InputAction.CallbackContext context)
+
+    private void OnMouseLock(InputAction.CallbackContext context)
+    {
+        OnMouseLock(!context.ReadValueAsButton());
+    }
+
+    private void OnMouseLock(bool isMouseLock)
+    {
+        SetCursorState(isMouseLock);
+        // 📡 단발성 이벤트 발행!
+        EventBus<ToggleMouseLockEvent>.Publish(new ToggleMouseLockEvent(isMouseLock));
+    }
+
+    private void OnWingFlapped(InputAction.CallbackContext context)
     {
         EventBus<OnWingFlappedEvent>.Publish(new OnWingFlappedEvent());
     }
+    
 
     //private void OnUseItemInput(InputAction.CallbackContext context)
     //{

@@ -162,7 +162,7 @@ MonoBehaviour:
   _initializeOrder: 0
   _preventDespawnOnDisconnect: 0
   _defaultDespawnType: 0
-  _initializedTimestamp: -8584173699032461676
+  _initializedTimestamp: -8584173485467380510
   _localLevelOfDetailCalculationType: 0
   _useLevelOfDetail: 0
   _useRootLevelOfDetail: 1
@@ -206,18 +206,18 @@ MonoBehaviour:
   _addedNetworkObject: {fileID: 1421060152581575441}
   _networkObjectCache: {fileID: 1421060152581575441}
   _componentConfiguration: 2
-  _synchronizeParent: 0
+  _synchronizeParent: 1
   _packing:
-    Position: 1
-    Rotation: 1
-    Scale: 0
+    Position: 2
+    Rotation: 2
+    Scale: 2
   _useScaledTime: 1
   _interpolation: 2
   _extrapolation: 2
-  _enableTeleport: 0
+  _enableTeleport: 1
   _teleportThreshold: 1
-  _clientAuthoritative: 1
-  _sendToOwner: 1
+  _clientAuthoritative: 0
+  _sendToOwner: 0
   _interval: 1
   _synchronizePosition: 1
   _positionSensitivity: 0.001
@@ -275,7 +275,7 @@ Rigidbody:
   m_ImplicitTensor: 1
   m_UseGravity: 1
   m_IsKinematic: 0
-  m_Interpolate: 0
+  m_Interpolate: 1
   m_Constraints: 48
   m_CollisionDetection: 1
 --- !u!114 &1070355745655290303

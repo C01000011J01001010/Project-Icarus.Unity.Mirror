@@ -59,6 +59,10 @@ namespace Core.Manager
             }
         }
 
-        
+        protected void SetCursorState(bool isMouseLock)
+        {
+            Cursor.lockState = isMouseLock ? CursorLockMode.Locked : CursorLockMode.None;
+            Cursor.visible = !isMouseLock;
+        }
     }
 }

@@ -1,10 +1,11 @@
 using Core;
 using Core.EventBus;
-using Core.EventBus.Event;
+
 using Core.Interface;
 using Core.Manager;
 using System;
 using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -17,6 +18,12 @@ public enum InputMapType
 public struct OnWingFlappedEvent : IEvent
 {
 
+}
+
+public struct ToggleMouseLockEvent : IEvent
+{
+    public bool IsMouseLock { get; }
+    public ToggleMouseLockEvent(bool isMouseLock) => this.IsMouseLock = isMouseLock;
 }
 
 public class UserInputManager : BaseInputManager<UserInputActions>, IManager, IPlayerInputProvider
@@ -40,7 +47,7 @@ public class UserInputManager : BaseInputManager<UserInputActions>, IManager, IP
         }
     }
 
-    public float ScrollY
+    public float ScrollDelta
     {
         get
         {
@@ -52,38 +59,57 @@ public class UserInputManager : BaseInputManager<UserInputActions>, IManager, IP
     public override void Exit()
     {
         base.Exit();
-
-        EventBus<ControllerSettingEvent>.Unsubscribe(OnControllerCall);
+        //EventBus<ControllerSettingEvent>.Unsubscribe(OnControllerCall);
         PlayerInputUnsubscribe();
     }
 
-    public override IEnumerator Initialize(IModuleHub hub)
+    public override IEnumerator Initialize()
     {
-        yield return base.Initialize(hub);
+        yield return base.Initialize();
         Player = inputAction.Player;
         Ui = inputAction.UI;
 
-        EventBus<ControllerSettingEvent>.Subscribe(OnControllerCall);
+        //EventBus<ControllerSettingEvent>.Subscribe(OnControllerCall);
         PlayerInputSubScribe();
 
+
         SwitchMap(InputMapType.Player);
+        yield return null;
     }
 
     private void PlayerInputSubScribe()
     {
         PlayerInputUnsubscribe();
-        Player.Flap.started += OnWingFalpped;
+        Player.Flap.started += OnWingFlapped;
+        Player.MouseLockOff.started += OnMouseLock;
+        Player.MouseLockOff.canceled += OnMouseLock;
     }
 
     private void PlayerInputUnsubscribe()
     {
-        Player.Flap.started -= OnWingFalpped;
+        Player.Flap.started -= OnWingFlapped;
+        Player.MouseLockOff.started -= OnMouseLock;
+        Player.MouseLockOff.canceled -= OnMouseLock;
     }
 
-    private void OnWingFalpped(InputAction.CallbackContext context)
+
+    private void OnMouseLock(InputAction.CallbackContext context)
+    {
+        OnMouseLock(!context.ReadValueAsButton());
+    }
+
+    private void OnMouseLock(bool isMouseLock)
+    {
+        SetCursorState(isMouseLock);
+        // 📡 단발성 이벤트 발행!
+        EventBus<ToggleMouseLockEvent>.Publish(new ToggleMouseLockEvent(isMouseLock));
+    }
+
+    private void OnWingFlapped(InputAction.CallbackContext context)
     {
         EventBus<OnWingFlappedEvent>.Publish(new OnWingFlappedEvent());
     }
+    
 
     //private void OnUseItemInput(InputAction.CallbackContext context)
     //{
@@ -101,10 +127,10 @@ public class UserInputManager : BaseInputManager<UserInputActions>, IManager, IP
             default: Debug.LogWarning($"{mapType}은 정의되지 않은 Input Action"); break;
         }
     }
-    private void OnControllerCall(ControllerSettingEvent evt)
-    {
-        evt.controller.SetInputProvider(this);
-    }
+    //private void OnControllerCall(ControllerSettingEvent evt)
+    //{
+    //    evt.controller.SetInputProvider(this);
+    //}
 
     // DOTO: 선입력 시스템(Input Buffering) 넣을지 고려 필요함
 }

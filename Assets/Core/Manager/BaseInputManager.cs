@@ -1,5 +1,4 @@
 ﻿using Core.EventBus;
-using Core.EventBus.Event;
 using System;
 using System.Collections;
 using UnityEngine;
@@ -29,6 +28,7 @@ namespace Core.Manager
 
         public override void Exit()
         {
+            base.Exit();
             if (inputAction != null)
             {
                 inputAction.Disable();
@@ -37,8 +37,9 @@ namespace Core.Manager
             InputSystem.onDeviceChange -= OnDeviceChange;
         }
 
-        public override IEnumerator Initialize(IModuleHub hub)
+        public override IEnumerator Initialize()
         {
+            yield return base.Initialize();
             inputAction ??= new TInputAction();
 
             if (inputAction != null)
@@ -58,6 +59,10 @@ namespace Core.Manager
             }
         }
 
-        
+        protected void SetCursorState(bool isMouseLock)
+        {
+            Cursor.lockState = isMouseLock ? CursorLockMode.Locked : CursorLockMode.None;
+            Cursor.visible = !isMouseLock;
+        }
     }
 }

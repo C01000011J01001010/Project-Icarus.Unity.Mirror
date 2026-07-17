@@ -1,3 +1,6 @@
+using Core.Camera;
+using Core.EventBus;
+using Core.Manager;
 using Core.Network;
 using FishNet.Component.Transforming;
 using FishNet.Managing.Server;
@@ -6,9 +9,11 @@ using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(NetworkTransform))]
-public class SharedActor : BaseNetworkActor<CharacterType>, IFixedTickable
+public class SharedActor : BaseActorNetworked, IFixedTickable
 {
-    public override CharacterType GroupType => CharacterType.CapsuleMan;
+    public FixedTickGroup FixedTickGroup => FixedTickGroup.Physics;
+
+    protected override NetworkTickTarget networkTickTarget => NetworkTickTarget.ServerOnly;
 
     private Rigidbody _rigidbody;
     public float moveSpeed = 50f;
@@ -24,6 +29,19 @@ public class SharedActor : BaseNetworkActor<CharacterType>, IFixedTickable
     private void Awake()
     {
         _rigidbody = GetComponent<Rigidbody>();
+    }
+
+    protected override void OnEnable()
+    {
+        base.OnEnable();
+
+        // 카메라한테 내가 등장했음을 알림
+        // "내 캐릭터(Transform)를 비춰줘! 단, ThirdPersonCamera만 타겟을 바꿔!"
+        CameraTargetProvider targetProvider = GetComponentInChildren<CameraTargetProvider>();
+        EventBus<SetCameraTargetEvent>.Publish(new SetCameraTargetEvent(targetProvider.Target, typeof(ThirdPersonCameraController)));
+
+        // "3인칭 카메라로 시점을 바꿔줘!" (자연스러운 Blending 발생)
+        EventBus<SwitchCameraEvent>.Publish(new SwitchCameraEvent(typeof(ThirdPersonCameraController)));
     }
 
     public override void OnStartClient()
@@ -47,14 +65,13 @@ public class SharedActor : BaseNetworkActor<CharacterType>, IFixedTickable
         SubscribeTo<SharedActorMoveEvent>(OnSharedActorMove);
         SubscribeTo<SharedActorFlapEvent>(OnSharedActorFlap);
 
-        UpdateManager.UPDATE_Physics -= FixedTick;
-        UpdateManager.UPDATE_Physics += FixedTick;
+        EventBus<R_FixedTickEvent>.Publish(new R_FixedTickEvent(this, FixedTickGroup.Physics, true));
     }
 
     public override void OnStopServer()
     {
         UnsubscribeAll();
-        UpdateManager.UPDATE_Physics -= FixedTick;
+        EventBus<R_FixedTickEvent>.Publish(new R_FixedTickEvent(this, FixedTickGroup.Physics, false));
     }
 
     private void OnSharedActorMove(SharedActorMoveEvent evt)

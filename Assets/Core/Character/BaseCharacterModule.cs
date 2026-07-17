@@ -4,7 +4,7 @@ using System.Collections;
 using UnityEngine;
 using Core;
 
-public abstract class BaseCharacterModule : BaseMonoModule<BaseCharacter>, IModule
+public abstract class BaseCharacterModule : BaseMonoModule<BaseCharacter>//, IModule
 {
     //public BaseCharacter Owner { get; protected set; }
 

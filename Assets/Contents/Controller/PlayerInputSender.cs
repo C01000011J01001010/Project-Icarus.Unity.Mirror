@@ -2,10 +2,10 @@
 using FishNet.Object; // FishNet 필수 네임스페이스
 using Core.Interface;
 using Core.EventBus;
-using Core.EventBus.Event;
-using FishNet.Connection;
-using Core;
 using Core.Network;
+using Core.Manager;
+using Core;
+using static Core.Utility;
 
 
 // 서버 전용: 클라이언트의 입력을 SharedActor에게 전달하는 이벤트
@@ -31,20 +31,21 @@ public struct SharedActorFlapEvent : IEvent
     }
 }
 
-public class PlayerInputSender : BaseNetworkActor<ControllerType>, IControllerSetter, ITickable
+public class PlayerInputSender : BaseActorNetworked, ITickable//, IControllerSetter
 {
     private IPlayerInputProvider _inputProvider;
 
-    public override ControllerType GroupType => ControllerType.InputSender;
+    protected override NetworkTickTarget networkTickTarget => NetworkTickTarget.OwnerOnly;
+    public TickGroup TickGroup => TickGroup.Controller;
+
 
     private Vector2 _lastSentMove;
 
     public override void OnStopClient()
     {
         base.OnStopClient();
-        if (IsOwner && _inputProvider != null)
+        if (IsOwner && !isUnityNull(_inputProvider))
         {
-            UpdateManager.UPDATE_OnController -= Tick;
             EventBus<OnWingFlappedEvent>.Unsubscribe(OnLocalFlapPerformed);
         }
     }
@@ -55,14 +56,19 @@ public class PlayerInputSender : BaseNetworkActor<ControllerType>, IControllerSe
         // 다른 유저의 껍데기가 내 키보드 입력을 빼앗아가는 것을 방지합니다.
         if (IsOwner)
         {
-            EventBus<ControllerSettingEvent>.Publish(new ControllerSettingEvent(this));
-            EventBus<OnWingFlappedEvent>.Subscribe(OnLocalFlapPerformed);
+            _inputProvider = CoreFacade.GetManager<UserInputManager>();
+            //EventBus<ControllerSettingEvent>.Publish(new ControllerSettingEvent(this));
+            if(!isUnityNull(_inputProvider))
+            {
+                EventBus<OnWingFlappedEvent>.Subscribe(OnLocalFlapPerformed);
+            }
         }
     }
 
     public void Tick(float deltaTime)
     {
-        InputMove();
+        if(_inputProvider != null)
+            InputMove();
     }
 
     private void InputMove()
@@ -101,15 +107,13 @@ public class PlayerInputSender : BaseNetworkActor<ControllerType>, IControllerSe
         EventBus<SharedActorFlapEvent>.Publish(new SharedActorFlapEvent(OwnerId));
     }
 
-    public void SetInputProvider(IPlayerInputProvider inputProvider)
-    {
-        if(inputProvider != null)
-        {
-            _inputProvider = inputProvider;
-            UpdateManager.UPDATE_OnController -= Tick;
-            UpdateManager.UPDATE_OnController += Tick;
-        }
-    }
+    //public void SetInputProvider(IPlayerInputProvider inputProvider)
+    //{
+    //    if(inputProvider != null)
+    //    {
+    //        _inputProvider = inputProvider;
+    //    }
+    //}
 
     
 }

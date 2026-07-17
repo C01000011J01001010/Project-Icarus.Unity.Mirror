@@ -1,3 +1,4 @@
+using Core.Manager;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -13,6 +14,10 @@ public abstract class BaseStateController<TState> : MonoBehaviour, IInitialize, 
     protected Dictionary<TState, BaseState<TState>> stateDict;
 
     public TState CurrentStateType => currentStateType;
+
+    public TickGroup TickGroup => TickGroup.Character;
+
+    public FixedTickGroup FixedTickGroup => FixedTickGroup.Physics;
 
     protected virtual void OnDestroy()
     {

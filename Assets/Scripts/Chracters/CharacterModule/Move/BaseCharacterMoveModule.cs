@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Core.Manager;
+using System.Collections;
 using UnityEngine;
 using static UnityEngine.EventSystems.StandaloneInputModule;
 
@@ -10,6 +11,9 @@ public abstract class BaseCharacterMoveModule : BaseCharacterModule,
     protected bool isSprint;
     protected Vector2 moveInput;
     public float SprintMul = 2f;
+
+    public FixedTickGroup FixedTickGroup => FixedTickGroup.Physics;
+
     public override void Exit()
     {
         base.Exit();

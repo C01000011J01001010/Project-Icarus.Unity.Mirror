@@ -6,6 +6,9 @@ using UnityEngine;
 
 
 
+/// <summary>
+/// GlobalScene에서 CameraManager의 자식객체로 사용
+/// </summary>
 [RequireComponent(typeof(Camera))]
 [RequireComponent(typeof(CinemachineBrain))]
 public class MainCameraController : MonoBehaviour//, IInitializable

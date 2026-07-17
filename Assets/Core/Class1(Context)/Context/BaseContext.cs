@@ -21,7 +21,7 @@ namespace Core
     [RequireComponent(typeof(ManagerHub))]
     [RequireComponent(typeof(ActorHub))] // 💡 단일 ActorHub도 필수로 요구하도록 추가!
     [RequireComponent(typeof(UiHub))]
-    internal abstract class BaseContext<T> : MonoBehaviour where T : BaseContext<T>
+    public abstract class BaseContext<T> : MonoBehaviour where T : BaseContext<T>
     {
         protected static T _instance;
         public static T Inst => _instance;

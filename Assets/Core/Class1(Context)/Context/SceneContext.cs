@@ -1,8 +1,9 @@
 ﻿using Core;
 using Core.Manager;
 using System.Collections;
-using UnityEngine.SceneManagement;
+using UnityEditor;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 
 namespace Core
@@ -11,7 +12,8 @@ namespace Core
     /// Additive로 로드되는 개별 씬마다 존재하는 컨텍스트
     /// 씬이 언로드될 때 자연스럽게 파괴되며 메모리를 정리
     /// </summary>
-    internal class SceneContext : BaseContext<SceneContext>
+    [DefaultExecutionOrder((int)ExecutionOrder.SceneContext)]
+    public class SceneContext : BaseContext<SceneContext>
     {
         protected override ContextScope myScope => ContextScope.Scene;
 

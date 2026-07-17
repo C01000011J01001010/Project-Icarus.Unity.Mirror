@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine;
-using Core;
 using Core.EventBus;
+using Core.Test;
 
 namespace Core
 {
@@ -25,7 +25,8 @@ namespace Core
     /// GlobalScene은 Additive 방식으로 언로드되지 않으므로 
     /// 자연스럽게 앱 종료 시점까지 생존이 보장
     /// </summary>
-    internal class ProjectContext : BaseContext<ProjectContext>
+    [DefaultExecutionOrder((int)ExecutionOrder.ProjectContext)]
+    public class ProjectContext : BaseContext<ProjectContext>
     {
         protected override ContextScope myScope => ContextScope.Project;
 
@@ -35,7 +36,17 @@ namespace Core
             yield return Initialize();
 
             // 모든 전역 시스템 세팅이 끝났으므로, 첫 씬을 로드하라고 허공에 외침 (EventBus)
-            EventBus<SceneLoadRequestEvent>.Publish(new SceneLoadRequestEvent(Constants.SCENE_SampleScene));
+            if(SceneTester.IsSceneTest)
+            {
+                Debug.Log($"[ProjectContext] 단독 씬 테스트 환경 시스템 빌드업을 시작합니다.");
+
+                // 전용 이벤트를 발행하여 디렉터의 공통 파이프라인(하단부)을 태움
+                EventBus<SceneTestBootstrapRequestEvent>.Publish(new SceneTestBootstrapRequestEvent(SceneTester.TestScene));
+            }
+            else
+            {
+                EventBus<SceneLoadRequestEvent>.Publish(new SceneLoadRequestEvent(Constants.SCENE_SampleScene));
+            }
         }
     }
 }

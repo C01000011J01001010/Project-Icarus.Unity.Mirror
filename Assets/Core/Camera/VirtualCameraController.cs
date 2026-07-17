@@ -4,6 +4,9 @@ using Core.Manager;
 using Unity.Cinemachine;
 using UnityEngine;
 
+/// <summary>
+/// 개별씬에서 GlobalScene에 존재하는 CameraManager에 자신을 등록함
+/// </summary>
 [RequireComponent(typeof(CinemachineCamera))]
 public abstract class VirtualCameraController : BaseActor
 {

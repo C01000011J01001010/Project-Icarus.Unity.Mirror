@@ -1,9 +1,9 @@
-﻿using System.Collections;
+﻿using Core.EventBus;
+using Core.Test;
+using System.Collections;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using Core.EventBus;
-using static Core.Utility;
 
 namespace Core
 {
@@ -17,6 +17,7 @@ namespace Core
         {
             // ProjectContext나 UI 버튼 등에서 씬 로드를 요청하면 여기서 듣고 실행합니다.
             SubscribeTo<SceneLoadRequestEvent>(OnSceneLoadRequest);
+            SubscribeTo<SceneTestBootstrapRequestEvent>(OnTestBootstrapRequest);
 
             // 기존 SceneManager 콜백 등록 (필요 시 유지)
             SceneManager.sceneLoaded += CALLBACK_SceneLoaded;
@@ -39,13 +40,19 @@ namespace Core
             _ = ChangeScene(evt.TargetSceneName);
         }
 
+        // 단독 씬 테스트 시작 요청을 받았을 때
+        private void OnTestBootstrapRequest(SceneTestBootstrapRequestEvent evt)
+        {
+            StartCoroutine(BootstrapTestSceneRoutine(evt.TestScene));
+        }
+
         /// <summary>
         /// 에디터 테스트 및 런타임 초기화 시, SceneContext가 자신의 씬 정보를 다이렉트로 등록하기 위한 함수
         /// </summary>
         public static void RegisterCurrentScene(Scene newScene)
         {
             currentScene = newScene;
-            SetActiveScene(currentScene);
+            Utility.SetActiveScene(currentScene);
         }
 
 
@@ -80,23 +87,47 @@ namespace Core
             sceneChangeProgress.allowSceneActivation = true;
 
             while (!sceneChangeProgress.isDone) yield return null;
-            // 💡 [이 시점] 새 씬이 활성화되면서 유저님이 만든 SceneContext.Awake()가 실행됨!
-            // -> SceneContext의 Awake에서 SceneFlowDirector.RegisterCurrentScene()이 호출되어 currentScene 세팅 완료.
 
+            yield return InitializeSceneSystemRoutine();
+        }
+
+        /// <summary>
+        /// 단독 씬 테스트용 부트스트랩 루틴 (자원 로드 생략)
+        /// </summary>
+        private IEnumerator BootstrapTestSceneRoutine(Scene testScene)
+        {
+            // [상단 부 생략] 이미 씬이 있으므로 캐싱만 수행
+            currentScene = testScene;
+
+            // DX(개발자 경험)를 위해 테스트 시작 연출용 가짜(?) 진행도 살짝 표기
+            EventBus<SystemLoadingEvent>.Publish(new SystemLoadingEvent(SystemLoadingEvent.State.Progress, "단독 씬 테스트 환경 감지...", 0.3f));
+            yield return new WaitForSecondsRealtime(0.1f); // 엔진 안정화용 미세 대기
+
+            // [하단 부 공유] 시스템 환경 구축 시퀀스로 진입
+            yield return InitializeSceneSystemRoutine();
+        }
+
+        /// <summary>
+        /// 3. [공통 파이프라인] 씬 내부의 시스템 구축 및 초기화 단계
+        /// </summary>
+        private IEnumerator InitializeSceneSystemRoutine()
+        {
             // 안전하게 현재씬을 다시 고정
-            SetActiveScene(currentScene);
+            Utility.SetActiveScene(currentScene);
 
-            // 3. 새 씬 내부의 시스템 구축 단계 (전체 진행도 70% ~ 95%)
             EventBus<SystemLoadingEvent>.Publish(new SystemLoadingEvent(SystemLoadingEvent.State.Progress, "새로운 시스템 환경 세팅 중...", 0.85f));
 
-            // 💡 디렉터가 씬 컨텍스트를 직접 깨움!
-            // (만약 이전에 논의했던 CoreFacade를 사용하셨다면 CoreFacade.InitializeSceneCore() 로 교체하시면 더 완벽합니다)
+            // 핵심: 디렉터가 전권을 가지고 씬 컨텍스트 산하 Hub들을 깨움
             if (SceneContext.Inst != null)
             {
                 yield return SceneContext.Inst.Initialize();
             }
+            else
+            {
+                Debug.LogWarning($"[{gameObject.name}] 현재 씬에 SceneContext가 존재하지 않습니다.");
+            }
 
-            // 4. 로딩 완료 명령 (Complete 발송)
+            // 로딩 최종 완료 공포
             EventBus<SystemLoadingEvent>.Publish(new SystemLoadingEvent(SystemLoadingEvent.State.Complete, "로딩 완료!", 1.0f));
         }
 

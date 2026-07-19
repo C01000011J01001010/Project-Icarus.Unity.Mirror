@@ -17,7 +17,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &2941183202969076680
 Transform:
   m_ObjectHideFlags: 0
@@ -49,6 +49,7 @@ MonoBehaviour:
   _addedNetworkObject: {fileID: 3109303395465510745}
   _networkObjectCache: {fileID: 3109303395465510745}
   capsuleManPrefab: {fileID: 3363384272826522340, guid: ed8a6742646579a4585fa4088bf4d875, type: 3}
+  SpawnPoint: {fileID: 2941183202969076680}
 --- !u!114 &3109303395465510745
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -79,7 +80,7 @@ MonoBehaviour:
   _initializeOrder: 0
   _preventDespawnOnDisconnect: 0
   _defaultDespawnType: 0
-  _initializedTimestamp: -8584177444275883841
+  _initializedTimestamp: -8584172861776648699
   _localLevelOfDetailCalculationType: 0
   _useLevelOfDetail: 0
   _useRootLevelOfDetail: 1

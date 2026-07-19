@@ -31,6 +31,18 @@ public struct SharedActorFlapEvent : IEvent
     }
 }
 
+public struct SharedActorMouseClickFlapEvent : IEvent
+{
+    public int clientId; // 누가 입력했는가
+    public bool isLeft; // 어느쪽 마우스를 입력했는가
+
+    public SharedActorMouseClickFlapEvent(int clientId, bool isLeft)
+    {
+        this.clientId = clientId;
+        this.isLeft = isLeft;
+    }
+}
+
 public class PlayerInputSender : BaseActorNetworked, ITickable//, IControllerSetter
 {
     private IPlayerInputProvider _inputProvider;
@@ -46,7 +58,8 @@ public class PlayerInputSender : BaseActorNetworked, ITickable//, IControllerSet
         base.OnStopClient();
         if (IsOwner && !isUnityNull(_inputProvider))
         {
-            EventBus<OnWingFlappedEvent>.Unsubscribe(OnLocalFlapPerformed);
+            EventBus<OnSpaceBarWingFlappedEvent>.Unsubscribe(OnLocalSpaceBarFlapPerformed);
+            EventBus<OnMouseClickWingFlappedEvent>.Unsubscribe(OnLocalMouseFlapPerformed);
         }
     }
     public override void OnStartClient()
@@ -60,7 +73,8 @@ public class PlayerInputSender : BaseActorNetworked, ITickable//, IControllerSet
             //EventBus<ControllerSettingEvent>.Publish(new ControllerSettingEvent(this));
             if(!isUnityNull(_inputProvider))
             {
-                EventBus<OnWingFlappedEvent>.Subscribe(OnLocalFlapPerformed);
+                EventBus<OnSpaceBarWingFlappedEvent>.Subscribe(OnLocalSpaceBarFlapPerformed);
+                EventBus<OnMouseClickWingFlappedEvent>.Subscribe(OnLocalMouseFlapPerformed);
             }
         }
     }
@@ -83,9 +97,14 @@ public class PlayerInputSender : BaseActorNetworked, ITickable//, IControllerSet
         ServerCmdSendMove(currentMove);
     }
 
-    private void OnLocalFlapPerformed(OnWingFlappedEvent evt)
+    private void OnLocalSpaceBarFlapPerformed(OnSpaceBarWingFlappedEvent evt)
     {
-        ServerRpcFlap();
+        ServerRpcSpaceBarFlap();
+    }
+
+    private void OnLocalMouseFlapPerformed(OnMouseClickWingFlappedEvent evt)
+    {
+        ServerRpcMouseFlap(evt.isLeft);
     }
 
     // =========================================================
@@ -101,10 +120,16 @@ public class PlayerInputSender : BaseActorNetworked, ITickable//, IControllerSet
     }
 
     [ServerRpc]
-    private void ServerRpcFlap()
+    private void ServerRpcSpaceBarFlap()
     {
         // 서버: "오케이, X번 클라이언트가 날갯짓을 했군."
         EventBus<SharedActorFlapEvent>.Publish(new SharedActorFlapEvent(OwnerId));
+    }
+
+    [ServerRpc]
+    private void ServerRpcMouseFlap(bool isLeft)
+    {
+        EventBus<SharedActorMouseClickFlapEvent>.Publish(new SharedActorMouseClickFlapEvent(OwnerId, isLeft));
     }
 
     //public void SetInputProvider(IPlayerInputProvider inputProvider)

@@ -15,9 +15,14 @@ public enum InputMapType
     Player,
 }
 
-public struct OnWingFlappedEvent : IEvent
+public struct OnSpaceBarWingFlappedEvent : IEvent
 {
 
+}
+public struct OnMouseClickWingFlappedEvent : IEvent
+{
+    public bool isLeft; //false면 right
+    public OnMouseClickWingFlappedEvent(bool isLeft)=> this.isLeft = isLeft;
 }
 
 public struct ToggleMouseLockEvent : IEvent
@@ -80,14 +85,18 @@ public class UserInputManager : BaseInputManager<UserInputActions>, IManager, IP
     private void PlayerInputSubScribe()
     {
         PlayerInputUnsubscribe();
-        Player.Flap.started += OnWingFlapped;
+        Player.Flap.started += OnSpaceBarWingFlapped;
+        Player.LeftFlap.started += OnMouseLeftClickWingFlapped;
+        Player.RightFlap.started += OnMouseRightClickWingFlapped;
         Player.MouseLockOff.started += OnMouseLock;
         Player.MouseLockOff.canceled += OnMouseLock;
     }
 
     private void PlayerInputUnsubscribe()
     {
-        Player.Flap.started -= OnWingFlapped;
+        Player.Flap.started -= OnSpaceBarWingFlapped;
+        Player.LeftFlap.started -= OnMouseLeftClickWingFlapped;
+        Player.RightFlap.started -= OnMouseRightClickWingFlapped;
         Player.MouseLockOff.started -= OnMouseLock;
         Player.MouseLockOff.canceled -= OnMouseLock;
     }
@@ -105,11 +114,22 @@ public class UserInputManager : BaseInputManager<UserInputActions>, IManager, IP
         EventBus<ToggleMouseLockEvent>.Publish(new ToggleMouseLockEvent(isMouseLock));
     }
 
-    private void OnWingFlapped(InputAction.CallbackContext context)
+    private void OnSpaceBarWingFlapped(InputAction.CallbackContext context)
     {
-        EventBus<OnWingFlappedEvent>.Publish(new OnWingFlappedEvent());
+        EventBus<OnSpaceBarWingFlappedEvent>.Publish(new OnSpaceBarWingFlappedEvent());
     }
-    
+
+    private void OnMouseLeftClickWingFlapped(InputAction.CallbackContext context)
+    {
+        EventBus<OnMouseClickWingFlappedEvent>.Publish(new OnMouseClickWingFlappedEvent(true));
+    }
+
+    private void OnMouseRightClickWingFlapped(InputAction.CallbackContext context)
+    {
+        EventBus<OnMouseClickWingFlappedEvent>.Publish(new OnMouseClickWingFlappedEvent(false));
+    }
+
+
 
     //private void OnUseItemInput(InputAction.CallbackContext context)
     //{

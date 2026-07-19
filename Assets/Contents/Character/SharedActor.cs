@@ -67,7 +67,9 @@ public class SharedActor : BaseActorNetworked, IFixedTickable
         // 이동 및 날갯짓 이벤트 모두 구독
         // 주: 원래 OnStartServer에서 구독을 등록했습니다.
         EventBus<SharedActorMoveEvent>.Subscribe(OnSharedActorMove);
-        EventBus<SharedActorFlapEvent>.Subscribe(OnSharedActorFlap);
+        EventBus<SharedActorFlapEvent>.Subscribe(OnSharedActorSpacebarFlap);
+        EventBus<SharedActorMouseClickFlapEvent>.Subscribe(OnSharedActorMouseFlap);
+
 
         EventBus<R_FixedTickEvent>.Publish(new R_FixedTickEvent(this, FixedTickGroup.Physics, true));
     }
@@ -76,7 +78,8 @@ public class SharedActor : BaseActorNetworked, IFixedTickable
     {
         // 수동으로 등록한 이벤트 해제
         EventBus<SharedActorMoveEvent>.Unsubscribe(OnSharedActorMove);
-        EventBus<SharedActorFlapEvent>.Unsubscribe(OnSharedActorFlap);
+        EventBus<SharedActorFlapEvent>.Unsubscribe(OnSharedActorSpacebarFlap);
+        EventBus<SharedActorMouseClickFlapEvent>.Unsubscribe(OnSharedActorMouseFlap);
         UnsubscribeAll();
         EventBus<R_FixedTickEvent>.Publish(new R_FixedTickEvent(this, FixedTickGroup.Physics, false));
     }
@@ -87,19 +90,40 @@ public class SharedActor : BaseActorNetworked, IFixedTickable
     }
 
     // ✨ 날갯짓 단발성 이벤트 처리 함수
-    private void OnSharedActorFlap(SharedActorFlapEvent evt)
+    private void OnSharedActorSpacebarFlap(SharedActorFlapEvent evt)
     {
         if (!IsServerInitialized) return;
-
-        // 1. 🚀 위로 향하는 순간적인 힘 가하기 (Impulse 모드는 질량을 고려해 툭 쳐줍니다)
-        _rigidbody.AddForce(transform.up * flapForce, ForceMode.Impulse);
 
         // 2. 🔄 짝수/홀수 ClientId에 따른 토크(회전력) 방향 계산
         // 💡 Unity 3D 좌표계 규칙 (Y축 기준)
         // (+) 값 = 위에서 내려다봤을 때 '반시계 방향' 회전 (Counter-Clockwise) -> 홀수
         // (-) 값 = 위에서 내려다봤을 때 '시계 방향' 회전 (Clockwise) -> 짝수
+        bool isLeft = evt.ClientId % 2 == 0;
+        Flap(isLeft);
 
-        float torqueDirection = (evt.ClientId % 2 == 0) ? -1f : 1f;
+
+        
+
+        //float torqueDirection = ;
+        //Vector3 appliedTorque = Vector3.forward * torqueDirection * flapTorque;
+
+        //// 3. 회전력 적용 (Impulse)
+        //_rigidbody.AddTorque(appliedTorque, ForceMode.Impulse);
+
+        //timeCount = 0;
+    }
+    private void OnSharedActorMouseFlap(SharedActorMouseClickFlapEvent evt)
+    {
+        if (!IsServerInitialized) return;
+        Flap(evt.isLeft);
+    }
+
+    private void Flap(bool isLeft)
+    {
+        // 1. 🚀 위로 향하는 순간적인 힘 가하기 (Impulse 모드는 질량을 고려해 툭 쳐줍니다)
+        _rigidbody.AddForce(transform.up * flapForce, ForceMode.Impulse);
+
+        float torqueDirection = isLeft ? -1f : 1f;
         Vector3 appliedTorque = Vector3.forward * torqueDirection * flapTorque;
 
         // 3. 회전력 적용 (Impulse)

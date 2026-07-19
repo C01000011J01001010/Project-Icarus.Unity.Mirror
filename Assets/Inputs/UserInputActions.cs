@@ -453,7 +453,7 @@ public partial class @UserInputActions: IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""e39fc455-cab7-4da2-8509-03b46fee7f22"",
-                    ""path"": """",
+                    ""path"": ""<Mouse>/leftButton"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
@@ -464,7 +464,7 @@ public partial class @UserInputActions: IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""81185166-f1bf-4afa-86e8-24a1b247b3bc"",
-                    ""path"": """",
+                    ""path"": ""<Mouse>/rightButton"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",

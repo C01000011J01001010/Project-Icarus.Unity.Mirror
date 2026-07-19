@@ -77,13 +77,13 @@ namespace Core.Hub
 
         public override IEnumerator Initialize()
         {
-            // 초기화 열차는 이미 떠났음을 알림
-            _isInitStarted = true;
+            yield return base.Initialize();
 
+            // 초기화 열차는 이미 떠났음을 알림
             // Initialize -> LateInitialize 사이에 추가되는 Module 이 LateInitialize만 실행하는것 방지
+            _isInitStarted = true;
             _startInitModules = moduleDict.Values.ToArray();
 
-            yield return base.Initialize();
             foreach(var module in _startInitModules)
             {
                 yield return module?.Initialize();
@@ -95,6 +95,13 @@ namespace Core.Hub
         public override IEnumerator LateInitialize()
         {
             yield return base.LateInitialize();
+
+            if(_startInitModules == null)
+            {
+                Debug.LogWarning($"{gameObject.name}의 {GetType().Name}에서 {nameof(LateInitialize)} 재시도");
+                yield break;
+            }
+
             foreach (var module in _startInitModules)
             {
                 if(module is ILateInitialize lateModule)
@@ -173,7 +180,7 @@ namespace Core.Hub
                 return module as T;
             }
             // 모듈을 찾지 못했을 때의 안전장치 및 경고
-            Debug.LogWarning($"[BaseModuleHub] {typeof(T).Name} 모듈이 등록되어 있지 않습니다.");
+            Debug.LogWarning($"{gameObject.name}의 {GetType().Name}에 {typeof(T).Name} 모듈이 등록되어 있지 않습니다.");
             return null;
         }
 

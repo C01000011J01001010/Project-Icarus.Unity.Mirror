@@ -12,6 +12,7 @@ namespace Core.EventBus
 
         public static void Subscribe(Action<T> handler)
         {
+            OnEvent -= handler;
             OnEvent += handler;
             LogSubscribe(handler); // 에디터에서만 작동, 빌드 시 증발
         }

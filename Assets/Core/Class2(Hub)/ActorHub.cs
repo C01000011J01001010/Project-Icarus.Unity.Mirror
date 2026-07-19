@@ -32,13 +32,25 @@ namespace Core.Hub
     }
 
     // 3. 단 하나만 존재하며, 서브 클래스가 필요 없는 통합 ActorHub
-    public class ActorHub : BaseHub<ActorRegistrationEvent>
+    public sealed class ActorHub : BaseHub<ActorRegistrationEvent>
     {
         // 씬Context 시퀀스 보장용 우선순위 (이제 액터는 단 하나이므로 기본값 고정)
         //public int Priority => 200; 
 
         // [핵심] 클래스 타입 및 인터페이스 타입별로 액터를 자동 분류하는 전화번호부
         private readonly Dictionary<Type, HashSet<IActor>> _actorRegistry = new();
+
+        public override IEnumerator Initialize()
+        {
+            Utility.LogFunctionCallStart(this);
+            return base.Initialize();
+        }
+
+        public override IEnumerator LateInitialize()
+        {
+            Utility.LogFunctionCallStart(this);
+            return base.LateInitialize();
+        }
 
         internal override void AwakeFromContext()
         {
@@ -53,8 +65,8 @@ namespace Core.Hub
             _actorRegistry.Clear();
         }
 
-        public override IEnumerator Initialize() => null;
-        public override IEnumerator LateInitialize() => null;
+        //public override IEnumerator Initialize() => null;
+        //public override IEnumerator LateInitialize() => null;
 
 
         protected override void RegisterLeaf(ActorRegistrationEvent evt)

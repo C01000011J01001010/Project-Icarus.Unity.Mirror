@@ -2,7 +2,6 @@ using FishNet.Connection;
 using FishNet.Object;
 using Core.EventBus;
 using Core.Manager;
-using Core.Update;
 using UnityEngine;
 
 namespace Core.Network

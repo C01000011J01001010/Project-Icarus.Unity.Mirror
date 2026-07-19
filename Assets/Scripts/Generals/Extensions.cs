@@ -159,7 +159,7 @@ public static class Extensions
     }
 
     /// <summary>
-    /// 싱글톤은 많아야 1~2개까지 만들어야함
+    /// 싱글톤 만들때 수백번 필요한지 생각할것
     /// </summary>
     /// <typeparam name="T">클래스명</typeparam>
     /// <param name="target">클래스 객체</param>
@@ -182,10 +182,11 @@ public static class Extensions
         }
         else // 이미 싱글톤으로 된 다른 객체가 존재하는 경우
         {
-            Debug.LogError($"Object {target} is already registered as a Singleton.");
+            Debug.LogWarning($"Object {target} is already registered as a Singleton.");
             return false;
         }
     }
+
     public static TargetStruct ByteArray2Struct<TargetStruct>(this byte[] originArr)
         where TargetStruct : struct
     {

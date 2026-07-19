@@ -1,7 +1,5 @@
 ﻿using Core;
 using Core.EventBus;
-using Core.Manager;
-using Core.Update;
 using UnityEngine;
 
 public abstract class BaseLeaf : MonoBehaviour
@@ -19,7 +17,6 @@ public abstract class BaseLeaf : MonoBehaviour
     {
 
     }
-
 
     protected virtual void OnEnable() => RegisterTick();
     protected virtual void OnDisable() => UnregisterTick();

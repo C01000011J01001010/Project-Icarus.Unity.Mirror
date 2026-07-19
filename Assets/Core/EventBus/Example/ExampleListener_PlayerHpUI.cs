@@ -7,7 +7,7 @@ namespace Core.EventBus.Example
     /// <summary>
     /// 메모리 해제 자동화 예시
     /// </summary>
-    public class ExampleListener_PlayerHpUI : BaseEventListener_Automatic
+    public class ExampleListener_PlayerHpUI : MonoBehaviour
     {
         [SerializeField] private int _targetPlayerId = 1; // 이 UI가 담당할 플레이어 ID
         [SerializeField] private Image _hpSliderImage;
@@ -16,8 +16,13 @@ namespace Core.EventBus.Example
 
         private void OnEnable()
         {
-            SubscribeTo<ExampleEvent_PlayerDamaged>(OnPlayerDamaged);
+            EventBus<ExampleEvent_PlayerDamaged>.Subscribe(OnPlayerDamaged);
 
+        }
+
+        private void OnDisable()
+        {
+            EventBus<ExampleEvent_PlayerDamaged>.Unsubscribe(OnPlayerDamaged);
         }
 
         // 이벤트가 들어왔을 때 실행될 로직

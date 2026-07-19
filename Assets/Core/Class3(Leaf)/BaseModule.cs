@@ -25,8 +25,6 @@ namespace Core
             EventBus<ModuleRegistrationEvent>.Publish(evt);
         }
 
-
-        
         protected virtual void OnDestroy()
         {
             // 만약 Hub가 먼저 사라졌다해도 문제 없음

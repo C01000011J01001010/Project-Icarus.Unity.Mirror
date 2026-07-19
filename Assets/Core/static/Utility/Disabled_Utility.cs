@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Core
 {
-    // Utility.Actor
+    // Utility.Log
     public static partial class Utility
     {
 

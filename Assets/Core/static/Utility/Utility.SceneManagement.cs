@@ -11,10 +11,10 @@ namespace Core
     {
         public static void SetActiveScene(Scene scene)
         {
-            if (scene.IsValid() && scene.isLoaded)
+            if (scene.IsValid() && scene.isLoaded && SceneManager.GetActiveScene() != scene)
             {
                 SceneManager.SetActiveScene(scene);
-                Debug.Log($"[SceneFlowDirector] 현재 콘텐츠 씬 등록 완료 (by SceneContext): {scene.name}");
+                LogColored($"[SceneFlowDirector] 현재 콘텐츠 씬 등록 완료 : {scene.name}", LogColor.Green);
             }
         }
     }

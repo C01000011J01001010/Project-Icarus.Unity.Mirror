@@ -1,9 +1,9 @@
-using Core.Manager;
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using Core;
 
 public abstract class BaseStateController<TState> : MonoBehaviour, IInitialize, ILateInitialize, ITickable, IFixedTickable
     where TState : struct, Enum

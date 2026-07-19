@@ -24,9 +24,9 @@ namespace Core.Hub
         internal virtual void AwakeFromContext() { }
         internal virtual void OnDestroyFromContext() {}
 
-        public virtual IEnumerator Initialize() { yield return null; }
+        public virtual IEnumerator Initialize() { yield break; }
 
-        public virtual IEnumerator LateInitialize() { yield return null; }
+        public virtual IEnumerator LateInitialize() { yield break; }
 
         protected virtual void OnLeafRegistration(TRegistrationEvent evt)
         {

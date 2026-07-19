@@ -7,6 +7,7 @@ using FishNet.Component.Transforming;
 using FishNet.Managing.Server;
 using System.Collections.Generic;
 using UnityEngine;
+using Core.Director;
 
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(NetworkTransform))]
@@ -64,14 +65,18 @@ public class SharedActor : BaseActorNetworked, IFixedTickable
         ServerManager.Spawn(gameObject);
 
         // 이동 및 날갯짓 이벤트 모두 구독
-        SubscribeTo<SharedActorMoveEvent>(OnSharedActorMove);
-        SubscribeTo<SharedActorFlapEvent>(OnSharedActorFlap);
+        // 주: 원래 OnStartServer에서 구독을 등록했습니다.
+        EventBus<SharedActorMoveEvent>.Subscribe(OnSharedActorMove);
+        EventBus<SharedActorFlapEvent>.Subscribe(OnSharedActorFlap);
 
         EventBus<R_FixedTickEvent>.Publish(new R_FixedTickEvent(this, FixedTickGroup.Physics, true));
     }
 
     public override void OnStopServer()
     {
+        // 수동으로 등록한 이벤트 해제
+        EventBus<SharedActorMoveEvent>.Unsubscribe(OnSharedActorMove);
+        EventBus<SharedActorFlapEvent>.Unsubscribe(OnSharedActorFlap);
         UnsubscribeAll();
         EventBus<R_FixedTickEvent>.Publish(new R_FixedTickEvent(this, FixedTickGroup.Physics, false));
     }

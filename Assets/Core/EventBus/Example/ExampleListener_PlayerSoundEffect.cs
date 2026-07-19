@@ -6,20 +6,20 @@ namespace Core.EventBus.Example
     /// <summary>
     /// 메모리 해제 수동조작 예시
     /// </summary>
-    public class ExampleListener_PlayerSoundEffect : BaseEventListener_Manual
+    public class ExampleListener_PlayerSoundEffect : MonoBehaviour
     {
         [SerializeField] private int _targetPlayerId = 1;
         [SerializeField] private AudioSource _audioSource;
         [SerializeField] private AudioClip _hitSound;
 
-        protected override void RegisterEvents()
+        private void OnEnable()
         {
-            SubscribeTo<ExampleEvent_PlayerDamaged>(PlayHitSound);
-        }
+            EventBus<ExampleEvent_PlayerDamaged>.Subscribe(PlayHitSound);
 
-        protected override void UnregisterEvents()
+        }
+        private void OnDisable()
         {
-            UnsubscribeFrom<ExampleEvent_PlayerDamaged>(PlayHitSound);
+            EventBus<ExampleEvent_PlayerDamaged>.Unsubscribe(PlayHitSound);
         }
 
         private void PlayHitSound(ExampleEvent_PlayerDamaged evt)

@@ -1,7 +1,6 @@
 using Core;
 using Core.EventBus;
 using Core.Manager;
-using Core.Update;
 using System;
 using System.Collections;
 using System.Collections.Generic;

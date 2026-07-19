@@ -1,10 +1,5 @@
 ﻿using Core.EventBus;
 using Core.Hub;
-using Core.Manager;
-using Core.Update;
-using System;
-using Unity.VisualScripting;
-using UnityEngine;
 
 namespace Core
 {
@@ -18,8 +13,6 @@ namespace Core
             var evt = new ActorRegistrationEvent(this, true, myScope);
             EventBus<ActorRegistrationEvent>.Publish(evt);
         }
-
-        
 
         protected override void OnDisable()
         {

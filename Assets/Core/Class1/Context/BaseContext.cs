@@ -21,12 +21,14 @@ namespace Core
     [RequireComponent(typeof(ManagerHub))]
     [RequireComponent(typeof(ActorHub))] // 💡 단일 ActorHub도 필수로 요구하도록 추가!
     [RequireComponent(typeof(UiHub))]
-    public abstract class BaseContext<T> : MonoBehaviour where T : BaseContext<T>
+    public abstract class BaseContext<T> : Singleton<T> 
+        where T : BaseContext<T>
     {
-        protected static T _instance;
-        public static T Inst => _instance;
+        //protected static T _instance;
+        //public static T Inst => _instance;
 
-        public virtual bool isInit { get; private set; }
+        private bool _isInit;
+        public static bool IsInit => Inst._isInit;
 
         protected abstract ContextScope myScope { get; }
 
@@ -35,16 +37,15 @@ namespace Core
         internal ActorHub actorHub { get; private set; }
         internal UiHub uiHub { get; private set; }
 
-        protected virtual void Awake()
+        protected override void OnDestroy()
         {
-            #region Singleton
-            T thisInstance = this as T;
-            if (!thisInstance.TryMakeSingleton(ref _instance))
-            {
-                Destroy(gameObject);
-                return;
-            }
-            #endregion
+            OnDestroyToss();
+            base.OnDestroy();
+        }
+
+        protected override void Awake()
+        {
+            base.Awake();
 
             // GetOrAddComponent로 안전하게 Hub들을 가져오거나 생성
             managerHub = gameObject.GetComponent<ManagerHub>();
@@ -66,15 +67,6 @@ namespace Core
             managerHub?.AwakeFromContext();
             actorHub?.AwakeFromContext();
             uiHub?.AwakeFromContext();
-        }
-
-        protected virtual void OnDestroy()
-        {
-            OnDestroyToss();
-            if (_instance == this)
-            {
-                _instance = null;
-            }
         }
 
         public void OnDestroyToss()
@@ -123,7 +115,7 @@ namespace Core
             // 4. 로딩 완료 알림
             EventBus<SystemLoadingEvent>.Publish(new SystemLoadingEvent(SystemLoadingEvent.State.Complete, "초기화 완료!", 1.0f));
 
-            isInit = true;
+            _isInit = true;
         }
     }
 }

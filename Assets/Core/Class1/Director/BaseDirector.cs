@@ -5,8 +5,8 @@ using UnityEngine;
 
 namespace Core.Director
 {
-    internal class BaseDirector<Director> : Singleton<Director>, IDirector
-        where Director : MonoBehaviour
+    public class BaseDirector<Director> : Singleton<Director>, IDirector
+        where Director : BaseDirector<Director>
     {
     }
 }

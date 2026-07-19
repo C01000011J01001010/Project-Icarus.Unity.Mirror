@@ -5,7 +5,8 @@ using UnityEngine;
 
 namespace Core
 { 
-    internal class Singleton<T> : MonoBehaviour where T : MonoBehaviour
+    public class Singleton<T> : MonoBehaviour 
+        where T : Singleton<T>
     {
         private static T _inst;
 

@@ -8,12 +8,12 @@ namespace Core.Environment
 {
     [ExecuteAlways]
     [RequireComponent(typeof(SpaceZoneCore))]
-    public class OuterWallModule : MonoBehaviour
+    public class OuterWallModule : BaseEnvironment
     {
         [HideInInspector][SerializeField] private bool _showOuterWalls = true;
 
         private SpaceZoneCore _core;
-        public const string OUTER_FOLDER_NAME = "Outer";
+        protected override string FolderName => "Outer";
 
         public bool ShowOuterWalls
         {
@@ -39,7 +39,7 @@ namespace Core.Environment
             if (pScale.x <= 0 || pScale.y <= 0 || pScale.z <= 0) return;
 
             // 🌟 유저님 아이디어 적용: 폴더가 없으면 만들고, 있으면 재활용합니다.
-            Transform folderTr = GetOrCreateContainer(OUTER_FOLDER_NAME);
+            Transform folderTr = GetOrCreateContainer(FolderName);
 
             // 🌟 기존 객체의 Transform 수치만 가볍게 덮어씌웁니다. (메모리 재할당 0%)
             UpdateFace("OuterWall_Left", new Vector3(-0.5f - (0.5f / pScale.x), 0, 0), new Vector3(1f / pScale.x, 1f, 1f), folderTr);
@@ -106,7 +106,7 @@ namespace Core.Environment
         {
             if (Application.isPlaying) _showOuterWalls = false;
 
-            Transform folder = transform.Find(OUTER_FOLDER_NAME);
+            Transform folder = transform.Find(FolderName);
             if (folder == null) return;
             foreach (var renderer in folder.GetComponentsInChildren<MeshRenderer>(true))
             {

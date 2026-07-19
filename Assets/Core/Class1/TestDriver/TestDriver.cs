@@ -12,7 +12,7 @@ namespace Core.Test
     /// [DefaultExecutionOrder]를 통해 씬 내의 어떤 객체보다 가장 먼저 깨어나서 타임라인을 통제합니다.
     /// </summary>
     [DefaultExecutionOrder((int)ExecutionOrder.TestDriver)] // 유니티 엔진 내에서 무조건 최우선으로 Awake() 실행 보장
-    public class TestDriver : MonoBehaviour
+    public class TestDriver : Singleton<TestDriver> // 1개만 존재해야하니 싱글톤으로 만들되, 절대 싱글톤 접근 사용 안함
     {
         public static Scene TestScene { get; private set; } = default;
 
@@ -28,8 +28,10 @@ namespace Core.Test
             TestScene = default;
         }
 
-        private void Awake()
+        protected override void Awake()
         {
+            base.Awake();
+
             if (SceneManager.sceneCount == 1)
             {
                 TestScene = gameObject.scene;
@@ -75,7 +77,7 @@ namespace Core.Test
             // SceneContext가 초기화 될때까지 대기
             if (SceneContext.Inst != null)
             {
-                while(!SceneContext.Inst.isInit)
+                while(!SceneContext.IsInit)
                 {
                     yield return null;
                 }

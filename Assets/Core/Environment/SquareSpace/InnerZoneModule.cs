@@ -7,7 +7,7 @@ namespace Core.Environment
 {
     [ExecuteAlways]
     [RequireComponent(typeof(SpaceZoneCore))]
-    public class InnerZoneModule : MonoBehaviour
+    public class InnerZoneModule : BaseEnvironment
     {
         [HideInInspector][SerializeField] private float _zoneA_StartY = 6f;
         [HideInInspector][SerializeField] private float _zoneB_StartXAbs = 3f;
@@ -15,7 +15,7 @@ namespace Core.Environment
         [HideInInspector][SerializeField] private bool _showInnerZones = true;
 
         private SpaceZoneCore _core;
-        public const string INNER_FOLDER_NAME = "Inner";
+        protected override string FolderName => "Inner";
 
         #region Properties
         public float ZoneA_StartY { get => _zoneA_StartY; set => _zoneA_StartY = value; }
@@ -26,6 +26,8 @@ namespace Core.Environment
             get => _showInnerZones;
             set { if (_showInnerZones != value) { _showInnerZones = value; UpdateZoneVisuals(); } }
         }
+
+        
         #endregion
 
         private void OnEnable()
@@ -45,7 +47,7 @@ namespace Core.Environment
             Vector3 pScale = _core.zoneSize;
             if (pScale.x <= 0 || pScale.y <= 0 || pScale.z <= 0) return;
 
-            Transform folderTr = GetOrCreateContainer(INNER_FOLDER_NAME);
+            Transform folderTr = GetOrCreateContainer(FolderName);
 
             // [Zone A]
             float sizeYA = pScale.y - _zoneA_StartY;
@@ -135,12 +137,13 @@ namespace Core.Environment
         {
             if (Application.isPlaying) _showInnerZones = false;
 
-            Transform folder = transform.Find(INNER_FOLDER_NAME);
+            Transform folder = transform.Find(FolderName);
             if (folder == null) return;
             foreach (var renderer in folder.GetComponentsInChildren<MeshRenderer>(true))
             {
                 renderer.enabled = _showInnerZones;
             }
         }
+
     }
 }

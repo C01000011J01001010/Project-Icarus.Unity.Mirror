@@ -154,6 +154,24 @@ public partial class @UserInputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": ""Hold"",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""LeftFlap"",
+                    ""type"": ""Button"",
+                    ""id"": ""d6b9f290-e7f9-4b6c-bc39-bd113c206216"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""RightFlap"",
+                    ""type"": ""Button"",
+                    ""id"": ""91f3a19f-476d-4ee6-a05f-6a3afa17d5e1"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -429,6 +447,28 @@ public partial class @UserInputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""MouseLockOff"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""e39fc455-cab7-4da2-8509-03b46fee7f22"",
+                    ""path"": """",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""LeftFlap"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""81185166-f1bf-4afa-86e8-24a1b247b3bc"",
+                    ""path"": """",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""RightFlap"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -1023,6 +1063,8 @@ public partial class @UserInputActions: IInputActionCollection2, IDisposable
         m_Player_MouseLockOff = m_Player.FindAction("MouseLockOff", throwIfNotFound: true);
         m_Player_UseItem = m_Player.FindAction("UseItem", throwIfNotFound: true);
         m_Player_Interact = m_Player.FindAction("Interact", throwIfNotFound: true);
+        m_Player_LeftFlap = m_Player.FindAction("LeftFlap", throwIfNotFound: true);
+        m_Player_RightFlap = m_Player.FindAction("RightFlap", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1123,6 +1165,8 @@ public partial class @UserInputActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_MouseLockOff;
     private readonly InputAction m_Player_UseItem;
     private readonly InputAction m_Player_Interact;
+    private readonly InputAction m_Player_LeftFlap;
+    private readonly InputAction m_Player_RightFlap;
     /// <summary>
     /// Provides access to input actions defined in input action map "Player".
     /// </summary>
@@ -1162,6 +1206,14 @@ public partial class @UserInputActions: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Player/Interact".
         /// </summary>
         public InputAction @Interact => m_Wrapper.m_Player_Interact;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/LeftFlap".
+        /// </summary>
+        public InputAction @LeftFlap => m_Wrapper.m_Player_LeftFlap;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/RightFlap".
+        /// </summary>
+        public InputAction @RightFlap => m_Wrapper.m_Player_RightFlap;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -1209,6 +1261,12 @@ public partial class @UserInputActions: IInputActionCollection2, IDisposable
             @Interact.started += instance.OnInteract;
             @Interact.performed += instance.OnInteract;
             @Interact.canceled += instance.OnInteract;
+            @LeftFlap.started += instance.OnLeftFlap;
+            @LeftFlap.performed += instance.OnLeftFlap;
+            @LeftFlap.canceled += instance.OnLeftFlap;
+            @RightFlap.started += instance.OnRightFlap;
+            @RightFlap.performed += instance.OnRightFlap;
+            @RightFlap.canceled += instance.OnRightFlap;
         }
 
         /// <summary>
@@ -1241,6 +1299,12 @@ public partial class @UserInputActions: IInputActionCollection2, IDisposable
             @Interact.started -= instance.OnInteract;
             @Interact.performed -= instance.OnInteract;
             @Interact.canceled -= instance.OnInteract;
+            @LeftFlap.started -= instance.OnLeftFlap;
+            @LeftFlap.performed -= instance.OnLeftFlap;
+            @LeftFlap.canceled -= instance.OnLeftFlap;
+            @RightFlap.started -= instance.OnRightFlap;
+            @RightFlap.performed -= instance.OnRightFlap;
+            @RightFlap.canceled -= instance.OnRightFlap;
         }
 
         /// <summary>
@@ -1590,6 +1654,20 @@ public partial class @UserInputActions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnInteract(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "LeftFlap" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnLeftFlap(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "RightFlap" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnRightFlap(InputAction.CallbackContext context);
     }
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "UI" which allows adding and removing callbacks.

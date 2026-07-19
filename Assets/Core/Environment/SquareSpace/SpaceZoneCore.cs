@@ -9,15 +9,18 @@ namespace Core.Environment
     /// </summary>
     [ExecuteAlways]
     [RequireComponent(typeof(BoxCollider))]
-    public class SpaceZoneCore : MonoBehaviour
+    public class SpaceZoneCore : BaseEnvironment
     {
         [HideInInspector] public Vector3 zoneSize = new Vector3(10f, 10f, 10f);
 
         // 🌟 핵심: 하위 모듈들이 구독할 수 있는 C# 이벤트 (관찰자 패턴)
         public event Action OnZoneModified;
 
-        private void Awake()
+        protected override string FolderName => "";
+
+        protected override void Awake()
         {
+            base.Awake();
             if (TryGetComponent(out BoxCollider mainCollider))
             {
                 mainCollider.isTrigger = true;

@@ -68,6 +68,24 @@
                     "processors": "",
                     "interactions": "Hold",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "LeftFlap",
+                    "type": "Button",
+                    "id": "d6b9f290-e7f9-4b6c-bc39-bd113c206216",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "RightFlap",
+                    "type": "Button",
+                    "id": "91f3a19f-476d-4ee6-a05f-6a3afa17d5e1",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -343,6 +361,28 @@
                     "processors": "",
                     "groups": "",
                     "action": "MouseLockOff",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "e39fc455-cab7-4da2-8509-03b46fee7f22",
+                    "path": "",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "LeftFlap",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "81185166-f1bf-4afa-86e8-24a1b247b3bc",
+                    "path": "",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RightFlap",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

@@ -13,7 +13,9 @@ namespace Core.Environment
         [HideInInspector][SerializeField] private bool _showOuterWalls = true;
 
         private SpaceZoneCore _core;
-        protected override string FolderName => "Outer";
+
+        public const string CONTAINER_NAME = "Outer";
+        protected override string FolderName => CONTAINER_NAME;
 
         public bool ShowOuterWalls
         {

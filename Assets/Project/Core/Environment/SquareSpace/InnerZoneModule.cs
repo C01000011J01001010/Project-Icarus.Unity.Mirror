@@ -12,22 +12,33 @@ namespace Core.Environment
         [HideInInspector][SerializeField] private float _zoneA_StartY = 6f;
         [HideInInspector][SerializeField] private float _zoneB_StartXAbs = 3f;
         [HideInInspector][SerializeField] private float _zoneC_EndY = 4f;
-        [HideInInspector][SerializeField] private bool _showInnerZones = true;
+
+        [HideInInspector][SerializeField] private bool _showInnerZones = true; // 마스터 토글
+
+        // 🌟 개별 구역 가시성 상태 저장 변수 추가
+        [HideInInspector][SerializeField] private bool _showZoneA = true;
+        [HideInInspector][SerializeField] private bool _showZoneB = true;
+        [HideInInspector][SerializeField] private bool _showZoneC = true;
 
         private SpaceZoneCore _core;
-        protected override string FolderName => "Inner";
+        public const string CONTAINER_NAME = "Inner";
+        protected override string FolderName => CONTAINER_NAME;
 
         #region Properties
         public float ZoneA_StartY { get => _zoneA_StartY; set => _zoneA_StartY = value; }
         public float ZoneB_StartXAbs { get => _zoneB_StartXAbs; set => _zoneB_StartXAbs = value; }
         public float ZoneC_EndY { get => _zoneC_EndY; set => _zoneC_EndY = value; }
+
         public bool ShowInnerZones
         {
             get => _showInnerZones;
             set { if (_showInnerZones != value) { _showInnerZones = value; UpdateZoneVisuals(); } }
         }
 
-        
+        // 🌟 개별 프로퍼티 추가 (변경 시 즉시 렌더러 업데이트)
+        public bool ShowZoneA { get => _showZoneA; set { if (_showZoneA != value) { _showZoneA = value; UpdateZoneVisuals(); } } }
+        public bool ShowZoneB { get => _showZoneB; set { if (_showZoneB != value) { _showZoneB = value; UpdateZoneVisuals(); } } }
+        public bool ShowZoneC { get => _showZoneC; set { if (_showZoneC != value) { _showZoneC = value; UpdateZoneVisuals(); } } }
         #endregion
 
         private void OnEnable()
@@ -101,14 +112,12 @@ namespace Core.Environment
                 zoneObj.transform.SetParent(parent);
                 if (zoneObj.TryGetComponent(out BoxCollider bc)) bc.isTrigger = true;
 
-                // 디버그용 머티리얼 세팅 (1회만 수행)
                 if (zoneObj.TryGetComponent(out MeshRenderer mr))
                 {
                     Material tempMat = new Material(Shader.Find("Sprites/Default"));
                     tempMat.color = new Color(zoneColor.r, zoneColor.g, zoneColor.b, 0.25f);
                     mr.sharedMaterial = tempMat;
                 }
-
 #if UNITY_EDITOR
                 Undo.RegisterCreatedObjectUndo(zoneObj, $"Create {zoneName}");
 #endif
@@ -121,7 +130,6 @@ namespace Core.Environment
 #endif
             }
 
-            // 🌟 파괴(Destroy) 대신 꺼두기(SetActive) 사용!
             zoneObj.SetActive(isVisibleAndActive);
 
             if (isVisibleAndActive)
@@ -135,15 +143,28 @@ namespace Core.Environment
 
         public void UpdateZoneVisuals()
         {
-            if (Application.isPlaying) _showInnerZones = false;
-
             Transform folder = transform.Find(FolderName);
             if (folder == null) return;
-            foreach (var renderer in folder.GetComponentsInChildren<MeshRenderer>(true))
+
+            // 🌟 마스터 토글이 꺼져있거나, 게임 플레이 중이면 무조건 모두 끕니다.
+            bool isMasterOn = _showInnerZones && !Application.isPlaying;
+
+            foreach (Transform child in folder)
             {
-                renderer.enabled = _showInnerZones;
+                if (child.TryGetComponent(out MeshRenderer mr))
+                {
+                    if (!isMasterOn)
+                    {
+                        mr.enabled = false;
+                        continue;
+                    }
+
+                    // 🌟 개별 구역별로 이름(Prefix)을 검사하여 각자의 토글 상태를 매핑합니다.
+                    if (child.name == "_Zone_A") mr.enabled = _showZoneA;
+                    else if (child.name.StartsWith("_Zone_B")) mr.enabled = _showZoneB; // Left와 Right 동시 제어
+                    else if (child.name == "_Zone_C") mr.enabled = _showZoneC;
+                }
             }
         }
-
     }
 }

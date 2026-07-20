@@ -14,7 +14,7 @@ namespace Core
             if (scene.IsValid() && scene.isLoaded && SceneManager.GetActiveScene() != scene)
             {
                 SceneManager.SetActiveScene(scene);
-                LogColored($"[SceneFlowDirector] 현재 콘텐츠 씬 등록 완료 : {scene.name}", LogColor.Green);
+                Log($"[SceneFlowDirector] 현재 콘텐츠 씬 등록 완료 : {scene.name}", LogColor.Green);
             }
         }
     }

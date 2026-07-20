@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Core.Hub;
+using Core.Manager.Culling;
 using UnityEngine;
 
 namespace Core
@@ -10,12 +11,9 @@ namespace Core
     /// 이카루스 프레임워크의 최상위 창구(Facade) 클래스입니다.
     /// 외부 Leaf(3계층) 및 콘텐츠 로직은 오직 이 파사드를 통해서만 안전하게 다른 모듈과 액터를 찾습니다.
     /// </summary>
+    // CoreFacade.Get
     public static partial class CoreFacade
     {
-        // 1. 최상위 1계층 Context 캐싱 (싱글톤 레퍼런스 연결)
-        // internal로 제한하여 외부 3계층 스크립트가 Context를 직접 조작하는 계층 위반을 원천 차단합니다.
-        internal static ProjectContext Project => ProjectContext.Inst;
-        internal static SceneContext Scene => SceneContext.Inst;
 
         #region 📦 Module (Manager & UI) 조회 API
 
@@ -134,5 +132,10 @@ namespace Core
         }
 
         #endregion
+
+        public static Vector3Int GetGridKey(Vector3 worldPos)
+        {
+            return spatialCullingManager?.GetGridKey(worldPos) ?? Vector3Int.zero;
+        }
     }
 }

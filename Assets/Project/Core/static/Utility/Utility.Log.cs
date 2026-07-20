@@ -87,20 +87,13 @@ namespace Core
 #endif
         }
 
-        // 중복 선언되어 있던 Utility.LogColorRed 등은 지웠습니다! 아래의 LogColor 클래스 하나면 충분합니다.
-
-        // 반환값이 있는 함수는 [Conditional]을 못 붙입니다. 하지만 어차피 LogColored가 날아가면 같이 날아가니 괜찮습니다.
-        private static string GetColorLogString(string message, string color = LogColor.Red)
-        {
-            return $"<color={color}>{message}</color>";
-        }
-
         [Conditional("UNITY_EDITOR")]
         [Conditional("DEVELOPMENT_BUILD")]
-        public static void LogColored(string message, string color = LogColor.Red)
+        public static void Log(string message, string color = LogColor.Default)
         {
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-            UnityEngine.Debug.Log(GetColorLogString(message, color));
+            if (color != LogColor.Default) message = $"<color={color}>{message}</color>";
+            UnityEngine.Debug.Log(message);
 #endif
         }
     }
@@ -108,6 +101,10 @@ namespace Core
     // 전역에서 아주 예쁘고 직관적으로 쓸 수 있는 최고의 구조입니다!
     public static class LogColor
     {
+        // Color를 쓰지 않는 경우
+        public const string Default = "";
+
+        // Color를 쓰는 경우
         public const string Red = "red";
         public const string Green = "green";
         public const string Blue = "blue";

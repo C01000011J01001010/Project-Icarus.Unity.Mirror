@@ -17,6 +17,10 @@ namespace Core.Environment
         // 부모 클래스 자폭 루틴용 명세 (본 컴포넌트는 서브 에디팅 유틸이므로 공백 처리)
         protected override string FolderName => "";
 
+        // 🌟 새로 추가할 기즈모 제어 토글 변수
+        [Header("⚙️ 에디터 제어")]
+        public bool showDragHandles = true;
+
         private void OnEnable()
         {
             _core = GetComponent<SpaceZoneCore>();

@@ -162,7 +162,7 @@ MonoBehaviour:
   _initializeOrder: 0
   _preventDespawnOnDisconnect: 0
   _defaultDespawnType: 0
-  _initializedTimestamp: -8584169491461019260
+  _initializedTimestamp: -8584169478726465671
   _localLevelOfDetailCalculationType: 0
   _useLevelOfDetail: 0
   _useRootLevelOfDetail: 1
@@ -296,11 +296,11 @@ MonoBehaviour:
   myScope: 2
   moveSpeed: 20
   rotationSpeed: 1
-  flapForce: 20
-  flapTorque: 0.5
-  timeDelay: 1
+  flapForce: 8
+  flapTorque: 0.6
   pGain: 15
   dGain: 5
+  timeDelay: 1
 --- !u!114 &923561929043110711
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -8,6 +8,7 @@ using FishNet.Managing.Server;
 using System.Collections.Generic;
 using UnityEngine;
 using Core.Director;
+using System.Runtime.CompilerServices;
 
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(NetworkTransform))]
@@ -24,14 +25,20 @@ public class SharedActor : BaseActorNetworked, IFixedTickable
     [Header("🪽 날갯짓 물리 세팅")]
     public float flapForce = 8f;   // 위로 솟구치는 순간적인 힘 (Impulse)
     public float flapTorque = 5f;  // 순간적인 회전력 (Impulse)
-    public float timeDelay = 2f;
+
+    [Header("⚖️ 균형(오뚝이) 보정 세팅")]
+    public float pGain = 20f;  // 복원력 (얼마나 강력하게 돌아올 것인가)
+    public float dGain = 5f;   // 제동력 (얼마나 빠르게 멈출 것인가)
+    public float timeDelay = 1f;
     private float timeCount;
+    private float gravityMul = 1f;
 
     private Dictionary<int, Vector2> _clientInputs = new Dictionary<int, Vector2>();
 
     private void Awake()
     {
         _rigidbody = GetComponent<Rigidbody>();
+        gravityMul = Physics.gravity.y / -9.81f;
     }
 
     protected override void OnEnable()
@@ -100,17 +107,6 @@ public class SharedActor : BaseActorNetworked, IFixedTickable
         // (-) 값 = 위에서 내려다봤을 때 '시계 방향' 회전 (Clockwise) -> 짝수
         bool isLeft = evt.ClientId % 2 == 0;
         Flap(isLeft);
-
-
-        
-
-        //float torqueDirection = ;
-        //Vector3 appliedTorque = Vector3.forward * torqueDirection * flapTorque;
-
-        //// 3. 회전력 적용 (Impulse)
-        //_rigidbody.AddTorque(appliedTorque, ForceMode.Impulse);
-
-        //timeCount = 0;
     }
     private void OnSharedActorMouseFlap(SharedActorMouseClickFlapEvent evt)
     {
@@ -121,7 +117,7 @@ public class SharedActor : BaseActorNetworked, IFixedTickable
     private void Flap(bool isLeft)
     {
         // 1. 🚀 위로 향하는 순간적인 힘 가하기 (Impulse 모드는 질량을 고려해 툭 쳐줍니다)
-        _rigidbody.AddForce(transform.up * flapForce, ForceMode.Impulse);
+        _rigidbody.AddForce(transform.up * flapForce * gravityMul, ForceMode.Impulse);
 
         float torqueDirection = isLeft ? -1f : 1f;
         Vector3 appliedTorque = Vector3.forward * torqueDirection * flapTorque;
@@ -161,9 +157,7 @@ public class SharedActor : BaseActorNetworked, IFixedTickable
         }
     }
 
-    [Header("⚖️ 균형(오뚝이) 보정 세팅")]
-    public float pGain = 20f;  // 복원력 (얼마나 강력하게 돌아올 것인가)
-    public float dGain = 5f;   // 제동력 (얼마나 빠르게 멈출 것인가)
+    
 
     private void StabilizeRotation(float fixedDeltaTime)
     {
@@ -181,7 +175,11 @@ public class SharedActor : BaseActorNetworked, IFixedTickable
         // (오차 * P값) - (현재 각속도 * D값)
         // - 오차가 클수록 강력하게 회전
         // - 회전 속도가 빠를수록 반대 방향으로 브레이크
-        Vector3 torque = (error * pGain) - (_rigidbody.angularVelocity * dGain);
+
+        // 중력값이 상관없이 일정한 속도로 처리하도록
+        float p = pGain * gravityMul;
+        float d = dGain * gravityMul;
+        Vector3 torque = (error * p) - (_rigidbody.angularVelocity * d);
 
         _rigidbody.AddTorque(torque, ForceMode.Force);
     }

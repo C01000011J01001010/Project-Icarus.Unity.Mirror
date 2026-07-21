@@ -207,13 +207,13 @@ namespace Core.Director
         internal static void StartTicking()
         {
             Inst._isTickingAllowed = true;
-            Utility.LogColored("[UpdateManager] 업데이트 루프가 가동되었습니다.", LogColor.Green);
+            Utility.Log("[UpdateManager] 업데이트 루프가 가동되었습니다.", LogColor.Green);
         }
 
         internal static void StopTicking()
         {
             Inst._isTickingAllowed = false;
-            Utility.LogColored("[UpdateManager] 업데이트 루프가 멈췄습니다.", LogColor.Green);
+            Utility.Log("[UpdateManager] 업데이트 루프가 멈췄습니다.", LogColor.Green);
         }
 
         private void OnEnable()

@@ -68,7 +68,7 @@ namespace Core.Manager.Culling
     }
     #endregion
 
-    public enum CullingAxis { OneD_X, TwoD_XY, TwoD_XZ, ThreeD_XYZ }
+    public enum CullingAxis { OneD_X, OneD_Y, OneD_Z, TwoD_XY, TwoD_XZ, ThreeD_XYZ }
 
     public class SpatialCullingManager : BaseManager
     {
@@ -118,6 +118,8 @@ namespace Core.Manager.Culling
             return cullingAxis switch
             {
                 CullingAxis.OneD_X => new Vector3Int(x, 0, 0),
+                CullingAxis.OneD_Y => new Vector3Int(0, y, 0),
+                CullingAxis.OneD_Z => new Vector3Int(0, 0, z),
                 CullingAxis.TwoD_XY => new Vector3Int(x, y, 0),
                 CullingAxis.TwoD_XZ => new Vector3Int(x, 0, z),
                 CullingAxis.ThreeD_XYZ => new Vector3Int(x, y, z),
@@ -131,24 +133,38 @@ namespace Core.Manager.Culling
             {
                 case CullingAxis.OneD_X:
                     for (int x = -radius; x <= radius; x++) 
-                        yield return new Vector3Int(center.x + x, 0, 0);
+                        yield return new Vector3Int(center.x + x, 0, 0); 
                     break;
+
+                case CullingAxis.OneD_Y:
+                    for (int y = -radius; y <= radius; y++)
+                        yield return new Vector3Int(0, center.y + y, 0); 
+                    break;
+
+                case CullingAxis.OneD_Z:
+                    for (int z = -radius; z <= radius; z++)
+                        yield return new Vector3Int(0, 0, center.z + z); 
+                    break;
+
                 case CullingAxis.TwoD_XY:
                     for (int x = -radius; x <= radius; x++) 
                         for (int y = -radius; y <= radius; y++) 
-                            yield return new Vector3Int(center.x + x, center.y + y, 0);
+                            yield return new Vector3Int(center.x + x, center.y + y, 0); 
                     break;
+
                 case CullingAxis.TwoD_XZ:
                     for (int x = -radius; x <= radius; x++) 
                         for (int z = -radius; z <= radius; z++) 
-                            yield return new Vector3Int(center.x + x, 0, center.z + z);
+                            yield return new Vector3Int(center.x + x, 0, center.z + z); 
                     break;
+
                 case CullingAxis.ThreeD_XYZ:
                     for (int x = -radius; x <= radius; x++) 
                         for (int y = -radius; y <= radius; y++) 
                             for (int z = -radius; z <= radius; z++) 
-                                yield return new Vector3Int(center.x + x, center.y + y, center.z + z);
+                                yield return new Vector3Int(center.x + x, center.y + y, center.z + z); 
                     break;
+
             }
         }
 
@@ -284,6 +300,8 @@ namespace Core.Manager.Culling
             switch (cullingAxis)
             {
                 case CullingAxis.OneD_X: center.y = debugPlaneHeight; center.z = debugPlaneHeight; size.y = 1000f; size.z = 0f; break;
+                case CullingAxis.OneD_Y: center.x = debugPlaneHeight; center.z = debugPlaneHeight; size.x = 1000f; size.z = 0f; break;
+                case CullingAxis.OneD_Z: center.x = debugPlaneHeight; center.y = debugPlaneHeight; size.x = 1000f; size.y = 0f; break;
                 case CullingAxis.TwoD_XY: center.z = debugPlaneHeight; size.z = 0f; break;
                 case CullingAxis.TwoD_XZ: center.y = debugPlaneHeight; size.y = 0f; break;
             }
@@ -317,6 +335,8 @@ namespace Core.Manager.Culling
                 // 그러므로 차원에 따라 a의 범위를 제한해야함
                 // 탐색을 위한 절대범위를 늘리고싶다면 cellsize를 조작해야함
                 case CullingAxis.OneD_X:
+                case CullingAxis.OneD_Y:
+                case CullingAxis.OneD_Z:
                     maxAllowedA = 30; // 탐색 횟수: 65번 (매우 가벼움)
                     break;
                 case CullingAxis.TwoD_XY:

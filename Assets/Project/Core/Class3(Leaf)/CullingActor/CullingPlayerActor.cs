@@ -28,7 +28,7 @@ namespace Core
                 // 허공에 "나 격자 바뀌었다!" 방송 (수백 개의 객체 Culling 로직이 단 한 번 실행됨)
                 EventBus<CullingPlayerGridChangedEvent>.Publish(new CullingPlayerGridChangedEvent(currentGrid));
 
-                Utility.Log($"여기 격자 바뀌었어요! 현재격자: {currentGrid}");
+                //Utility.Log($"여기 격자 바뀌었어요! 현재격자: {currentGrid}");
             }
         }
     }

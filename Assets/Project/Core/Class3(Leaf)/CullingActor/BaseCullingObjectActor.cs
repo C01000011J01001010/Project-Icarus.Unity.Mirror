@@ -1,17 +1,42 @@
 ﻿using Core.EventBus;
 using Core.Manager.Culling;
+using System.Diagnostics;
 using UnityEngine;
 
 namespace Core
 {
-    // 장애물(정적 객체)에 부착될 초경량 액터
+    // 장애물 및 모든 Culling 객체의 부모 액터
     public abstract class BaseCullingObjectActor : BaseActor, ICullingObject
     {
         public abstract CullingType cullingType { get; }
 
-        // 🌟 자식 클래스에서 접근할 수 있도록 protected로 변경!
         protected Renderer[] _renderers;
         protected Collider[] _colliders;
+
+        #region 디버깅 속성, 메서드
+        // 🌟 기즈모 디버깅을 위한 상태 캐싱 (기본값 true)
+#if UNITY_EDITOR
+        protected bool _isVisualActive = true;
+        protected bool _isPhysicsActive = true;
+
+
+#endif
+        [Conditional("UNITY_EDITOR")]
+        protected void SetFlagVisualActive(bool isVisualActive)
+        {
+#if UNITY_EDITOR
+            _isVisualActive = isVisualActive;
+#endif
+        }
+
+        [Conditional("UNITY_EDITOR")]
+        protected void SetFlagPhysicsActive(bool isPhysicsActive)
+        {
+#if UNITY_EDITOR
+            _isPhysicsActive = isPhysicsActive;
+#endif
+        }
+        #endregion
 
         protected virtual void Awake()
         {
@@ -21,30 +46,39 @@ namespace Core
 
         protected virtual void Start()
         {
-            // "저 태어났어요! 위치 기억해주세요!" 
             EventBus<CullingObjectRegistrationEvent>.Publish(new CullingObjectRegistrationEvent(this, true));
         }
 
         protected virtual void OnDestroy()
         {
-            // 파괴 중일 때는 딕셔너리에서 안전하게 제거
             EventBus<CullingObjectRegistrationEvent>.Publish(new CullingObjectRegistrationEvent(this, false));
         }
 
-        #region 기본적인 Culling 메서드
-        public virtual void SetVisualActive(bool isActive)
-        {
-            // 모든 컬링 대상은 비주얼적 요소를 어떻게 할지 결정해야함
-            Utility.Log($"Culling: {gameObject.name}를 Visual:{isActive}", isActive? LogColor.Green: LogColor.Red);
-        }
-
-        public virtual void SetPhysicsActive(bool isActive)
-        {
-            // 물리연산의 예외 존재
-            Utility.Log(cullingType != CullingType.ActiveDynamic ?
-                $"Culling: {gameObject.name}를 Physics : {isActive}" : "",
-                isActive ? LogColor.Green : LogColor.Red);
-        }
+        #region 자식들이 구현할 Culling 메서드
+        public abstract void SetVisualActive(bool isActive);
+        public abstract void SetPhysicsActive(bool isActive);
         #endregion
+
+#if UNITY_EDITOR
+        // 🎨 Editor 전용 시각화 디버깅
+        protected virtual void OnDrawGizmos()
+        {
+            if (!Application.isPlaying) return;
+
+            // 1. R+1 범위 제한 (시각적으로 꺼져있으면 아예 그리지 않음!)
+            // 정적 객체는 activeSelf=false라 애초에 이 함수가 안 불리고, 
+            // 동적 객체는 여기서 완벽하게 필터링됩니다.
+            if (!_isVisualActive) return;
+
+            // 2. 물리 상태에 따라 색상 결정 (On: 초록, Off: 빨강)
+            Color gizmoColor = _isPhysicsActive ? Color.green : Color.red;
+
+            // 3. 발밑(Root 위치)에 보기 좋은 원(Disc) 그리기
+            UnityEditor.Handles.color = gizmoColor;
+
+            // Vector3.up을 법선(Normal)으로 하여 바닥에 1m 반경의 예쁜 원을 그립니다.
+            UnityEditor.Handles.DrawWireDisc(transform.position, Vector3.up, 1f);
+        }
+#endif
     }
 }

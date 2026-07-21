@@ -73,7 +73,11 @@ namespace Core.Manager.Culling
     public class SpatialCullingManager : BaseManager
     {
         [Header("Grid Settings")]
+
+        [Tooltip("차원에 따라 연산속도가 달라짐을 참고하시오")]
         [SerializeField] private CullingAxis cullingAxis = CullingAxis.TwoD_XZ;
+
+        [Tooltip("a값의 한계에 도달했다면 저를 늘려보세요 ^^")]
         [SerializeField] private float cellSize = 10f;
 
         [Header("Culling Thresholds")]
@@ -292,15 +296,47 @@ namespace Core.Manager.Culling
 
 
 #if UNITY_EDITOR
-        // 인스펙터에서 값이 바뀔 때마다 자동으로 호출되어 논리적 오류를 원천 차단합니다.
         protected override void OnValidate()
         {
             base.OnValidate();
-            // 1. b는 항상 0보다 커야 합니다. (최소값 1)
+
+            // cellSize사이즈가 음수가 되는거 방지
+            cellSize = Mathf.Max(1, cellSize);
+
+            // 1. b는 무조건 1 이상이어야 함 (물리 연산 최소 반경)
             b = Mathf.Max(1, b);
 
-            // 2. a는 항상 b보다 커야 합니다. (최소값 b + 1)
-            a = Mathf.Max(b + 1, a);
+            // 2. 최하옵 PC를 위한 극한의 최적화 한도 (CPU Cache Miss 방지)
+            int maxAllowedA = 7; // 기본값 2D 기준
+
+            switch (cullingAxis)
+            {
+                // visual 범위값을 a값, 차원을 x라고 했을 때
+                // 탐색범위 R = a+2
+                // 플레이어가 격자를 이동할때마다 (2R+1)^x == (2a+5)^x 의 수행시간 발생
+                // 그러므로 차원에 따라 a의 범위를 제한해야함
+                // 탐색을 위한 절대범위를 늘리고싶다면 cellsize를 조작해야함
+                case CullingAxis.OneD_X:
+                    maxAllowedA = 30; // 탐색 횟수: 65번 (매우 가벼움)
+                    break;
+                case CullingAxis.TwoD_XY:
+                case CullingAxis.TwoD_XZ:
+                    maxAllowedA = 7;  // 탐색 횟수: 361번 (최하옵 2D 안전선)
+                    break;
+                case CullingAxis.ThreeD_XYZ:
+                    maxAllowedA = 2;  // 탐색 횟수: 729번 (최하옵 3D 마지노선!)
+                    break;
+            }
+
+            // 3. a는 'b + 1' 보다 크거나 같아야 하고, 기기 한계치(maxAllowedA)를 넘을 수 없음
+            a = Mathf.Clamp(a, b + 1, maxAllowedA);
+
+            // 4. 기획자가 억지로 b를 너무 높여서 a의 공간을 침범하는 경우 강제 교정
+            if (b >= maxAllowedA)
+            {
+                b = maxAllowedA - 1;
+                a = maxAllowedA;
+            }
         }
 #endif
     }

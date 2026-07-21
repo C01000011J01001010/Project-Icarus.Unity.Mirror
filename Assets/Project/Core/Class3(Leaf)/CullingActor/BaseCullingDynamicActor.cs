@@ -9,14 +9,37 @@ namespace Core
     {
         private Vector3Int _lastGridKey;
 
+        // 🌟 최초 스폰과 컬링에 의한 재활성화를 구별하기 위한 방어막 플래그
+        private bool _isFirstSpawn = true;
+
         // 몬스터나 일반 오브젝트 그룹에 맞게 설정 (UpdateManager 연동)
         public virtual TickGroup TickGroup => TickGroup.Object;
 
         protected override void OnEnable()
         {
             base.OnEnable();
-            // 🌟 매우 중요: 스폰 직후의 최초 격자 위치를 반드시 동기화해두어야 함
-            _lastGridKey = CoreFacade.GetGridKey(transform.position);
+
+            // 현재 상자의 실제 물리적 위치 격자 계산
+            Vector3Int currentGrid = CoreFacade.GetGridKey(transform.position);
+
+            if (_isFirstSpawn)
+            {
+                // 1. 맵에 처음 스폰되었을 때는 이동한 게 아니므로 현재 위치를 기억만 합니다.
+                _lastGridKey = currentGrid;
+                _isFirstSpawn = false;
+            }
+            else
+            {
+                // 2. 🌟 유저님이 찾으신 버그 방어막: 꺼져있는 동안 인위적으로 위치가 바뀌었다면!
+                if (currentGrid != _lastGridKey)
+                {
+                    // 매니저에게 "나 꺼져있는 동안 몰래 방 옮겼어! 옛날 딕셔너리방({_lastGridKey})에서 빼고 새 방({currentGrid})으로 옮겨줘!" 라고 이벤트를 쏩니다.
+                    EventBus<CullingObjectMovedEvent>.Publish(new CullingObjectMovedEvent(this, _lastGridKey, currentGrid));
+
+                    // 그리고 내 최신 좌표 기억 장치를 동기화합니다.
+                    _lastGridKey = currentGrid;
+                }
+            }
         }
 
         public void Tick(float deltaTime)

@@ -31,14 +31,12 @@ public class SharedActor : BaseActorNetworked, IFixedTickable
     public float dGain = 5f;   // 제동력 (얼마나 빠르게 멈출 것인가)
     public float timeDelay = 1f;
     private float timeCount;
-    private float gravityMul = 1f;
 
     private Dictionary<int, Vector2> _clientInputs = new Dictionary<int, Vector2>();
 
     private void Awake()
     {
         _rigidbody = GetComponent<Rigidbody>();
-        gravityMul = Physics.gravity.y / -9.81f;
     }
 
     protected override void OnEnable()
@@ -117,7 +115,7 @@ public class SharedActor : BaseActorNetworked, IFixedTickable
     private void Flap(bool isLeft)
     {
         // 1. 🚀 위로 향하는 순간적인 힘 가하기 (Impulse 모드는 질량을 고려해 툭 쳐줍니다)
-        _rigidbody.AddForce(transform.up * flapForce * gravityMul, ForceMode.Impulse);
+        _rigidbody.AddForce(transform.up * flapForce, ForceMode.Impulse);
 
         float torqueDirection = isLeft ? -1f : 1f;
         Vector3 appliedTorque = Vector3.forward * torqueDirection * flapTorque;
@@ -150,10 +148,10 @@ public class SharedActor : BaseActorNetworked, IFixedTickable
         {
             // 이동하는 방향 바라보고
             Vector3 moveDir = new Vector3(combinedInput.x, 0, combinedInput.y).normalized;
-            Utility.SmoothLookAt(_rigidbody, moveDir, rotationSpeed * gravityMul, fixedDeltaTime);
+            Utility.SmoothLookAt(_rigidbody, moveDir, rotationSpeed, fixedDeltaTime);
 
             // 출발
-            _rigidbody.AddForce(moveDir * moveSpeed * gravityMul, ForceMode.Force); // 지속적인 이동은 Force 모드
+            _rigidbody.AddForce(moveDir * moveSpeed, ForceMode.Force); // 지속적인 이동은 Force 모드
         }
     }
 
@@ -177,9 +175,7 @@ public class SharedActor : BaseActorNetworked, IFixedTickable
         // - 회전 속도가 빠를수록 반대 방향으로 브레이크
 
         // 중력값이 상관없이 일정한 속도로 처리하도록
-        float p = pGain * gravityMul;
-        float d = dGain * gravityMul;
-        Vector3 torque = (error * p) - (_rigidbody.angularVelocity * d);
+        Vector3 torque = (error * pGain) - (_rigidbody.angularVelocity * dGain);
 
         _rigidbody.AddTorque(torque, ForceMode.Force);
     }

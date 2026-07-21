@@ -1,6 +1,6 @@
 using UnityEngine;
 using UnityEditor;
-using UnityEditor.IMGUI.Controls; // AdvancedDropdown 사용을 위한 네임스페이스
+using UnityEditor.IMGUI.Controls;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,7 +17,7 @@ namespace CustomTools.Editor
         }
 
         // ==========================================
-        // 🎯 1. 타겟 세팅 데이터 (유저님의 훌륭한 아이디어 적용)
+        // 🎯 1. 타겟 세팅 데이터 
         // ==========================================
         private string _selectedTag = "Untagged";
 
@@ -30,25 +30,29 @@ namespace CustomTools.Editor
         // 🌟 2. 그림자 상태(Shadow State) 데이터
         private List<Component> _tempAddedComponents = new List<Component>();
 
-        // 📊 3. UI 갱신용 리스트
+        // 📊 3. UI 갱신용 리스트 (3분할)
         private List<GameObject> _processedObjects = new List<GameObject>();
         private List<GameObject> _ignoredObjects = new List<GameObject>();
+        private List<GameObject> _errorObjects = new List<GameObject>();
 
-        private Vector2 _scrollPositionProcessed;
-        private Vector2 _scrollPositionIgnored;
+        // ✨ 개선점: 내부 리스트별 스크롤 변수들을 모두 제거하고, 창 전체를 관장하는 메인 스크롤 변수 하나만 사용합니다.
+        private Vector2 _mainWindowScrollPosition;
 
         [MenuItem("Tools/Tag Component Setup Tool")]
         public static void ShowWindow()
         {
             var window = GetWindow<TagComponentSetupTool>("Tag Component Setup");
-            window.minSize = new Vector2(450, 600);
+            window.minSize = new Vector2(450, 650);
             window.Show();
         }
 
         private void OnGUI()
         {
+            // 🌐 창 전체를 덮는 메인 스크롤 뷰 시작
+            _mainWindowScrollPosition = EditorGUILayout.BeginScrollView(_mainWindowScrollPosition);
+
             GUILayout.Space(10);
-            GUILayout.Label("🏷️ Tag-Based Component Setup Tool (Hybrid V3)", EditorStyles.boldLabel);
+            GUILayout.Label("🏷️ Tag-Based Component Setup Tool (V3.2)", EditorStyles.boldLabel);
             GUILayout.Space(5);
 
             DrawStateHelpBox();
@@ -60,11 +64,11 @@ namespace CustomTools.Editor
             // ==========================================
             EditorGUI.BeginDisabledGroup(_currentState == TransactionState.Staged);
 
-            // 1. 태그 선택 (유니티 내장 팝업)
+            // 1. 태그 선택
             _selectedTag = EditorGUILayout.TagField("Target Tag", _selectedTag);
             GUILayout.Space(5);
 
-            // 2. 컴포넌트 선택 (드래그 앤 드롭 + 검색 팝업 하이브리드)
+            // 2. 컴포넌트 선택
             DrawComponentSelectionUI();
 
             EditorGUI.EndDisabledGroup();
@@ -77,15 +81,16 @@ namespace CustomTools.Editor
             // 📋 처리 결과 리스트 UI
             // ==========================================
             DrawResultListsUI();
+
+            // 🌐 메인 스크롤 뷰 종료
+            EditorGUILayout.EndScrollView();
         }
 
-        // ✨ 핵심 UX: 유저님이 고안하신 드래그 앤 드롭 + 드롭다운 하이브리드 UI
         private void DrawComponentSelectionUI()
         {
             EditorGUILayout.BeginHorizontal();
             GUILayout.Label("Component to Add", GUILayout.Width(EditorGUIUtility.labelWidth - 2));
 
-            // [1] 스크립트 드래그 앤 드롭 필드
             MonoScript newScript = (MonoScript)EditorGUILayout.ObjectField(_droppedScript, typeof(MonoScript), false, GUILayout.Width(70));
             if (newScript != _droppedScript)
             {
@@ -121,7 +126,6 @@ namespace CustomTools.Editor
                 }
             }
 
-            // [2] 컴포넌트 검색 드롭다운 버튼 (빌트인 + 커스텀 모두 지원)
             string btnText = string.IsNullOrEmpty(_targetTypeName) ? "(컴포넌트 검색 및 선택...)" : _targetTypeName;
             if (GUILayout.Button(btnText, EditorStyles.popup))
             {
@@ -130,7 +134,7 @@ namespace CustomTools.Editor
                 {
                     _targetComponentType = selectedType;
                     _targetTypeName = selectedType.Name;
-                    _droppedScript = null; // 검색으로 선택 시 드롭 필드 초기화 (시각적 혼선 방지)
+                    _droppedScript = null;
                     Repaint();
                 };
                 dropdown.Show(new Rect(Event.current.mousePosition, Vector2.zero));
@@ -141,6 +145,24 @@ namespace CustomTools.Editor
 
         private void DrawResultListsUI()
         {
+            // 1. 오류 대상 (2개 이상 중복)
+            if (_errorObjects.Count > 0)
+            {
+                GUI.contentColor = new Color(1.0f, 0.4f, 0.4f);
+                GUILayout.Label($"❌ 오류: 중복 컴포넌트 발견 ({_errorObjects.Count}개)", EditorStyles.boldLabel);
+                GUI.contentColor = Color.white;
+
+                // ✨ 개선점: ScrollView 대신 Vertical("box")를 사용하여 아이템 개수에 정비례하여 길이가 자연스럽게 늘어남
+                EditorGUILayout.BeginVertical("box");
+                foreach (var obj in _errorObjects)
+                {
+                    if (obj != null) EditorGUILayout.ObjectField(obj, typeof(GameObject), true);
+                }
+                EditorGUILayout.EndVertical();
+                GUILayout.Space(10);
+            }
+
+            // 2. 작업 대상 (성공)
             if (_processedObjects.Count > 0)
             {
                 string prefix = _currentState == TransactionState.Staged ? "[임시 대기]" : "[최종 확정]";
@@ -148,27 +170,28 @@ namespace CustomTools.Editor
                 GUILayout.Label($"{prefix} 컴포넌트 부착 대상 ({_processedObjects.Count}개)", EditorStyles.boldLabel);
                 GUI.contentColor = Color.white;
 
-                _scrollPositionProcessed = EditorGUILayout.BeginScrollView(_scrollPositionProcessed, "box", GUILayout.MaxHeight(150));
+                EditorGUILayout.BeginVertical("box");
                 foreach (var obj in _processedObjects)
                 {
                     if (obj != null) EditorGUILayout.ObjectField(obj, typeof(GameObject), true);
                 }
-                EditorGUILayout.EndScrollView();
+                EditorGUILayout.EndVertical();
                 GUILayout.Space(10);
             }
 
+            // 3. 작업 무시 (정상적으로 1개 존재)
             if (_ignoredObjects.Count > 0)
             {
                 GUI.contentColor = new Color(1.0f, 0.8f, 0.4f);
                 GUILayout.Label($"⚠️ 건너뜀: 이미 컴포넌트가 존재함 ({_ignoredObjects.Count}개)", EditorStyles.boldLabel);
                 GUI.contentColor = Color.white;
 
-                _scrollPositionIgnored = EditorGUILayout.BeginScrollView(_scrollPositionIgnored, "box", GUILayout.MaxHeight(150));
+                EditorGUILayout.BeginVertical("box");
                 foreach (var obj in _ignoredObjects)
                 {
                     if (obj != null) EditorGUILayout.ObjectField(obj, typeof(GameObject), true);
                 }
-                EditorGUILayout.EndScrollView();
+                EditorGUILayout.EndVertical();
             }
         }
 
@@ -182,7 +205,7 @@ namespace CustomTools.Editor
             switch (_currentState)
             {
                 case TransactionState.Idle:
-                    EditorGUILayout.HelpBox("태그를 선택하고, 스크립트를 드래그하거나 버튼을 눌러 컴포넌트를 선택하세요.", UnityEditor.MessageType.Info);
+                    EditorGUILayout.HelpBox("태그를 선택하고 컴포넌트를 지정하세요.\n(이미 2개 이상 중복 부착된 객체는 오류 리스트로 분류됩니다.)", UnityEditor.MessageType.Info);
                     break;
                 case TransactionState.Staged:
                     EditorGUILayout.HelpBox("⚠️ 현재 변경 사항은 유니티 Undo 스택과 무관한 '가상 상태'입니다.\n결과를 확인하고 [확정 (Commit)]을 눌러 씬에 반영하세요.", UnityEditor.MessageType.Warning);
@@ -224,6 +247,7 @@ namespace CustomTools.Editor
             _tempAddedComponents.Clear();
             _processedObjects.Clear();
             _ignoredObjects.Clear();
+            _errorObjects.Clear();
 
             GameObject[] targetObjects = GameObject.FindGameObjectsWithTag(_selectedTag);
 
@@ -237,7 +261,14 @@ namespace CustomTools.Editor
 
             foreach (GameObject obj in targetObjects)
             {
-                if (obj.GetComponent(_targetComponentType) != null)
+                Component[] existingComponents = obj.GetComponents(_targetComponentType);
+                int compCount = existingComponents.Length;
+
+                if (compCount >= 2)
+                {
+                    _errorObjects.Add(obj);
+                }
+                else if (compCount == 1)
                 {
                     _ignoredObjects.Add(obj);
                 }
@@ -268,9 +299,9 @@ namespace CustomTools.Editor
                 return;
             }
 
-            if (_tempAddedComponents.Count == 0)
+            if (_tempAddedComponents.Count == 0 && _errorObjects.Count == 0)
             {
-                EditorUtility.DisplayDialog("결과", "모든 대상 객체에 이미 해당 컴포넌트가 존재하여 추가 작업이 진행되지 않았습니다.", "확인");
+                EditorUtility.DisplayDialog("결과", "모든 대상 객체에 이미 해당 컴포넌트가 1개씩 존재하여 추가 작업이 진행되지 않았습니다.", "확인");
                 return;
             }
 
@@ -313,13 +344,14 @@ namespace CustomTools.Editor
             _tempAddedComponents.Clear();
             _processedObjects.Clear();
             _ignoredObjects.Clear();
+            _errorObjects.Clear();
 
             _currentState = TransactionState.Idle;
             if (!isAutoOnClose) Repaint();
         }
 
         // =========================================================
-        // 🔍 AdvancedDropdown 클래스 (유저님 코드 완벽 이식)
+        // 🔍 AdvancedDropdown 클래스 
         // =========================================================
         private class ComponentSearchDropdown : AdvancedDropdown
         {
@@ -349,7 +381,6 @@ namespace CustomTools.Editor
 
                 foreach (Type type in componentTypes)
                 {
-                    // 불필요한 에디터 전용 컴포넌트나 숨겨진 뼈대 필터링
                     if (type.Name.StartsWith("Skeleton") || type.Namespace == "UnityEditor") continue;
 
                     string[] namespaces = (type.Namespace ?? "Scripts (Custom)").Split('.');

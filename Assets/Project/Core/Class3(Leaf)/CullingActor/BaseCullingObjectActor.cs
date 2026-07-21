@@ -12,6 +12,7 @@ namespace Core
 
         protected Renderer[] _renderers;
         protected Collider[] _colliders;
+        protected Rigidbody[] _rigidbodies;
 
         #region 디버깅 속성, 메서드
         // 🌟 기즈모 디버깅을 위한 상태 캐싱 (기본값 true)
@@ -42,6 +43,7 @@ namespace Core
         {
             _renderers = GetComponentsInChildren<Renderer>(true);
             _colliders = GetComponentsInChildren<Collider>(true);
+            _rigidbodies = GetComponentsInChildren<Rigidbody>(true);
         }
 
         protected virtual void Start()

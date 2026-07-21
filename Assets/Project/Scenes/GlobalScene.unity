@@ -755,6 +755,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 822796425}
     m_Modifications:
+    - target: {fileID: 433759299826732024, guid: 8f209fa52a3f2ed43b9bcc2ca164cb1c, type: 3}
+      propertyPath: cellSize
+      value: 100
+      objectReference: {fileID: 0}
     - target: {fileID: 4427022006623053962, guid: 8f209fa52a3f2ed43b9bcc2ca164cb1c, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -1156,6 +1160,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 822796425}
     m_Modifications:
+    - target: {fileID: 5460875384310946406, guid: 04139c6712f67fe449b6503719e820e3, type: 3}
+      propertyPath: far clip plane
+      value: 1000
+      objectReference: {fileID: 0}
     - target: {fileID: 6340379389859361183, guid: 04139c6712f67fe449b6503719e820e3, type: 3}
       propertyPath: UpdateMethod
       value: 1

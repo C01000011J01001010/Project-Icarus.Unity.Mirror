@@ -124,7 +124,7 @@ PrefabInstance:
       addedObject: {fileID: 1070355745655290303}
     - targetCorrespondingSourceObject: {fileID: 1856871421391184497, guid: bae7dafd02b707846b8390b2bce63321, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 923561929043110711}
+      addedObject: {fileID: 6616538380056961763}
   m_SourcePrefab: {fileID: 100100000, guid: bae7dafd02b707846b8390b2bce63321, type: 3}
 --- !u!1 &3363384272826522340 stripped
 GameObject:
@@ -162,7 +162,7 @@ MonoBehaviour:
   _initializeOrder: 0
   _preventDespawnOnDisconnect: 0
   _defaultDespawnType: 0
-  _initializedTimestamp: -8584169470798882842
+  _initializedTimestamp: -8584169466794476525
   _localLevelOfDetailCalculationType: 0
   _useLevelOfDetail: 0
   _useRootLevelOfDetail: 1
@@ -294,14 +294,14 @@ MonoBehaviour:
   _addedNetworkObject: {fileID: 1421060152581575441}
   _networkObjectCache: {fileID: 1421060152581575441}
   myScope: 2
-  moveSpeed: 10
+  moveSpeed: 20
   rotationSpeed: 3
   flapForce: 15
   flapTorque: 0.5
   pGain: 15
   dGain: 5
   timeDelay: 1
---- !u!114 &923561929043110711
+--- !u!114 &6616538380056961763
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -310,9 +310,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 3363384272826522340}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 101c2a4df18ea11498957a3ae3947f8d, type: 3}
+  m_Script: {fileID: 11500000, guid: 941d11f4510b96147b926e2e1f4963e8, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MeshCCTV
+  m_EditorClassIdentifier: Assembly-CSharp::Core.CullingPlayerActor
+  myScope: 2
 --- !u!4 &4370832847619979300 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 847129471433703601, guid: bae7dafd02b707846b8390b2bce63321, type: 3}

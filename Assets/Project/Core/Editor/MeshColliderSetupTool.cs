@@ -18,7 +18,7 @@ namespace CustomTools.Editor
 
         // 🌟 [핵심] 글로벌 Undo 스택에 의존하지 않는 독립 그림자 상태(Shadow State) 데이터
         private List<MeshCollider> _tempAddedColliders = new List<MeshCollider>();
-        private List<MeshCollider> _tempHiddenColliders = new List<MeshCollider>();
+        private List<Collider> _tempHiddenColliders = new List<Collider>();
 
         // UI 갱신용 리스트
         private List<GameObject> _processedMeshObjects = new List<GameObject>();
@@ -162,7 +162,7 @@ namespace CustomTools.Editor
 
                 if (rend is MeshRenderer)
                 {
-                    MeshCollider[] colliders = obj.GetComponents<MeshCollider>();
+                    Collider[] colliders = obj.GetComponents<Collider>();
 
                     if (colliders.Length == 0)
                     {
@@ -177,7 +177,7 @@ namespace CustomTools.Editor
                         // 2. 제거 대상: 진짜 지우지 않고 "비활성화 + 인스펙터 숨김" 처리 (완벽한 눈속임)
                         for (int i = 1; i < colliders.Length; i++)
                         {
-                            MeshCollider col = colliders[i];
+                            Collider col = colliders[i];
                             col.enabled = false;
                             col.hideFlags = HideFlags.HideInInspector;
                             _tempHiddenColliders.Add(col);

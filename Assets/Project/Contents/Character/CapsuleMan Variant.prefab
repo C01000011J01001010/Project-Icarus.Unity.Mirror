@@ -162,7 +162,7 @@ MonoBehaviour:
   _initializeOrder: 0
   _preventDespawnOnDisconnect: 0
   _defaultDespawnType: 0
-  _initializedTimestamp: -8584169477370980376
+  _initializedTimestamp: -8584169472890749892
   _localLevelOfDetailCalculationType: 0
   _useLevelOfDetail: 0
   _useRootLevelOfDetail: 1
@@ -295,9 +295,9 @@ MonoBehaviour:
   _networkObjectCache: {fileID: 1421060152581575441}
   myScope: 2
   moveSpeed: 20
-  rotationSpeed: 1
-  flapForce: 10
-  flapTorque: 0.6
+  rotationSpeed: 3
+  flapForce: 12
+  flapTorque: 0.5
   pGain: 15
   dGain: 5
   timeDelay: 1

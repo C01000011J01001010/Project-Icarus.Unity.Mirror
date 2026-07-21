@@ -127,4 +127,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9c43b19174b056547a83508937b299dc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Core.CullingActiveDynamicActor
-  myScope: 0
+  myScope: 2
+  _isVisualActive: 1
+  _isPhysicsActive: 1
+  _deubgSize: 1

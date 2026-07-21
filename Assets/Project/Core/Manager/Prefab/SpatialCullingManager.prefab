@@ -46,8 +46,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Core.Manager.Culling.SpatialCullingManager
   myScope: 1
   cullingAxis: 2
-  cellSize: 10
-  a: 3
+  cellSize: 20
+  a: 10
   b: 1
   showDebugGrid: 1
   IsDrawSelected: 0

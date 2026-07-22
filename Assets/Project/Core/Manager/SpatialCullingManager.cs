@@ -16,6 +16,11 @@ namespace Core.Manager.Culling
     {
         CullingType cullingType { get; }
         Transform transform { get; } // Behaviour 자동
+
+        /// <summary>
+        /// 이 객체의 렌더러를 거리에 상관없이 항상 켜둘 것인가?
+        /// </summary>
+        bool IsVisualAlwaysOn { get; }
         void SetVisualActive(bool isActive);
         void SetPhysicsActive(bool isActive);
     }
@@ -68,7 +73,15 @@ namespace Core.Manager.Culling
     }
     #endregion
 
-    public enum CullingAxis { OneD_X, OneD_Y, OneD_Z, TwoD_XY, TwoD_XZ, ThreeD_XYZ }
+    public enum CullingAxis 
+    { 
+        OneD_X, 
+        OneD_Y, 
+        OneD_Z, 
+        TwoD_XY, 
+        TwoD_XZ, 
+        //ThreeD_XYZ // 너무 비효율적이라 안씀
+    }
 
     public class SpatialCullingManager : BaseManager
     {
@@ -91,7 +104,7 @@ namespace Core.Manager.Culling
         // 통합 격자 딕셔너리 (이제 완벽하게 CullingReference만 담습니다)
         protected Dictionary<Vector3Int, List<CullingReference>> gridDictionary = new();
 
-        private Vector3Int _currentPlayerGrid;
+        private Vector3Int _currentPlayerGrid = new Vector3Int(int.MaxValue, int.MaxValue, int.MaxValue); // 초기 쓰레기값;
 
         protected override void OnEnable()
         {
@@ -122,7 +135,7 @@ namespace Core.Manager.Culling
                 CullingAxis.OneD_Z => new Vector3Int(0, 0, z),
                 CullingAxis.TwoD_XY => new Vector3Int(x, y, 0),
                 CullingAxis.TwoD_XZ => new Vector3Int(x, 0, z),
-                CullingAxis.ThreeD_XYZ => new Vector3Int(x, y, z),
+                //CullingAxis.ThreeD_XYZ => new Vector3Int(x, y, z),
                 _ => new Vector3Int(x, 0, z)
             };
         }
@@ -158,12 +171,12 @@ namespace Core.Manager.Culling
                             yield return new Vector3Int(center.x + x, 0, center.z + z); 
                     break;
 
-                case CullingAxis.ThreeD_XYZ:
-                    for (int x = -radius; x <= radius; x++) 
-                        for (int y = -radius; y <= radius; y++) 
-                            for (int z = -radius; z <= radius; z++) 
-                                yield return new Vector3Int(center.x + x, center.y + y, center.z + z); 
-                    break;
+                //case CullingAxis.ThreeD_XYZ:
+                //    for (int x = -radius; x <= radius; x++) 
+                //        for (int y = -radius; y <= radius; y++) 
+                //            for (int z = -radius; z <= radius; z++) 
+                //                yield return new Vector3Int(center.x + x, center.y + y, center.z + z); 
+                //    break;
 
             }
         }
@@ -179,10 +192,7 @@ namespace Core.Manager.Culling
             {
                 if (gridDictionary.TryGetValue(checkGrid, out List<CullingReference> objects))
                 {
-                    int d = Mathf.Max(Mathf.Abs(_currentPlayerGrid.x - checkGrid.x),
-                                      Mathf.Abs(_currentPlayerGrid.y - checkGrid.y),
-                                      Mathf.Abs(_currentPlayerGrid.z - checkGrid.z));
-
+                    int d = GetMaxDistance(_currentPlayerGrid, checkGrid);
                     ProcessCulling(objects, d);
                 }
             }
@@ -199,6 +209,14 @@ namespace Core.Manager.Culling
                     gridDictionary[gridKey] = new List<CullingReference>();
 
                 gridDictionary[gridKey].Add(reference);
+
+                // 딕셔너리 등록 직후, 현재 플레이어 위치를 기준으로 즉시 계산
+                // 플레이어가 아직 스폰되지 않았거나 너무 멀다면 자연스럽게 d 값이 커져서 즉시 Culling(OFF) 됨
+                int d = GetMaxDistance(_currentPlayerGrid, gridKey);
+
+                // 단일 객체만 리스트로 감싸서 판정 함수에 넘김 (O(1) 연산)
+                List<CullingReference> singleList = new List<CullingReference> { reference };
+                ProcessCulling(singleList, d);
             }
             else
             {
@@ -224,9 +242,7 @@ namespace Core.Manager.Culling
             }
             gridDictionary[evt.NewGrid].Add(new CullingReference(evt.CullingObject));
 
-            int d = Mathf.Max(Mathf.Abs(_currentPlayerGrid.x - evt.NewGrid.x),
-                              Mathf.Abs(_currentPlayerGrid.y - evt.NewGrid.y),
-                              Mathf.Abs(_currentPlayerGrid.z - evt.NewGrid.z));
+            int d = GetMaxDistance(_currentPlayerGrid, evt.NewGrid);
 
             List<CullingReference> singleObjList = new List<CullingReference> { new CullingReference(evt.CullingObject) };
             ProcessCulling(singleObjList, d);
@@ -237,16 +253,21 @@ namespace Core.Manager.Culling
             if (d <= b) SetCollidersActive(objects, true);
             else if (d > b + 1) SetCollidersActive(objects, false);
 
-            if (d <= a) SetGameObjectsActive(objects, true);
-            else if (d > a + 1) SetGameObjectsActive(objects, false);
+            if (d <= a) SetVisualsActive(objects, true);
+            else if (d > a + 1) SetVisualsActive(objects, false);
         }
 
-        private void SetGameObjectsActive(List<CullingReference> objects, bool isActive)
+        private void SetVisualsActive(List<CullingReference> objects, bool isActive)
         {
             CullingReference[] snapshot = objects.ToArray();
             foreach (var refObj in snapshot)
             {
+                // 유니티 객체가 제대로 존재하는지 체크
                 if (!refObj.IsValid) continue;
+
+                // 안보이게 처리하라는 명령인데 항시 켜져야하는 객체인지 체크
+                if (!isActive && refObj.Interface.IsVisualAlwaysOn) continue;
+
                 refObj.Interface.SetVisualActive(isActive);
             }
         }
@@ -260,9 +281,15 @@ namespace Core.Manager.Culling
                 refObj.Interface.SetPhysicsActive(isActive);
             }
         }
+        private int GetMaxDistance(Vector3Int from, Vector3Int to)
+        {
+            return Mathf.Max(Mathf.Abs(from.x - to.x),
+                            Mathf.Abs(from.y - to.y),
+                            Mathf.Abs(from.z - to.z));
+        }
 
 #if UNITY_EDITOR
-        // ... (유저님께서 작성하신 아름다운 Gizmo 코드는 동일하게 유지!)
+        
         [Header("Debug Visualization")]
         [SerializeField] private bool showDebugGrid = true;
         [SerializeField] private bool IsDrawSelected = false;
@@ -343,9 +370,9 @@ namespace Core.Manager.Culling
                 case CullingAxis.TwoD_XZ:
                     maxAllowedA = 7;  // 탐색 횟수: 361번 (최하옵 2D 안전선)
                     break;
-                case CullingAxis.ThreeD_XYZ:
-                    maxAllowedA = 2;  // 탐색 횟수: 729번 (최하옵 3D 마지노선!)
-                    break;
+                //case CullingAxis.ThreeD_XYZ:
+                //    maxAllowedA = 2;  // 탐색 횟수: 729번 (최하옵 3D 마지노선!)
+                //    break;
             }
 
             // 3. a는 'b + 1' 보다 크거나 같아야 하고, 기기 한계치(maxAllowedA)를 넘을 수 없음

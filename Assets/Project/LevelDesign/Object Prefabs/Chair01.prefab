@@ -74,14 +74,17 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 2f8616aed21e7d4488afa52137716c9d, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 7131420793536102338}
+      addedObject: {fileID: 8190754042209575194}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 2f8616aed21e7d4488afa52137716c9d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5773788362493009058}
   m_SourcePrefab: {fileID: 100100000, guid: 2f8616aed21e7d4488afa52137716c9d, type: 3}
 --- !u!1 &5627567281209590638 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 2f8616aed21e7d4488afa52137716c9d, type: 3}
   m_PrefabInstance: {fileID: 4816682753096875583}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &7131420793536102338
+--- !u!114 &8190754042209575194
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -94,6 +97,29 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Core.CullingStaticActor
   myScope: 2
+  _deubgGizmoSize: 1
   _isVisualActive: 1
   _isPhysicsActive: 1
-  _deubgSize: 1
+  _isVisualAlwaysOn: 0
+--- !u!64 &5773788362493009058
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5627567281209590638}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -24783592192637363, guid: 2f8616aed21e7d4488afa52137716c9d, type: 3}

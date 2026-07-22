@@ -17,7 +17,7 @@ namespace Core
 
         [Header("Culling Options")]
         [Tooltip("Culling에 상관없이 항상 보여야하는 객체면 true로 설정")]
-        [SerializeField] private bool _isVisualAlwaysOn = true;
+        [SerializeField] private bool _isVisualAlwaysOn = false;
 
         public bool IsVisualAlwaysOn => _isVisualAlwaysOn;
         public abstract CullingType cullingType { get; }

@@ -860,7 +860,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 536986849010484313, guid: 140424fbad2358b45963ac057787ae9d, type: 3}
       propertyPath: m_Name
-      value: HUD Canvas (Not RayCaster)
+      value: HUD (NoRay)
       objectReference: {fileID: 0}
     - target: {fileID: 1249815726548429402, guid: 140424fbad2358b45963ac057787ae9d, type: 3}
       propertyPath: m_Pivot.x
@@ -941,6 +941,14 @@ PrefabInstance:
     - target: {fileID: 1249815726548429402, guid: 140424fbad2358b45963ac057787ae9d, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1288289453119166910, guid: 140424fbad2358b45963ac057787ae9d, type: 3}
+      propertyPath: m_Name
+      value: Compass Direction Canvas (NoRay)
+      objectReference: {fileID: 0}
+    - target: {fileID: 1417366890339363241, guid: 140424fbad2358b45963ac057787ae9d, type: 3}
+      propertyPath: m_Name
+      value: Arrow Canvas (NoRay)
       objectReference: {fileID: 0}
     - target: {fileID: 8229200060888458680, guid: 140424fbad2358b45963ac057787ae9d, type: 3}
       propertyPath: m_Name

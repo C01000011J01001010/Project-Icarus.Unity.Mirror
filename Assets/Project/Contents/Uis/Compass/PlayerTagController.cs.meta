@@ -1,0 +1,12 @@
+fileFormatVersion: 2
+guid: 9260b2742ab660b4ca8a9e969d9968e0
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - _playerTagCanvasPrefab: {fileID: -2141266474699287921, guid: c06ede35b83488f489997bdb1157a2f7, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

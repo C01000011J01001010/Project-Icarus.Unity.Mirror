@@ -1,14 +1,15 @@
 using Core;
 using Core.Camera;
+using Core.Director;
 using Core.EventBus;
 using Core.Manager;
 using Core.Network;
 using FishNet.Component.Transforming;
 using FishNet.Managing.Server;
+using FishNet.Object.Synchronizing;
 using System.Collections.Generic;
-using UnityEngine;
-using Core.Director;
 using System.Runtime.CompilerServices;
+using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(NetworkTransform))]
@@ -32,7 +33,9 @@ public class SharedActor : BaseActorNetworked, IFixedTickable
     public float timeDelay = 1f;
     private float timeCount;
 
-    private Dictionary<int, Vector2> _clientInputs = new Dictionary<int, Vector2>();
+    
+    private readonly SyncDictionary<int, Vector2> _clientInputs = new SyncDictionary<int, Vector2>();
+    public SyncDictionary<int, Vector2> ClientInputs => _clientInputs;
 
     private void Awake()
     {

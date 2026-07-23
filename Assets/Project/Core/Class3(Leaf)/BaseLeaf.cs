@@ -23,7 +23,6 @@ public abstract class BaseLeaf : MonoBehaviour
 
     protected void RegisterTick()
     {
-        // 이제 인스펙터 필드 체크가 아닌 인터페이스의 구현된 그룹값을 사용합니다.
         if (this is ITickable tickable)
         {
             EventBus<R_TickEvent>.Publish(new R_TickEvent(tickable, tickable.TickGroup, true));

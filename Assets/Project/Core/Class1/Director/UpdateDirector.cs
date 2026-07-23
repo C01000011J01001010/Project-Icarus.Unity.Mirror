@@ -230,8 +230,9 @@ namespace Core.Director
             EventBus<R_FixedTickEvent>.Unsubscribe(OnRegisterFixedTick);
         }
 
-        private void Awake()
+        protected override void Awake()
         {
+             base.Awake();
             _tickRunners = CreateRunners<TickGroup, TickRunner>();
             _lateTickRunners = CreateRunners<LateTickGroup, LateTickRunner>();
             _fixedTickRunners = CreateRunners<FixedTickGroup, FixedTickRunner>();

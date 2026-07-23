@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 2052943975722439144}
   - component: {fileID: 78772888561541155}
   - component: {fileID: 6415505668538135733}
-  - component: {fileID: 8583982795499252245}
   m_Layer: 5
   m_Name: Quest Select Star
   m_TagString: Untagged
@@ -76,19 +75,3 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &8583982795499252245
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3167013355795333385}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6efb346cb6d08e944866ca9dbf421e32, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::QuestSelect
-  EmptyStar: {fileID: -4242947009033715984, guid: 8f98dfad537b50b488747c4d6a116123, type: 3}
-  FullStar: {fileID: -5139632261723576764, guid: 8f98dfad537b50b488747c4d6a116123, type: 3}
-  OutlinedEmptyStar: {fileID: 5202622485663618440, guid: 8f98dfad537b50b488747c4d6a116123, type: 3}
-  OutlinedFullStar: {fileID: -3185880035316116652, guid: 8f98dfad537b50b488747c4d6a116123, type: 3}

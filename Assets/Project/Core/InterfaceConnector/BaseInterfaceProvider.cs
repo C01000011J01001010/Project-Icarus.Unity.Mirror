@@ -1,48 +1,44 @@
-﻿using Core.EventBus;
-using UnityEngine;
+﻿using UnityEngine;
+using Core.EventBus;
 
-namespace Core
+namespace Core.Interface
 {
-    /// <summary>
-    /// 인터페이스를 주고받기 위한 객체
-    /// </summary>
-    public abstract class BaseInterfaceProvider<TRequestEvent, TPublishEvent> : MonoBehaviour
-        where TRequestEvent : struct, IEvent
-        where TPublishEvent : struct, IEvent
+    // 💡 이벤트 구조체 2개를 받던 것을 버리고, "어떤 인터페이스를 제공할 것인가" 하나만 받습니다.
+    public abstract class BaseInterfaceProvider<TInterface> : MonoBehaviour // (또는 기존 상속 Base)
+        where TInterface : class
     {
-        protected virtual void Awake()
-        {
-            // (핑) 나의 인터페이스를 필요한 이에게 줄 수 있도록 먼저 구독 
-            EventBus<TRequestEvent>.Subscribe(OnRequestReceived);
-        }
-
-        protected virtual void OnDestroy()
-        {
-            // 메모리 누수 방지를 위한 구독 해제
-            EventBus<TRequestEvent>.Unsubscribe(OnRequestReceived);
-        }
-
         protected virtual void OnEnable()
         {
-            // (퐁)
-            // 내가 일어났으니 내 인터페이스 필요한 친구 있나 물어보기
-            PublishInterface();
+            // 💡 마법이 일어나는 곳: 나 자신(this)을 TInterface로 캐스팅합니다.
+            TInterface provider = this as TInterface;
+
+            if (provider != null)
+            {
+                // 제네릭 이벤트를 생성하여 EventBus에 태워 보냅니다.
+                EventBus<SetProviderEvent<TInterface>>.Publish(new SetProviderEvent<TInterface>(provider));
+            }
+            else
+            {
+                Debug.LogError($"[Provider Error] {gameObject.name} 객체가 {typeof(TInterface).Name} 인터페이스를 상속받지 않았습니다!");
+            }
+
+            // 요청(Request) 이벤트 구독
+            EventBus<RequestProviderEvent<TInterface>>.Subscribe(OnProviderRequested);
         }
 
-        private void OnRequestReceived(TRequestEvent evt)
+        protected virtual void OnDisable()
         {
+            EventBus<RequestProviderEvent<TInterface>>.Unsubscribe(OnProviderRequested);
+            // 필요하다면 null을 보내 해제하는 로직 추가
+        }
 
-            if (isActiveAndEnabled)
+        private void OnProviderRequested(RequestProviderEvent<TInterface> evt)
+        {
+            TInterface provider = this as TInterface;
+            if (provider != null)
             {
-                PublishInterface();
+                EventBus<SetProviderEvent<TInterface>>.Publish(new SetProviderEvent<TInterface>(provider));
             }
         }
-
-        private void PublishInterface()
-        {
-            EventBus<TPublishEvent>.Publish(GetPublishEvent());
-        }
-
-        protected abstract TPublishEvent GetPublishEvent();
     }
 }

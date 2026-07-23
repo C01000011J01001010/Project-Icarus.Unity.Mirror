@@ -8,6 +8,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1249815726548429402}
     m_Modifications:
+    - target: {fileID: 1496427308661769744, guid: f6a405412fdac7e4d9207973f4f57fd7, type: 3}
+      propertyPath: m_VertexColorAlwaysGammaSpace
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5020666479079497341, guid: f6a405412fdac7e4d9207973f4f57fd7, type: 3}
+      propertyPath: m_Name
+      value: Compass Arrow Canvas (NoRay)
+      objectReference: {fileID: 0}
     - target: {fileID: 5822102332587970443, guid: f6a405412fdac7e4d9207973f4f57fd7, type: 3}
       propertyPath: m_Pivot.x
       value: 0
@@ -90,13 +98,63 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6847821554555061226, guid: f6a405412fdac7e4d9207973f4f57fd7, type: 3}
       propertyPath: m_Name
-      value: Compass
+      value: Compass BackGround
+      objectReference: {fileID: 0}
+    - target: {fileID: 7904896940937930625, guid: f6a405412fdac7e4d9207973f4f57fd7, type: 3}
+      propertyPath: m_VertexColorAlwaysGammaSpace
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7904896940937930625, guid: f6a405412fdac7e4d9207973f4f57fd7, type: 3}
+      propertyPath: m_AdditionalShaderChannelsFlag
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 4385178756191977452, guid: f6a405412fdac7e4d9207973f4f57fd7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8157278608034653146}
+    - targetCorrespondingSourceObject: {fileID: 5020666479079497341, guid: f6a405412fdac7e4d9207973f4f57fd7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 160084396655389962}
   m_SourcePrefab: {fileID: 100100000, guid: f6a405412fdac7e4d9207973f4f57fd7, type: 3}
+--- !u!1 &1288289453119166910 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4385178756191977452, guid: f6a405412fdac7e4d9207973f4f57fd7, type: 3}
+  m_PrefabInstance: {fileID: 3259379860185130578}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &8157278608034653146
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1288289453119166910}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: faacbeaf8cb937045a4896765abbbc1a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Icarus.Ui.CompassDirectionUI
+  myScope: 2
+--- !u!1 &7536590603436111919 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5020666479079497341, guid: f6a405412fdac7e4d9207973f4f57fd7, type: 3}
+  m_PrefabInstance: {fileID: 3259379860185130578}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &160084396655389962
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7536590603436111919}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ecbac75861763ca47a2e6cae37084203, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Icarus.ui.CompassArrowUI
+  myScope: 2
 --- !u!224 &9076978176454076889 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 5822102332587970443, guid: f6a405412fdac7e4d9207973f4f57fd7, type: 3}
@@ -192,7 +250,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8452093770348277317, guid: 15b18ac9583849045bfd6c69e39d6ad5, type: 3}
       propertyPath: m_Name
-      value: HUD (Not RayCaster)
+      value: HUD (NoRay)
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

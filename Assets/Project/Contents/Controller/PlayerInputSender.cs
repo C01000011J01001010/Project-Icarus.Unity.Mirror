@@ -24,22 +24,12 @@ public struct SharedActorMoveEvent : IEvent
 public struct SharedActorFlapEvent : IEvent
 {
     public int ClientId; // 누가 날개를 펄럭였는가?
+    public bool IsLeft; // 어느쪽 날개인가
 
-    public SharedActorFlapEvent(int clientId)
+    public SharedActorFlapEvent(int clientId, bool isLeft)
     {
         ClientId = clientId;
-    }
-}
-
-public struct SharedActorMouseClickFlapEvent : IEvent
-{
-    public int clientId; // 누가 입력했는가
-    public bool isLeft; // 어느쪽 마우스를 입력했는가
-
-    public SharedActorMouseClickFlapEvent(int clientId, bool isLeft)
-    {
-        this.clientId = clientId;
-        this.isLeft = isLeft;
+        IsLeft = isLeft;
     }
 }
 
@@ -122,23 +112,15 @@ public class PlayerInputSender : BaseActorNetworked, ITickable//, IControllerSet
     [ServerRpc]
     private void ServerRpcSpaceBarFlap()
     {
-        // 서버: "오케이, X번 클라이언트가 날갯짓을 했군."
-        EventBus<SharedActorFlapEvent>.Publish(new SharedActorFlapEvent(OwnerId));
+        // 0번부터 좌우 순서
+        bool isLeft = OwnerId % 2 == 0;
+        EventBus<SharedActorFlapEvent>.Publish(new SharedActorFlapEvent(OwnerId, isLeft));
     }
 
     [ServerRpc]
     private void ServerRpcMouseFlap(bool isLeft)
     {
-        EventBus<SharedActorMouseClickFlapEvent>.Publish(new SharedActorMouseClickFlapEvent(OwnerId, isLeft));
+        EventBus<SharedActorFlapEvent>.Publish(new SharedActorFlapEvent(OwnerId, isLeft));
     }
-
-    //public void SetInputProvider(IPlayerInputProvider inputProvider)
-    //{
-    //    if(inputProvider != null)
-    //    {
-    //        _inputProvider = inputProvider;
-    //    }
-    //}
-
     
 }

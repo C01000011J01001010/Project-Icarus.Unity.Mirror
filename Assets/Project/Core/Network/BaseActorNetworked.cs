@@ -6,14 +6,8 @@ namespace Core.Network
 {
     // 멀티플레이 객체용 3계층 Leaf 기본 클래스
 
-    public abstract class BaseActorNetworked : EventListenerNetworked, IActor
+    public abstract class BaseActorNetworked : BaseLeafNetworked, IActor
     {
-
-        // NetworkBehaviour는 OnSpawn/OnDespawn 대신 FishNet 콜백을 사용하지만, 
-        // 인터페이스 규격을 맞추기 위해 래핑해줍니다.
-        //public virtual void OnSpawn() { }
-
-        //public virtual void OnDespawn() { }
         protected override void OnEnable()
         {
             base.OnEnable();

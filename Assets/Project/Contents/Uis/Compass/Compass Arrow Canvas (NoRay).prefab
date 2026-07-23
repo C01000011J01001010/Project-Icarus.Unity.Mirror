@@ -114,13 +114,17 @@ PrefabInstance:
       propertyPath: m_SortingOrder
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 232568201705329025, guid: 8ccefe47111bf9d408a86db19521efdd, type: 3}
+      propertyPath: m_OverrideSorting
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 461102597145124588, guid: 8ccefe47111bf9d408a86db19521efdd, type: 3}
       propertyPath: m_IgnoreParentGroups
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3108917373896321149, guid: 8ccefe47111bf9d408a86db19521efdd, type: 3}
       propertyPath: m_Name
-      value: Arrow Canvas (Not RayCaster)
+      value: Arrow Canvas (NoRay)
       objectReference: {fileID: 0}
     - target: {fileID: 4399710727262127742, guid: 8ccefe47111bf9d408a86db19521efdd, type: 3}
       propertyPath: m_Pivot.x

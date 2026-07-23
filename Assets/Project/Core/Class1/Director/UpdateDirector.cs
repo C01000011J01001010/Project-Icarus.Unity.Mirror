@@ -14,13 +14,15 @@ namespace Core
         Initial,
         Controller,
         Character,
-        Object
+        Object,
+        Ui,
     }
     public enum LateTickGroup
     {
         None,
         Camera,
-        Post
+        Ui,
+        Post,
     }
     public enum FixedTickGroup
     {

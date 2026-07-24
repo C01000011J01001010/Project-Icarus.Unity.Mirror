@@ -14,12 +14,13 @@ namespace Icarus.Character
 
     // 안전장치
     [RequireComponent(typeof(SharedActor))]
-    public class ClientMoveInfoProvider : BaseInterfaceProvider<IClientInputProvider>, IClientInputProvider
+    public class ClientMoveInfoProvider : BaseSinglePublisher<IClientInputProvider>, IClientInputProvider
     {
         private SharedActor _sharedActor;
 
-        private void Awake()
+        protected override void Awake()
         {
+            base.Awake();
             _sharedActor = GetComponent<SharedActor>();
         }
 

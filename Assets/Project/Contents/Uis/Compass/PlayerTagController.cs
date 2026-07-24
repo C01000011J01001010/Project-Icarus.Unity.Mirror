@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Icarus.Ui
 {
-    public class PlayerTagController : BaseInterfaceConsumer<IClientInputProvider>, ITickable
+    public class PlayerTagController : BaseLeaf, ITickable
     {
         [SerializeField] private PlayerTagCanvas _playerTagCanvasPrefab;
         [SerializeField, Range(1f, 30f)] private float _rotationSmoothSpeed = 15f;
@@ -16,16 +16,30 @@ namespace Icarus.Ui
 
         private List<PlayerTagCanvas> _playerTagCanvasList = new();
 
+        private InterfaceReceiver<IClientInputProvider> _receiver = new();
+        protected IClientInputProvider Target => _receiver.Target;
+
         public TickGroup TickGroup => TickGroup.Ui;
 
-        protected override void Awake()
+        private void Awake()
         {
-            base.Awake();
             // 인스펙터에서 할당을 깜빡했을 경우를 대비한 방어 코드 (기존 로직 유지)
             if (_canvasContainer == null)
             {
                 _canvasContainer = transform.parent;
             }
+        }
+
+        protected override void OnEnable()
+        {
+            base.OnEnable();
+            _receiver.Bind();
+        }
+
+        protected override void OnDisable()
+        {
+            base.OnDisable();
+            _receiver.Unbind();
         }
 
         public void Tick(float deltaTime)

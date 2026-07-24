@@ -8,15 +8,29 @@ namespace Icarus.Ui
     /// <summary>
     /// Y축 회전 인터페이스(IYRotationProvider)를 받아 RectTransform의 Z축 회전으로 표현하는 UI 기본 클래스
     /// </summary>
-    public abstract class BaseYRotationUI<TInterface> : BaseInterfaceConsumer<TInterface>
+    public abstract class BaseYRotationUI<TInterface> : BaseLeaf
         where TInterface : class, IYRotationProvider
     {
         private RectTransform _rectTransform;
 
-        protected override void Awake()
+        private InterfaceReceiver<TInterface> _receiver = new();
+        protected TInterface Target => _receiver.Target;
+
+        protected virtual void Awake()
         {
-            base.Awake();
             _rectTransform = GetComponent<RectTransform>();
+        }
+
+        protected override void OnEnable()
+        {
+            base.OnEnable();
+            _receiver.Bind();
+        }
+
+        protected override void OnDisable()
+        {
+            base.OnDisable();
+            _receiver.Unbind();
         }
 
         protected virtual void OnTick(float deltaTime)

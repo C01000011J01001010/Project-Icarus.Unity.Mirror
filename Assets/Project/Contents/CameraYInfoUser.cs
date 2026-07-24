@@ -1,9 +1,10 @@
 using Core;
 using Core.Interface;
+using UnityEngine;
 
 namespace Icarus.Camera
 {
-    public class CameraYInfoUser : BaseInterfaceConsumer<ICameraRotationProvider>
+    public class CameraYInfoUser : MonoBehaviour
     {
 
     }

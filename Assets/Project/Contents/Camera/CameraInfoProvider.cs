@@ -1,13 +1,12 @@
 using Core;
 using Core.Interface;
-using Icarus.Ui;
 
 namespace Icarus.Camera
 {
     public interface ICameraRotationProvider : IYRotationProvider { }
-    public class CameraInfoProvider : BaseInterfaceProvider<ICameraRotationProvider>, ICameraRotationProvider
+    // 💡 1. 상속의 자유: 이제 MonoBehaviour를 직접 상속받거나 다른 부모를 가질 수 있습니다.
+    public class CameraInfoProvider : BaseSinglePublisher<ICameraRotationProvider>, ICameraRotationProvider
     {
-        // 인터페이스 구현: 내 Transform의 Y 각도를 반환
         public float WorldYRotation => transform.eulerAngles.y;
     }
 }

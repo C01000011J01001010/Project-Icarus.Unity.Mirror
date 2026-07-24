@@ -31,7 +31,12 @@ namespace Icarus.Character
             {
                 return input;
             }
-
+            Utility.Log("버그 발생! 자세한 내용은 주석 참조!", LogColor.Red);
+            // SharedActor에서 Dictionary로 입력을 보관하기 때문에
+            // 클라이언트id가 앞순서인 유저의 입력이 없는 이상
+            // 나의 클라이언트 id가 유효해도 제대로 된 값을 받아갈 수 없음
+            // 때문에 ServerManager.OnRemoteConnectionState를 사용하여 접속 유저가 변경될때마다 EventBus로 알려서
+            // 접속중인 유저의 숫자가 중요한 객체에 알려줘야함
             return Vector2.zero; // 값이 없으면 (0, 0) 반환
         }
 

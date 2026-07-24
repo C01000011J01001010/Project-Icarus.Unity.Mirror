@@ -12,7 +12,7 @@ namespace Core.Interface
     /// <summary>
     /// 등록된 모든 Receiver와 Publisher의 Bind/Unbind를 한 번에 처리해주는 도구
     /// </summary>
-    public class AutoBinder
+    public class InterfaceBinderContainer
     {
         private List<IBindable> _bindables = new List<IBindable>();
 

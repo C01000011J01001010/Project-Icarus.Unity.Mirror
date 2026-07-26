@@ -30,7 +30,6 @@ namespace CoreEngine.LevelDesign.Editor
                     MapBakeSettingsSO newSettings = CreateNewProfileAsset();
                     if (newSettings != null)
                     {
-                        // 생성된 에셋을 뷰에 전달하여 할당 및 저장 처리
                         onProfileCreated?.Invoke(newSettings);
                     }
                 }
@@ -70,10 +69,7 @@ namespace CoreEngine.LevelDesign.Editor
 
             profileSO.Update();
 
-            // 🌟 수동 LabelField를 모두 제거했습니다.
-            // SO 필드에 달린 [Header] 속성에 의해 유니티가 헤더를 자동으로 1번만 렌더링합니다.
             EditorGUILayout.PropertyField(profileSO.FindProperty("mapDimension"), new GUIContent("게임 차원 모드"));
-
             EditorGUILayout.PropertyField(profileSO.FindProperty("projectionPlane"), new GUIContent("투영 평면"));
             EditorGUILayout.PropertyField(profileSO.FindProperty("depthSteps"), new GUIContent("명도 양자화 단계"));
 
@@ -94,20 +90,27 @@ namespace CoreEngine.LevelDesign.Editor
             if (useLayerColorProp.boolValue)
             {
                 EditorGUILayout.HelpBox("프로젝트에 등록된 레이어별로 고유 색상을 지정합니다.", MessageType.Info);
-
                 SerializedProperty layerColorsProp = profileSO.FindProperty("layerColors");
                 DrawLayerColorPalette(layerColorsProp);
             }
             else
             {
                 if (settings.depthSteps != MapDepthSteps.None)
-                {
                     EditorGUILayout.HelpBox("흑백 모드입니다. 지형 깊이(Depth)에 따라 명도가 조절됩니다.", MessageType.Info);
-                }
                 else
-                {
                     EditorGUILayout.HelpBox("단색 모드입니다. 캡처된 오브젝트가 깊이와 상관없이 단일 색상으로 렌더링됩니다.", MessageType.Info);
-                }
+            }
+
+            // ========================================================
+            // 🌟 외곽선(Outline) 설정 UI 렌더링 추가
+            // ========================================================
+            EditorGUILayout.Space(10);
+            SerializedProperty outlineSettingsProp = profileSO.FindProperty("outlineSettings");
+            EditorGUILayout.PropertyField(outlineSettingsProp, new GUIContent("외곽선 대상 레이어 목록"), true);
+
+            if (outlineSettingsProp.arraySize > 0)
+            {
+                EditorGUILayout.HelpBox("추가된 레이어의 오브젝트 테두리에만 외곽선이 렌더링됩니다. (중복 레이어 선택 시 자동 취소됨)", MessageType.None);
             }
 
             profileSO.ApplyModifiedProperties();

@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace Core.Environment
+namespace CoreEngine.Environment
 {
     /// <summary>
     /// [모듈 조립 시스템의 코어]

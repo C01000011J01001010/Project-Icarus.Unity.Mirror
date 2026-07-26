@@ -1,9 +1,9 @@
-using Core;
-using Core.Camera;
-using Core.Director;
-using Core.EventBus;
-using Core.Manager;
-using Core.Network;
+using CoreEngine;
+using CoreEngine.CameraSystem;
+using CoreEngine.Director;
+using CoreEngine.EventBus;
+using CoreEngine.Manager;
+using CoreEngine.Network;
 using FishNet.Component.Transforming;
 using FishNet.Managing.Server;
 using FishNet.Object.Synchronizing;

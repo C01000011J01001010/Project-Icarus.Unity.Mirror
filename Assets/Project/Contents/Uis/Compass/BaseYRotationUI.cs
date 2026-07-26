@@ -1,6 +1,6 @@
-﻿using Core;
-using Core.EventBus;
-using Core.Interface;
+﻿using CoreEngine;
+using CoreEngine.EventBus;
+using CoreEngine.Interface;
 using UnityEngine;
 
 namespace Icarus.Ui

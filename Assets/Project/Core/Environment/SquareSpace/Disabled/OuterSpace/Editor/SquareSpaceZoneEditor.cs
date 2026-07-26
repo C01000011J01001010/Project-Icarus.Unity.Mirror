@@ -1,7 +1,7 @@
 ﻿using UnityEditor;
 using UnityEngine;
 
-namespace Core.Environment
+namespace CoreEngine.Environment
 {
     /// <summary>
     /// SquareSpaceZone 컴포넌트의 유니티 인스펙터 UI를 커스터마이징하고 툴링을 제공하는 에디터 클래스

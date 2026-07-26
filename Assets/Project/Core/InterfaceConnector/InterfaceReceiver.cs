@@ -1,7 +1,7 @@
 using System;
-using Core.EventBus;
+using CoreEngine.EventBus;
 
-namespace Core.Interface
+namespace CoreEngine.Interface
 {
     /// <summary>
     /// 상속 없이 어떤 클래스에서든 자유롭게 생성(new)하여 사용할 수 있는 인터페이스 수신기
@@ -33,6 +33,20 @@ namespace Core.Interface
         {
             Target = evt.Provider;
             OnTargetSet?.Invoke(Target);
+        }
+
+        public bool TryGet(out TInterface target)
+        {
+            if (Utility.isUnityNull(Target))
+            {
+                target = null;
+                return false;
+            }
+            else
+            {
+                target = Target;
+                return true;
+            }
         }
     }
 }

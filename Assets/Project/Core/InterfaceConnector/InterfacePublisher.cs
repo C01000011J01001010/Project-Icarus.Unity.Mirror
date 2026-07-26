@@ -1,6 +1,6 @@
-﻿using Core.EventBus;
+﻿using CoreEngine.EventBus;
 
-namespace Core.Interface
+namespace CoreEngine.Interface
 {
     /// <summary>
     /// 상속 없이 어떤 클래스에서든 자유롭게 생성하여 인터페이스를 외부로 제공(Publish)하는 부품

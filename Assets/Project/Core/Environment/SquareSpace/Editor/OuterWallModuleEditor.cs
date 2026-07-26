@@ -1,7 +1,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace Core.Environment
+namespace CoreEngine.Environment
 {
     [CustomEditor(typeof(OuterWallModule))]
     public class OuterWallModuleEditor : Editor

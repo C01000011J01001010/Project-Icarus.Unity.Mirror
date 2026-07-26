@@ -1,6 +1,6 @@
-﻿using Core.EventBus;
+﻿using CoreEngine.EventBus;
 
-namespace Core
+namespace CoreEngine
 {
     public abstract class BaseUi : BaseModule, IUi
     {

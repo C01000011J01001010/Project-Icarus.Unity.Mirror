@@ -1,10 +1,10 @@
-﻿using Core.EventBus;
+﻿using CoreEngine.EventBus;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Core
+namespace CoreEngine
 {
     #region Tcik구별을 위한 enum
     // None을 제외한 enum 순서를 Update 순서에 사용
@@ -97,7 +97,7 @@ namespace Core
     #endregion
 }
 
-namespace Core.Director
+namespace CoreEngine.Director
 {
     [DefaultExecutionOrder((int)ExecutionOrder.Director)]
     internal sealed class UpdateDirector : BaseDirector<UpdateDirector>

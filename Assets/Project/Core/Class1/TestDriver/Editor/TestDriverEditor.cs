@@ -1,8 +1,8 @@
 using UnityEngine;
 using UnityEditor;
-using Core.Test;
+using CoreEngine.Test;
 
-namespace Core.Test.Editor
+namespace CoreEngine.Test.Editor
 {
     [CustomEditor(typeof(TestDriver))]
     public class TestDriverEditor : UnityEditor.Editor

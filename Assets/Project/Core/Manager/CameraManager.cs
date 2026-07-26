@@ -1,13 +1,13 @@
-using Core;
-using Core.EventBus;
-using Core.Manager;
+using CoreEngine;
+using CoreEngine.EventBus;
+using CoreEngine.Manager;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace Core.Manager
+namespace CoreEngine.Manager
 {
     #region Camera Events
     public struct RegisterVirtualCameraEvent : IEvent

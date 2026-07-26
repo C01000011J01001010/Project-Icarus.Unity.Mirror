@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Core.Interface
+namespace CoreEngine.Interface
 {
     /// <summary>
     /// Polling으로 입력 데이터를 가져오는 처리

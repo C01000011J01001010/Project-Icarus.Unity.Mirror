@@ -1,9 +1,9 @@
 // 위치: Scripts/Core/Editor/SceneContextEditor.cs
-using Core; // SceneContext가 있는 네임스페이스
+using CoreEngine; // SceneContext가 있는 네임스페이스
 using UnityEditor;
 using UnityEngine;
 
-namespace Core
+namespace CoreEngine
 {
     [CustomEditor(typeof(SceneContext), true)]
     public class SceneContextEditor : Editor
@@ -25,7 +25,7 @@ namespace Core
                 }
 
                 // 자식 객체로 SceneTester를 잘 넣어놨는지 검사 -> 존재해야됨
-                var tester = gameObject.GetComponentInChildren<Core.Test.TestDriver>(true);
+                var tester = gameObject.GetComponentInChildren<CoreEngine.Test.TestDriver>(true);
                 if (tester == null)
                 {
                     string messgae = //$"<color=red>[Hierarchy Error]</color>" +

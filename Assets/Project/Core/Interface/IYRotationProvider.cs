@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Core.Interface
+namespace CoreEngine.Interface
 {
     public interface IYRotationProvider
     {

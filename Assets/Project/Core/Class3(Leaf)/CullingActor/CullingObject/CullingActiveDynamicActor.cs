@@ -1,7 +1,7 @@
-﻿using Core.Manager.Culling;
+﻿using CoreEngine.Manager.Culling;
 using UnityEngine;
 
-namespace Core
+namespace CoreEngine
 {
     internal class CullingActiveDynamicActor : BaseCullingDynamicActor
     {

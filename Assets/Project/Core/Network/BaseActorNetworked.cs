@@ -1,8 +1,8 @@
 ﻿using System;
-using Core.EventBus;
-using Core.Hub;
+using CoreEngine.EventBus;
+using CoreEngine.Hub;
 
-namespace Core.Network
+namespace CoreEngine.Network
 {
     // 멀티플레이 객체용 3계층 Leaf 기본 클래스
 

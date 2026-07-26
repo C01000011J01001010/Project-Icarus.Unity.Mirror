@@ -4,10 +4,10 @@ using UnityEngine.UI;
 using FishNet;
 using UnityEngine.Networking;
 using System.Threading.Tasks;
-using Core;
+using CoreEngine;
 using System.Collections;
 
-namespace Core.Network
+namespace CoreEngine.Network
 {
     public class NetworkTestUI : BaseModule, IUi
     {

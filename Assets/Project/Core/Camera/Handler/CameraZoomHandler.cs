@@ -2,7 +2,7 @@
 using UnityEngine;
 using Unity.Cinemachine;
 
-namespace Core.Camera
+namespace CoreEngine.CameraSystem
 {
     [Serializable]
     public class CameraZoomHandler

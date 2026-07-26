@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Core.Character
+namespace CoreEngine.Character
 {
     public interface ICharacter
     {

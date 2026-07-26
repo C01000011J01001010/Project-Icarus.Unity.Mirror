@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace Core.Camera
+namespace CoreEngine.CameraSystem
 {
     [Serializable]
     public class CameraRotationHandler

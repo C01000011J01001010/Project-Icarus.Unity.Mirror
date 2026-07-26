@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Core.Loading
+namespace CoreEngine.Loading
 {
     [DefaultExecutionOrder((int)ExecutionOrder.Loading)]
     [RequireComponent(typeof(CanvasGroup))]

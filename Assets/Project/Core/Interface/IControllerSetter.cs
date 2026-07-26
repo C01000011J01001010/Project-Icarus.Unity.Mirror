@@ -1,5 +1,5 @@
 ﻿
-namespace Core.Interface
+namespace CoreEngine.Interface
 {
     public interface IControllerSetter
     {

@@ -1,8 +1,8 @@
-﻿using Core.EventBus;
+﻿using CoreEngine.EventBus;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Core.EventBus.Example
+namespace CoreEngine.EventBus.Example
 {
     /// <summary>
     /// 메모리 해제 자동화 예시

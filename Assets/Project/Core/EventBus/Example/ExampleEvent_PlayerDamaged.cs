@@ -1,7 +1,7 @@
 ﻿// example -> 주고받을 이벤트 명세서
-using Core.EventBus;
+using CoreEngine.EventBus;
 
-namespace Core.EventBus.Example
+namespace CoreEngine.EventBus.Example
 {
     public struct ExampleEvent_PlayerDamaged : IEvent
     {

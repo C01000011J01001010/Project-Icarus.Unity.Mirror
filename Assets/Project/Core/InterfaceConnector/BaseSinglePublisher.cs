@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
-using Core.Interface; // InterfacePublisher가 있는 곳
+using CoreEngine.Interface; // InterfacePublisher가 있는 곳
 
-namespace Core
+namespace CoreEngine
 {
     /// <summary>
     /// 오직 1개의 인터페이스만 외부로 제공하는 단순한 MonoBehaviour를 위한 자동화 부모 클래스

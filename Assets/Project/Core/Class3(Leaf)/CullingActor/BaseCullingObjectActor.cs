@@ -1,9 +1,9 @@
-﻿using Core.EventBus;
-using Core.Manager.Culling;
+﻿using CoreEngine.EventBus;
+using CoreEngine.Manager.Culling;
 using System.Diagnostics;
 using UnityEngine;
 
-namespace Core
+namespace CoreEngine
 {
     // 장애물 및 모든 Culling 객체의 부모 액터
     public abstract class BaseCullingObjectActor : BaseActor, ICullingObject

@@ -1,8 +1,8 @@
-﻿using Core.EventBus;
-using Core.Manager.Culling;
+﻿using CoreEngine.EventBus;
+using CoreEngine.Manager.Culling;
 using UnityEngine;
 
-namespace Core
+namespace CoreEngine
 {
     
     public abstract class BaseCullingDynamicActor : BaseCullingObjectActor, ITickable

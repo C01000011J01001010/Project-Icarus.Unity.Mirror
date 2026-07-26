@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections;
 
-namespace Core
+namespace CoreEngine
 {
     public interface IModule
     {

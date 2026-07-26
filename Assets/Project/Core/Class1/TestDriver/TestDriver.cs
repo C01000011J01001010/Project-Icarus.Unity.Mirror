@@ -1,11 +1,11 @@
 
-using Core.EventBus;
+using CoreEngine.EventBus;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace Core.Test
+namespace CoreEngine.Test
 {
     /// <summary>
     /// 메인 코드를 1도 건드리지 않는 단독 씬 부트스트래퍼.

@@ -1,12 +1,12 @@
-﻿using Core.EventBus;
-using Core.Hub;
-using Core.Manager.Culling;
+﻿using CoreEngine.EventBus;
+using CoreEngine.Hub;
+using CoreEngine.Manager.Culling;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 
-namespace Core
+namespace CoreEngine
 {
     public class CullingPlayerActor : BaseActor, ITickable
     {

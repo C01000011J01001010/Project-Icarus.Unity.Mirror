@@ -1,12 +1,12 @@
-using Core;
-using Core.Camera;
-using Core.EventBus;
-using Core.Interface;
-using Core.Manager;
+using CoreEngine;
+using CoreEngine.CameraSystem;
+using CoreEngine.EventBus;
+using CoreEngine.Interface;
+using CoreEngine.Manager;
 using Unity.Cinemachine;
 using UnityEngine;
 
-namespace Core.Camera
+namespace CoreEngine.CameraSystem
 {
     [RequireComponent(typeof(CinemachineThirdPersonFollow))]
     public class ThirdPersonCameraController : VirtualCameraController

@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Core.Environment
+namespace CoreEngine.Environment
 {
     /// <summary>
     /// 환경 효과(Environment Effect)가 적용될 논리적 공간을 정의하는 컴포넌트.

@@ -1,9 +1,9 @@
-﻿using Core.EventBus;
+﻿using CoreEngine.EventBus;
 using System.Collections;
 using System.Linq;
 using UnityEngine;
 
-namespace Core.Hub
+namespace CoreEngine.Hub
 {
     internal sealed class UiHub : BaseModuleHub<IUi>
     {

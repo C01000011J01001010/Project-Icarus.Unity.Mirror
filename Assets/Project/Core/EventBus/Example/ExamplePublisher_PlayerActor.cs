@@ -1,7 +1,7 @@
-﻿using Core.EventBus;
+﻿using CoreEngine.EventBus;
 using UnityEngine;
 
-namespace Core.EventBus.Example
+namespace CoreEngine.EventBus.Example
 {
     // 명세서를 들고 이벤트를 알리는 객체의 예시
     public class ExamplePublisher_PlayerActor : MonoBehaviour

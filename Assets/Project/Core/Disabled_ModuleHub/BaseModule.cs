@@ -1,6 +1,6 @@
 ﻿using System.Collections;
 using UnityEngine;
-using Core;
+using CoreEngine;
 public abstract class BaseModule<TOnwer> //: IModule
     where TOnwer : MonoBehaviour, IModuleHub
 {

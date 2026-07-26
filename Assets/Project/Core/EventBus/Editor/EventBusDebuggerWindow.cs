@@ -1,7 +1,7 @@
 #if UNITY_EDITOR
 using UnityEditor;
 using UnityEngine;
-using Core.EventBus;
+using CoreEngine.EventBus;
 
 public class EventBusDebuggerWindow : EditorWindow
 {

@@ -1,7 +1,7 @@
-﻿using Core.EventBus;
-using Core.Hub;
+﻿using CoreEngine.EventBus;
+using CoreEngine.Hub;
 
-namespace Core
+namespace CoreEngine
 {
     public abstract class BaseActor : BaseLeaf, IActor
     {

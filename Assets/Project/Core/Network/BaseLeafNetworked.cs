@@ -1,10 +1,10 @@
 using FishNet.Connection;
 using FishNet.Object;
-using Core.EventBus;
-using Core.Manager;
+using CoreEngine.EventBus;
+using CoreEngine.Manager;
 using UnityEngine;
 
-namespace Core.Network
+namespace CoreEngine.Network
 {
     public enum NetworkTickTarget
     {

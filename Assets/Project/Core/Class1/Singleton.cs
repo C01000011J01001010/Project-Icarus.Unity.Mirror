@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 
-namespace Core
+namespace CoreEngine
 { 
     public class Singleton<T> : MonoBehaviour 
         where T : Singleton<T>

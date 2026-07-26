@@ -1,15 +1,12 @@
-﻿using Core.EventBus;
-using Core;
+﻿using CoreEngine.EventBus;
+using CoreEngine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using UnityEngine;
-using static Core.Utility;
-using UnityEditor.Experimental.GraphView;
 
-namespace Core.Hub
+namespace CoreEngine.Hub
 {
     /// <summary>
     /// Manager, Ui 등 단일객체 모듈을 위한 등록, 해제 이벤트
@@ -55,19 +52,19 @@ namespace Core.Hub
             var modules = moduleDict.Values.ToArray();
             foreach (var module in modules)
             {
-                if (!isUnityNull(module)) module.Exit();
+                if (!Utility.isUnityNull(module)) module.Exit();
             }
             // 모듈들정리를 끝낸 후 나도 구독취소
             // Hub가 어차피 사라질것이니 모듈들의 관리도 필요가 없어짐
             EventBus<ModuleRegistrationEvent>.Unsubscribe(OnLeafRegistration);
 
             // 게임이 종료 중이면 나머지 객체는 알아서 정리됨
-            if (IsAppQuitting) return;
+            if (Utility.IsAppQuitting) return;
 
             foreach (var module in modules)
             {
                 // 허브와 다른씬에 남아서 살아남을 수도 있으니
-                if (!isUnityNull(module) && module is MonoBehaviour asMono)
+                if (!Utility.isUnityNull(module) && module is MonoBehaviour asMono)
                 {
                     Debug.Log($"Hub에서 module {asMono.name}을 수동 삭제함");
                     Destroy(asMono.gameObject);
@@ -131,7 +128,7 @@ namespace Core.Hub
 
             // 등록한적이 없거나 등록했던 객체가 페이크 널일때
             Type typeKey = module.GetType();
-            if (!moduleDict.TryGetValue(typeKey, out TModule old) || isUnityNull(old))
+            if (!moduleDict.TryGetValue(typeKey, out TModule old) || Utility.isUnityNull(old))
             {
                 moduleDict[typeKey] = module;
             }

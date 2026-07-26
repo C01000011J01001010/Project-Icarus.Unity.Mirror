@@ -1,11 +1,11 @@
-﻿using Core.EventBus;
+﻿using CoreEngine.EventBus;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace Core.Hub
+namespace CoreEngine.Hub
 {
     // 1. 아주 가벼운 마커 인터페이스. 모든 Leaf Actor는 이를 구현합니다.
     public interface IActor { }

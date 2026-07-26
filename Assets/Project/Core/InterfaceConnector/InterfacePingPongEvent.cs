@@ -1,9 +1,9 @@
-﻿using Core.EventBus;
+﻿using CoreEngine.EventBus;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Core.Interface
+namespace CoreEngine.Interface
 {
     // 모든 인터페이스 제공자가 자신을 등록할 때 쓸 단일 제네릭 이벤트
     public struct SetProviderEvent<TInterface> : IEvent where TInterface : class

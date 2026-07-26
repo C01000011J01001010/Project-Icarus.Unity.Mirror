@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-namespace Core
+namespace CoreEngine
 {
     public interface IUi : IModule
     {

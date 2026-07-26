@@ -1,8 +1,8 @@
-﻿using Core;
-using Core.Director;
-using Core.EventBus;
-using Core.Interface;
-using Core.Network;
+﻿using CoreEngine;
+using CoreEngine.Director;
+using CoreEngine.EventBus;
+using CoreEngine.Interface;
+using CoreEngine.Network;
 using FishNet.Object; // FishNet 필수 네임스페이스
 using Icarus.Camera;
 using UnityEngine;

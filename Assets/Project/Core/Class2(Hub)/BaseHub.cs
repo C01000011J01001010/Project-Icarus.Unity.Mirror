@@ -1,8 +1,8 @@
-﻿using Core.EventBus;
+﻿using CoreEngine.EventBus;
 using System.Collections;
 using UnityEngine;
 
-namespace Core.Hub
+namespace CoreEngine.Hub
 {
     public interface IRegistration
     {

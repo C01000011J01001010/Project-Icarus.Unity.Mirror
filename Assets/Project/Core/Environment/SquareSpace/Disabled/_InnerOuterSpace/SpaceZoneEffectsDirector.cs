@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Core.Environment
+namespace CoreEngine.Environment
 {
     /// <summary>
     /// 단일 공간의 외곽 벽면과 내부 효과 구역을 관리하는 마스터 디렉터 컴포넌트.

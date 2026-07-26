@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Core.Environment
+namespace CoreEngine.Environment
 {
     public abstract class BaseEnvironment : MonoBehaviour
     {

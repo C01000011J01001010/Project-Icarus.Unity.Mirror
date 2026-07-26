@@ -1,4 +1,4 @@
-﻿using Core.EventBus;
+﻿using CoreEngine.EventBus;
 using System;
 using System.Collections;
 using UnityEngine;
@@ -6,7 +6,7 @@ using UnityEngine.InputSystem;
 
 //public delegate Vector2 MovementDelegate(float x, float y);
 //public delegate 
-namespace Core.Manager
+namespace CoreEngine.Manager
 {
     public abstract class BaseInputManager<TInputAction> : BaseManager, IManager
         where TInputAction : class, IInputActionCollection2, IDisposable, new()

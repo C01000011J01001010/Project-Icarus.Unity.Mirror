@@ -1,10 +1,10 @@
-﻿using Core.EventBus;
+﻿using CoreEngine.EventBus;
 // SystemLoadingEvent가 있는 네임스페이스 추가 (필요시 수정)
-using Core.Hub;
+using CoreEngine.Hub;
 using System.Collections;
 using UnityEngine;
 
-namespace Core
+namespace CoreEngine
 {
     public enum ContextScope
     {

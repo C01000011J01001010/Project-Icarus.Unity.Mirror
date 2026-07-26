@@ -1,9 +1,9 @@
-﻿using Core.Director;
-using Core.EventBus;
+﻿using CoreEngine.Director;
+using CoreEngine.EventBus;
 using System.Collections;
 using UnityEngine;
 
-namespace Core.Loading
+namespace CoreEngine.Loading
 {
     // Ui를 직접 다루기에 Director로써 특수한 초기화순서
     [DefaultExecutionOrder((int)ExecutionOrder.Loading)]

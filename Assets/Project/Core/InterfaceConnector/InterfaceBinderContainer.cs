@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine.UIElements;
 
-namespace Core.Interface
+namespace CoreEngine.Interface
 {
     public interface IBindable
     {

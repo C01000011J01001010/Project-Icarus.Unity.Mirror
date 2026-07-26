@@ -1,5 +1,5 @@
-using Core;
-using Core.Interface;
+using CoreEngine;
+using CoreEngine.Interface;
 using UnityEngine;
 
 namespace Icarus.Camera

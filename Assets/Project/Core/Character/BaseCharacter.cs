@@ -1,7 +1,7 @@
 using System;
 using System.Collections;
 using UnityEngine;
-using Core;
+using CoreEngine;
 
 
 [RequireComponent(typeof(baseCharacterAnim))]

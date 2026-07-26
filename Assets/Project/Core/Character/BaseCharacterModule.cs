@@ -2,7 +2,7 @@
 using System;
 using System.Collections;
 using UnityEngine;
-using Core;
+using CoreEngine;
 
 public abstract class BaseCharacterModule : BaseMonoModule<BaseCharacter>//, IModule
 {

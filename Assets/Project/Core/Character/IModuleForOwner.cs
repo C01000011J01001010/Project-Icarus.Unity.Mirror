@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using Core;
+using CoreEngine;
 interface ICharacterModule : IModule
 {
     BaseCharacter Character { get; }

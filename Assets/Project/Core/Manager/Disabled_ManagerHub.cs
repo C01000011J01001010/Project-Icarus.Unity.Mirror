@@ -1,5 +1,5 @@
 ﻿using System;
-using Core;
+using CoreEngine;
 /// <summary>
 /// 하이라키에서 부모객체로 GameManager 또는 WorldManager 필요
 /// </summary>

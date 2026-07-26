@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Core.Environment
+namespace CoreEngine.Environment
 {
     /// <summary>
     /// [모듈형 확장 플러그인]

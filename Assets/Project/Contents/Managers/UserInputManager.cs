@@ -1,8 +1,8 @@
-using Core;
-using Core.EventBus;
+using CoreEngine;
+using CoreEngine.EventBus;
 
-using Core.Interface;
-using Core.Manager;
+using CoreEngine.Interface;
+using CoreEngine.Manager;
 using System;
 using System.Collections;
 using Unity.VisualScripting;

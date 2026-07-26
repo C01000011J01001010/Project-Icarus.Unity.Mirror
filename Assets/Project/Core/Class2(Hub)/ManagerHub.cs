@@ -1,7 +1,7 @@
 ﻿
 using System.Collections;
 
-namespace Core.Hub
+namespace CoreEngine.Hub
 {
     internal sealed class ManagerHub : BaseModuleHub<IManager>
     {

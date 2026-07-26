@@ -1,8 +1,8 @@
-using Core.EventBus;
+using CoreEngine.EventBus;
 using FishNet;
 using UnityEngine;
 
-namespace Core.Network
+namespace CoreEngine.Network
 {
     public class NetworkConnectionTest : MonoBehaviour
     {

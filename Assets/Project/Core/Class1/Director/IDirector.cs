@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Core.Director
+namespace CoreEngine.Director
 {
     /// <summary>
     /// 1계층의 뼈대가 되는 객체

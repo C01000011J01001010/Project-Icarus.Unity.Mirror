@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using FishNet;
 using FishNet.Object;
-namespace Core
+namespace CoreEngine
 {
     public class BaseMono : MonoBehaviour
     {

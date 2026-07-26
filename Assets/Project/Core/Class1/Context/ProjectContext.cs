@@ -1,11 +1,11 @@
 ﻿using System.Collections;
 using UnityEngine;
-using Core.EventBus;
-using Core.Test;
-using Core.Director;
-using Core.Loading;
+using CoreEngine.EventBus;
+using CoreEngine.Test;
+using CoreEngine.Director;
+using CoreEngine.Loading;
 
-namespace Core
+namespace CoreEngine
 {
 
     public struct ProjectContextProgressEvent : IEvent

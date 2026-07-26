@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Core
+namespace CoreEngine
 {
     public interface IManager : IModule
     {

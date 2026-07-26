@@ -1,11 +1,11 @@
-﻿using Core;
+﻿using CoreEngine;
 using System.Collections;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using Core.Director;
+using CoreEngine.Director;
 
-namespace Core
+namespace CoreEngine
 {
     /// <summary>
     /// Additive로 로드되는 개별 씬마다 존재하는 컨텍스트

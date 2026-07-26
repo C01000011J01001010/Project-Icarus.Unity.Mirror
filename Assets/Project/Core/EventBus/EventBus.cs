@@ -1,7 +1,7 @@
 ﻿using System;
 using Unity.VisualScripting;
 
-namespace Core.EventBus
+namespace CoreEngine.EventBus
 {
     public interface IEvent { }
 

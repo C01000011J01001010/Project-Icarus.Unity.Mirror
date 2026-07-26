@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace Core.EventBus
+namespace CoreEngine.EventBus
 {
     public interface IEventBusControl
     {

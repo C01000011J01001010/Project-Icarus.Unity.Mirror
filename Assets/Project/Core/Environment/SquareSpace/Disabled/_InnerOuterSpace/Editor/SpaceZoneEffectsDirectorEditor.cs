@@ -1,7 +1,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace Core.Environment
+namespace CoreEngine.Environment
 {
     /// <summary>
     /// SpaceZoneEffectsDirector의 인스펙터 레이아웃을 탭 메뉴로 가공하고,

@@ -4,7 +4,7 @@
 using UnityEditor;
 #endif
 
-namespace Core.Environment
+namespace CoreEngine.Environment
 {
     [ExecuteAlways]
     [RequireComponent(typeof(SpaceZoneCore))]

@@ -1,8 +1,8 @@
-﻿using Core.EventBus;
-using Core.Hub;
+﻿using CoreEngine.EventBus;
+using CoreEngine.Hub;
 using System.Collections;
 
-namespace Core
+namespace CoreEngine
 {
     public abstract class BaseModule : BaseLeaf, IModule
     {

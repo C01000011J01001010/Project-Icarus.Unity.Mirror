@@ -1,5 +1,5 @@
 ﻿// 로딩 진행 상황을 중계하는 이벤트
-using Core.EventBus;
+using CoreEngine.EventBus;
 
 public struct SystemLoadingEvent : IEvent
 {

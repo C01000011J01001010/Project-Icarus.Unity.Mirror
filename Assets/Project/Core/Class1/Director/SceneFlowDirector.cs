@@ -1,11 +1,11 @@
-﻿using Core.EventBus;
-using Core.Test;
+﻿using CoreEngine.EventBus;
+using CoreEngine.Test;
 using System.Collections;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace Core
+namespace CoreEngine
 {
     public struct SceneLoadRequestEvent : IEvent
     {
@@ -17,7 +17,7 @@ namespace Core
     }
 }
 
-namespace Core.Test
+namespace CoreEngine.Test
 {
     /// <summary>
     /// 단독 씬 플레이 테스트 시, 이미 로드된 씬의 시스템 초기화를 요청하는 이벤트
@@ -29,7 +29,7 @@ namespace Core.Test
     }
 }
 
-namespace Core.Director
+namespace CoreEngine.Director
 {
     
 

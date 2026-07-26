@@ -1,6 +1,6 @@
-using Core;
-using Core.EventBus;
-using Core.Manager;
+using CoreEngine;
+using CoreEngine.EventBus;
+using CoreEngine.Manager;
 using Unity.Cinemachine;
 using UnityEngine;
 

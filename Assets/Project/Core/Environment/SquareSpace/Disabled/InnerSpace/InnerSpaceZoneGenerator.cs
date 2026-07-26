@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Core.Environment
+namespace CoreEngine.Environment
 {
     /// <summary>
     /// 부모 공간의 내부를 A(상단), B(좌/우 외곽), C(하단) 구역으로 정밀 분할하는 컴포넌트입니다.

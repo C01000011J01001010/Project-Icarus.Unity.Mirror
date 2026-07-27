@@ -17,7 +17,7 @@ namespace CoreEngine.LevelDesign.Editor
             Rect colorRect = new Rect(position.x, position.y + EditorGUIUtility.singleLineHeight + 2, position.width, EditorGUIUtility.singleLineHeight);
             Rect thickRect = new Rect(position.x, position.y + (EditorGUIUtility.singleLineHeight + 2) * 2, position.width, EditorGUIUtility.singleLineHeight);
             Rect depthRect = new Rect(position.x, position.y + (EditorGUIUtility.singleLineHeight + 2) * 3, position.width, EditorGUIUtility.singleLineHeight);
-            Rect coverRect = new Rect(position.x, position.y + (EditorGUIUtility.singleLineHeight + 2) * 4, position.width, EditorGUIUtility.singleLineHeight); // 🌟 커버 위치
+            Rect overRect = new Rect(position.x, position.y + (EditorGUIUtility.singleLineHeight + 2) * 4, position.width, EditorGUIUtility.singleLineHeight);
 
             SerializedProperty layerNameProp = property.FindPropertyRelative("layerName");
             int layerIndex = LayerMask.NameToLayer(layerNameProp.stringValue);
@@ -28,8 +28,10 @@ namespace CoreEngine.LevelDesign.Editor
 
             EditorGUI.PropertyField(colorRect, property.FindPropertyRelative("outlineColor"), new GUIContent("Outline Color"));
             EditorGUI.PropertyField(thickRect, property.FindPropertyRelative("outlineThickness"), new GUIContent("Thickness (Px)"));
-            EditorGUI.PropertyField(depthRect, property.FindPropertyRelative("occluderMask"), new GUIContent("실루엣 자르기(Occluder)"));
-            EditorGUI.PropertyField(coverRect, property.FindPropertyRelative("coverMask"), new GUIContent("위에 그리기 방지(Cover)")); // 🌟 커버 UI
+            EditorGUI.PropertyField(depthRect, property.FindPropertyRelative("depthThreshold"), new GUIContent("깊이 오차 허용(Threshold)"));
+
+            // 🌟 강제 절단 마스크 UI
+            EditorGUI.PropertyField(overRect, property.FindPropertyRelative("forceEdgeMask"), new GUIContent("강제 경계선 생성 (자르기)"));
 
             EditorGUI.indentLevel = indent;
             EditorGUI.EndProperty();
@@ -37,7 +39,7 @@ namespace CoreEngine.LevelDesign.Editor
 
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
-            return (EditorGUIUtility.singleLineHeight + 2) * 5; // 🌟 5줄로 변경
+            return (EditorGUIUtility.singleLineHeight + 2) * 5;
         }
     }
 }

@@ -53,19 +53,16 @@ namespace CoreEngine.LevelDesign
     [System.Serializable]
     public class LayerOutlineSetting
     {
-        // 유니티 202X 이상에서는 Layer 팝업을 위해 별도 Drawer를 쓰거나,
-        // [Layer] 어트리뷰트를 만들어 드롭다운으로 노출시키는 것이 일반적입니다.
         public string layerName;
         public Color outlineColor = Color.black;
         [Range(1, 5)] public int outlineThickness = 2;
 
-        // bool을 지우고 LayerMask로 교체 (기본값은 Everything)
-        [Tooltip("이 레이어를 가려서 외곽선을 자를(Occlude) 장애물 레이어들")]
-        public LayerMask occluderMask = -1;
+        // 교차선 및 Z-Fighting 방지를 위한 깊이 허용 오차
+        [Range(0f, 0.05f)] public float depthThreshold = 0.001f;
 
-        // 내 외곽선 위를 덮고 있어서, 외곽선을 가려줄 레이어들
-        [Tooltip("이 레이어보다 앞에 있어서 외곽선을 덮어 가려줄 레이어들")]
-        public LayerMask coverMask = 0;
+        // 이 레이어에 가려지는 것은 쿨하게 무시하고 외곽선을 그림
+        [Tooltip("이 레이어들에 가려져도 무시하고 그 위에 외곽선을 그립니다. (예: 물에 잠겨도 선을 그리고 싶다면 Water 체크)")]
+        public LayerMask forceEdgeMask = 0;
     }
 
     [CreateAssetMenu(fileName = "NewMapBakeSettings", menuName = MenuNamesSO.DefaultMenu + "/LevelDesign/Map Bake Settings")]
@@ -82,12 +79,12 @@ namespace CoreEngine.LevelDesign
 
         [Header("Global Settings")]
         public Vector3 centerPosition;
-        public Vector2 totalMapSize = new Vector2(3000, 3000);
+        public Vector2 totalMapSize = new Vector2(1024, 1024);
         public float captureOffset = 500f;
         public float maxDepth = 1000f;
 
         [Header("Tile Settings (Grid)")]
-        public Vector2 tileSize = new Vector2(1024, 1024);
+        public Vector2 tileSize = new Vector2(256, 256);
 
         [Header("Render Settings")]
         public MapResolution resolution = MapResolution.Res_1024;
@@ -112,7 +109,12 @@ namespace CoreEngine.LevelDesign
         private void OnValidate()
         {
             DimensionPreset();
-            PreventDuplication();
+
+            if (outlineSettings != null && outlineSettings.Count > 1)
+            {
+                PreventDuplication();
+                PreventAlpha0();
+            }
         }
 
         public void DimensionPreset()
@@ -142,8 +144,6 @@ namespace CoreEngine.LevelDesign
         }
         public void PreventDuplication()
         {
-            if (outlineSettings == null || outlineSettings.Count <= 1) return;
-
             HashSet<string> usedLayers = new HashSet<string>();
 
             // 역순으로 검사하여 중복된 항목을 처리
@@ -168,7 +168,9 @@ namespace CoreEngine.LevelDesign
                     usedLayers.Add(currentLayer);
                 }
             }
-
+        }
+        public void PreventAlpha0()
+        {
             // 알파 0 방지 안전장치
             for (int i = 0; i < outlineSettings.Count; i++)
             {

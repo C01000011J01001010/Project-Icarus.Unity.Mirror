@@ -37,8 +37,8 @@ namespace CoreEngine.LevelDesign.Editor
         {
             if (profileSO == null || settings == null) return;
 
-            // 레이어 색상 갱신
-            if (settings.useLayerColor) SyncProjectLayers(settings);
+            // 🌟 1. 데이터는 무조건 32개 레이어 분량을 보존합니다 (삭제 안 함)
+            SyncAllLayersFixed(settings);
 
             profileSO.Update();
 
@@ -51,7 +51,7 @@ namespace CoreEngine.LevelDesign.Editor
             EditorGUILayout.Space();
 
             // 3. 외곽선(Outline) 설정 UI
-            DrawOutlineSettingsGUI(profileSO);
+            DrawOutlineSettingsGUI(profileSO, settings);
 
             profileSO.ApplyModifiedProperties();
 
@@ -97,49 +97,80 @@ namespace CoreEngine.LevelDesign.Editor
             EditorGUILayout.LabelField("렌더링 및 캡처 설정", EditorStyles.boldLabel);
             EditorGUILayout.PropertyField(profileSO.FindProperty("captureOffset"), new GUIContent("카메라 렌더 깊이 (Offset)"));
             EditorGUILayout.PropertyField(profileSO.FindProperty("maxDepth"), new GUIContent("최대 캡처 깊이"));
+
             EditorGUILayout.PropertyField(profileSO.FindProperty("depthSteps"), new GUIContent("명도 양자화 단계"));
+
+            // *요청 반영: Step이 2단계 이상일 때만 하한선 밝기 세팅 노출
+            if (settings.depthSteps >= MapDepthSteps.Step_2)
+            {
+                EditorGUILayout.PropertyField(profileSO.FindProperty("finalDepthBrightness"), new GUIContent("가장 깊은 곳 밝기 제한"));
+            }
+
             EditorGUILayout.PropertyField(profileSO.FindProperty("resolution"), new GUIContent("타일 해상도"));
             EditorGUILayout.PropertyField(profileSO.FindProperty("renderMask"), new GUIContent("렌더링 마스크"));
             EditorGUILayout.PropertyField(profileSO.FindProperty("backgroundColor"), new GUIContent("배경 색상"));
 
-            SerializedProperty useLayerColorProp = profileSO.FindProperty("useLayerColor");
-            EditorGUILayout.PropertyField(useLayerColorProp, new GUIContent("레이어별 색상 사용"));
-
-            if (useLayerColorProp.boolValue)
+            // *요청 반영: depthSteps가 None이면 layerColors(색상 사용) 옵션 자체를 숨깁니다.
+            if (settings.depthSteps != MapDepthSteps.None)
             {
-                EditorGUILayout.HelpBox("프로젝트에 등록된 레이어별로 고유 색상을 지정합니다.", MessageType.Info);
-                DrawLayerColorPalette(profileSO.FindProperty("layerColors"));
+                SerializedProperty useLayerColorProp = profileSO.FindProperty("useLayerColor");
+                EditorGUILayout.PropertyField(useLayerColorProp, new GUIContent("레이어별 색상 사용"));
+
+                if (useLayerColorProp.boolValue)
+                {
+                    EditorGUILayout.HelpBox("RenderMask에 포함된 레이어별로 고유 색상을 지정합니다.", MessageType.Info);
+                    DrawLayerColorPalette(profileSO.FindProperty("layerColors"), settings);
+                }
+                else
+                {
+                    EditorGUILayout.HelpBox("단색 모드입니다. 캡처된 오브젝트가 단일 색상으로 렌더링됩니다.", MessageType.Info);
+                }
             }
             else
             {
-                string helpMsg = settings.depthSteps != MapDepthSteps.None
-                    ? "흑백 모드입니다. 지형 깊이(Depth)에 따라 명도가 조절됩니다."
-                    : "단색 모드입니다. 캡처된 오브젝트가 깊이와 상관없이 단일 색상으로 렌더링됩니다.";
-                EditorGUILayout.HelpBox(helpMsg, MessageType.Info);
+                EditorGUILayout.HelpBox("None 상태입니다. 씬의 원본 머티리얼과 텍스처를 그대로 사용하여 캡처합니다.", MessageType.Info);
             }
         }
 
-        private static void DrawOutlineSettingsGUI(SerializedObject profileSO)
+        // 외곽선 세팅도 렌더마스크에 포함된 것만 추출해서 그립니다.
+        private static void DrawOutlineSettingsGUI(SerializedObject profileSO, MapBakeSettingsSO settings)
         {
-            SerializedProperty outlineSettingsProp = profileSO.FindProperty("outlineSettings");
-            EditorGUILayout.PropertyField(outlineSettingsProp, new GUIContent("외곽선 대상 레이어 목록"), true);
+            EditorGUILayout.LabelField("외곽선 설정", EditorStyles.label);
+            EditorGUILayout.HelpBox("체크된 레이어의 테두리에 외곽선을 생성", MessageType.Info);
 
-            if (outlineSettingsProp.arraySize > 0)
+            SerializedProperty outlineSettingsProp = profileSO.FindProperty("outlineSettings");
+
+            for (int i = 0; i < 32; i++)
             {
-                EditorGUILayout.HelpBox("추가된 레이어의 오브젝트 테두리에만 외곽선이 렌더링됩니다. (중복 레이어 자동 취소)", MessageType.None);
+                if ((settings.renderMask.value & (1 << i)) != 0 && !string.IsNullOrEmpty(LayerMask.LayerToName(i)))
+                {
+                    if (i < outlineSettingsProp.arraySize)
+                    {
+                        SerializedProperty itemProp = outlineSettingsProp.GetArrayElementAtIndex(i);
+                        EditorGUILayout.PropertyField(itemProp); // 커스텀 Drawer가 이 부분을 예쁘게 그려줌
+                    }
+                }
             }
         }
 
-        private static void DrawLayerColorPalette(SerializedProperty layerColorsProp)
+        // 렌더마스크에 포함된 인덱스만 반복문을 돌며 인스펙터에 그림
+        private static void DrawLayerColorPalette(SerializedProperty layerColorsProp, MapBakeSettingsSO settings)
         {
             EditorGUI.indentLevel++;
-            for (int i = 0; i < layerColorsProp.arraySize; i++)
+            for (int i = 0; i < 32; i++)
             {
-                SerializedProperty pair = layerColorsProp.GetArrayElementAtIndex(i);
-                SerializedProperty nameProp = pair.FindPropertyRelative("layerName");
-                SerializedProperty colorProp = pair.FindPropertyRelative("color");
+                // 렌더마스크에 포함되어 있고 이름이 존재하는 레이어만 표시
+                if ((settings.renderMask.value & (1 << i)) != 0 && !string.IsNullOrEmpty(LayerMask.LayerToName(i)))
+                {
+                    if (i < layerColorsProp.arraySize)
+                    {
+                        SerializedProperty pair = layerColorsProp.GetArrayElementAtIndex(i);
+                        SerializedProperty nameProp = pair.FindPropertyRelative("layerName");
+                        SerializedProperty colorProp = pair.FindPropertyRelative("color");
 
-                EditorGUILayout.PropertyField(colorProp, new GUIContent(nameProp.stringValue));
+                        EditorGUILayout.PropertyField(colorProp, new GUIContent(nameProp.stringValue));
+                    }
+                }
             }
             EditorGUI.indentLevel--;
         }
@@ -282,51 +313,63 @@ namespace CoreEngine.LevelDesign.Editor
             return newSettings;
         }
 
-        private static void SyncProjectLayers(MapBakeSettingsSO settings)
+        // 🌟 4. 데이터 보존의 핵심! 무조건 32개의 배열 공간을 유지시킵니다.
+        private static void SyncAllLayersFixed(MapBakeSettingsSO settings)
         {
-            string[] projectLayers = InternalEditorUtility.layers;
-            if (projectLayers == null || projectLayers.Length == 0) return;
+            bool isChanged = false;
 
-            Dictionary<string, Color> existingColors = new Dictionary<string, Color>();
-            if (settings.layerColors != null)
+            // 크기가 32개가 아니면 강제로 맞춤
+            while (settings.layerColors.Count < 32) { settings.layerColors.Add(new LayerColorPair()); isChanged = true; }
+            while (settings.outlineSettings.Count < 32) { settings.outlineSettings.Add(new LayerOutlineSetting()); isChanged = true; }
+
+            for (int i = 0; i < 32; i++)
             {
-                foreach (var pair in settings.layerColors)
+                string layerName = LayerMask.LayerToName(i);
+
+                // =================================================================
+                // 🚨 [수정된 부분] 구조체(struct)는 꺼내서 수정한 뒤 다시 덮어씌워야 합니다!
+                // =================================================================
+                LayerColorPair tempColorPair = settings.layerColors[i];
+                bool colorPairChanged = false;
+
+                if (tempColorPair.layerName != layerName)
                 {
-                    if (!string.IsNullOrEmpty(pair.layerName) && !existingColors.ContainsKey(pair.layerName))
+                    tempColorPair.layerName = layerName;
+                    colorPairChanged = true;
+                }
+
+                if (tempColorPair.color == default(Color))
+                {
+                    tempColorPair.color = Color.white;
+                    colorPairChanged = true;
+                }
+
+                // 변경사항이 있다면 수정한 임시 구조체를 리스트에 통째로 다시 할당
+                if (colorPairChanged)
+                {
+                    settings.layerColors[i] = tempColorPair;
+                    isChanged = true;
+                }
+
+                // =================================================================
+                // 클래스(class)인 OutlineSetting은 원본이 바로 참조되므로 직접 수정 가능
+                // =================================================================
+                if (settings.outlineSettings[i].layerName != layerName)
+                {
+                    settings.outlineSettings[i].layerName = layerName;
+                    if (settings.outlineSettings[i].outlineColor == default(Color))
                     {
-                        existingColors.Add(pair.layerName, pair.color);
+                        settings.outlineSettings[i].outlineColor = Color.black;
+                        settings.outlineSettings[i].outlineColor.a = 1f;
+                        settings.outlineSettings[i].outlineThickness = 2;
+                        settings.outlineSettings[i].depthThreshold = 0.001f;
                     }
-                }
-            }
-            else
-            {
-                settings.layerColors = new List<LayerColorPair>();
-            }
-
-            // 레이어 변경 감지
-            bool needSync = settings.layerColors.Count != projectLayers.Length;
-            if (!needSync)
-            {
-                for (int i = 0; i < projectLayers.Length; i++)
-                {
-                    if (settings.layerColors[i].layerName != projectLayers[i])
-                    {
-                        needSync = true;
-                        break;
-                    }
+                    isChanged = true;
                 }
             }
 
-            // 변경사항이 있을 경우에만 초기화 후 갱신
-            if (needSync)
+            if (isChanged)
             {
-                Undo.RecordObject(settings, "Sync Layer Colors");
-                settings.layerColors.Clear();
-                foreach (string layerName in projectLayers)
-                {
-                    Color col = existingColors.TryGetValue(layerName, out Color savedCol) ? savedCol : Color.white;
-                    settings.layerColors.Add(new LayerColorPair { layerName = layerName, color = col });
-                }
                 EditorUtility.SetDirty(settings);
             }
         }

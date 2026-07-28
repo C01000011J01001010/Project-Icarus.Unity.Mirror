@@ -97,38 +97,46 @@ namespace CoreEngine.LevelDesign
             RenderTexture rtBase = RenderTexture.GetTemporary(resX, resY, 24, RenderTextureFormat.ARGB32);
             cam.targetTexture = rtBase;
 
-            // Renderer 세팅
-            foreach (Renderer r in renderers)
+            // *요청 반영: None이면 매터리얼 덮어쓰기 로직을 통째로 생략 (씬 원본 텍스처/매터리얼 그대로 렌더링)
+            if (settings.depthSteps != MapDepthSteps.None)
             {
-                if (r == null || !r.enabled || ((1 << r.gameObject.layer) & settings.renderMask) == 0) continue;
+                // Renderer 세팅
+                foreach (Renderer r in renderers)
+                {
+                    if (r == null || !r.enabled || ((1 << r.gameObject.layer) & settings.renderMask) == 0) continue;
 
-                Material[] tempMats = new Material[r.sharedMaterials.Length];
-                for (int i = 0; i < tempMats.Length; i++) tempMats[i] = bakeMat;
-                r.sharedMaterials = tempMats;
+                    Material[] tempMats = new Material[r.sharedMaterials.Length];
+                    for (int i = 0; i < tempMats.Length; i++) tempMats[i] = bakeMat;
+                    r.sharedMaterials = tempMats;
 
-                Color targetColor = Color.white;
-                if (settings.useLayerColor && colorDict.TryGetValue(LayerMask.LayerToName(r.gameObject.layer), out Color mappedColor))
-                    targetColor = mappedColor;
+                    Color targetColor = Color.white;
+                    if (settings.useLayerColor && colorDict.TryGetValue(LayerMask.LayerToName(r.gameObject.layer), out Color mappedColor))
+                        targetColor = mappedColor;
 
-                mpb.SetColor(BakeColorProperty, targetColor);
-                mpb.SetFloat(StepsProperty, (int)settings.depthSteps);
-                r.SetPropertyBlock(mpb);
-            }
+                    mpb.SetColor(BakeColorProperty, targetColor);
+                    mpb.SetFloat(StepsProperty, (int)settings.depthSteps);
 
-            // Terrain 세팅
-            foreach (Terrain t in terrains)
-            {
-                if (t == null || !t.enabled || ((1 << t.gameObject.layer) & settings.renderMask) == 0) continue;
+                    // *요청 반영: 셰이더에 최종 하한선 밝기 값 전달
+                    mpb.SetFloat("_FinalDepthBrightness", settings.finalDepthBrightness);
+                    r.SetPropertyBlock(mpb);
+                }
 
-                t.materialTemplate = bakeMat;
+                // Terrain 세팅
+                foreach (Terrain t in terrains)
+                {
+                    if (t == null || !t.enabled || ((1 << t.gameObject.layer) & settings.renderMask) == 0) continue;
 
-                Color targetColor = Color.white;
-                if (settings.useLayerColor && colorDict.TryGetValue(LayerMask.LayerToName(t.gameObject.layer), out Color mappedColor))
-                    targetColor = mappedColor;
+                    t.materialTemplate = bakeMat;
 
-                mpb.SetColor(BakeColorProperty, targetColor);
-                mpb.SetFloat(StepsProperty, (int)settings.depthSteps);
-                t.SetSplatMaterialPropertyBlock(mpb);
+                    Color targetColor = Color.white;
+                    if (settings.useLayerColor && colorDict.TryGetValue(LayerMask.LayerToName(t.gameObject.layer), out Color mappedColor))
+                        targetColor = mappedColor;
+
+                    mpb.SetColor(BakeColorProperty, targetColor);
+                    mpb.SetFloat(StepsProperty, (int)settings.depthSteps);
+                    mpb.SetFloat("_FinalDepthBrightness", settings.finalDepthBrightness);
+                    t.SetSplatMaterialPropertyBlock(mpb);
+                }
             }
 
             cam.Render();
@@ -160,9 +168,12 @@ namespace CoreEngine.LevelDesign
 
             foreach (var outline in settings.outlineSettings)
             {
-                if (string.IsNullOrEmpty(outline.layerName)) continue;
+                if (!outline.isUse || string.IsNullOrEmpty(outline.layerName)) continue;
                 int targetLayer = LayerMask.NameToLayer(outline.layerName);
                 if (targetLayer == -1) continue;
+
+                // 🌟 [추가된 안전장치] RenderMask에 포함되어 있지 않은 레이어라면 무시!
+                if ((settings.renderMask.value & (1 << targetLayer)) == 0) continue;
 
                 // 🌟 1. 전체 씬 깊이(Global Depth) 맵 렌더링 (forceEdgeMask 대상은 투명인간 취급)
                 cam.cullingMask = settings.renderMask & ~outline.forceEdgeMask;

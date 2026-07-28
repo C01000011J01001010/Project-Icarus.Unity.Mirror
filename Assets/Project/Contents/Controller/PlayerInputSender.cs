@@ -73,7 +73,7 @@ public class PlayerInputSender : BaseActorNetworked, ITickable//, IControllerSet
     public override void OnStopClient()
     {
         base.OnStopClient();
-        if (IsOwner && !Utility.isUnityNull(_inputProvider))
+        if (IsOwner && !UtilitySystem.isUnityNull(_inputProvider))
         {
             EventBus<OnSpaceBarWingFlappedEvent>.Unsubscribe(OnLocalSpaceBarFlapPerformed);
             EventBus<OnMouseClickWingFlappedEvent>.Unsubscribe(OnLocalMouseFlapPerformed);
@@ -89,7 +89,7 @@ public class PlayerInputSender : BaseActorNetworked, ITickable//, IControllerSet
         {
             _inputProvider = CoreFacade.GetManager<UserInputManager>();
             //EventBus<ControllerSettingEvent>.Publish(new ControllerSettingEvent(this));
-            if(!Utility.isUnityNull(_inputProvider))
+            if(!UtilitySystem.isUnityNull(_inputProvider))
             {
                 EventBus<OnSpaceBarWingFlappedEvent>.Subscribe(OnLocalSpaceBarFlapPerformed);
                 EventBus<OnMouseClickWingFlappedEvent>.Subscribe(OnLocalMouseFlapPerformed);
@@ -100,7 +100,7 @@ public class PlayerInputSender : BaseActorNetworked, ITickable//, IControllerSet
 
     public void Tick(float deltaTime)
     {
-        if(!Utility.isUnityNull(_inputProvider))
+        if(!UtilitySystem.isUnityNull(_inputProvider))
             InputMove();
     }
 

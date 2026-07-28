@@ -23,7 +23,7 @@ namespace CoreEngine
                 // 씬을 다 뒤졌는데도 없으면 그때 경고 발생
                 if (_inst == null)
                 {
-                    Utility.LogWarningDontInstance<T>();
+                    UtilityLog.LogWarningDontInstance<T>();
                 }
 
                 return _inst;
@@ -33,7 +33,7 @@ namespace CoreEngine
         protected virtual void Awake()
         {
             var asT = this as T;
-            if(!Utility.TryMakeSingleton<T>(asT, ref _inst))
+            if(!UtilityDesignPattern.TryMakeSingleton<T>(asT, ref _inst))
             {
                 // 몸통에 다른 객체가 붙어있을 수 있으니 GameObject는 살려둠
                 Destroy(this);

@@ -8,7 +8,7 @@ namespace Icarus.Ui
     /// <summary>
     /// Y축 회전 인터페이스(IYRotationProvider)를 받아 RectTransform의 Z축 회전으로 표현하는 UI 기본 클래스
     /// </summary>
-    public abstract class BaseYRotationUI<TInterface> : BaseLeaf
+    public abstract class BaseYRotationUI<TInterface> : CoreMonoBehaviour
         where TInterface : class, IYRotationProvider
     {
         private RectTransform _rectTransform;

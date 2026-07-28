@@ -35,12 +35,13 @@ namespace CoreEngine
 
         private IEnumerator Start()
         {
-            Utility.LogFunctionCallCount(this);
+            UtilityLog.LogFunctionCallCount(this);
 
             // BaseContext의 초기화를 실행 (내부에서 0.3, 0.6, 0.9 순서로 이벤트가 발송됨)
             yield return Initialize();
 
             // 모든 전역 시스템 세팅이 끝났으므로, 첫 씬을 로드하라고 허공에 외침 (EventBus)
+            
             if(TestDriver.IsSceneTest)
             {
                 Debug.Log($"[ProjectContext] 단독 씬 테스트 환경 시스템 빌드업을 시작합니다.");

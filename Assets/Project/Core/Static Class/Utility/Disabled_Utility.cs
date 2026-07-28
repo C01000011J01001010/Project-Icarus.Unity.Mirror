@@ -4,8 +4,7 @@ using System.Text;
 
 namespace CoreEngine
 {
-    // Utility
-    public static partial class Utility
+    public static class UtilityDisabled
     {
 
     }

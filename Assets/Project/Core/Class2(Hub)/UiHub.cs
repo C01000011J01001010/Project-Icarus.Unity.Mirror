@@ -11,12 +11,12 @@ namespace CoreEngine.Hub
 
         public override IEnumerator Initialize()
         {
-            Utility.LogFunctionCallStart(this);
+            UtilityLog.LogFunctionCallStart(this);
             return base.Initialize();
         }
         public override IEnumerator LateInitialize()
         {
-            Utility.LogFunctionCallStart(this);
+            UtilityLog.LogFunctionCallStart(this);
             yield return base.LateInitialize();
 
             //TODO: 씬마다 HUD만 활성화시키는 기능 추가해야함

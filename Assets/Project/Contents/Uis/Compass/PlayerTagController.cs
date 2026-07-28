@@ -6,12 +6,12 @@ using UnityEngine;
 
 namespace Icarus.Ui
 {
-    public class PlayerTagController : BaseLeaf, ITickable
+    public class PlayerTagController : CoreMonoBehaviour, ITickable
     {
         [SerializeField] private PlayerTagCanvas _playerTagCanvasPrefab;
         [SerializeField, Range(1f, 30f)] private float _rotationSmoothSpeed = 15f;
 
-        [Tooltip("UI 프리팹들이 생성될 부모 컨테이너 (미지정 시 이 객체의 부모로 자동 할당)")]
+        [Tooltip("UI 프리팹들이 생성될 부모 컨테이너\n(미지정 시 이 객체의 부모로 자동 할당)")]
         [SerializeField] private Transform _canvasContainer;
 
         private List<PlayerTagCanvas> _playerTagCanvasList = new();
@@ -44,7 +44,7 @@ namespace Icarus.Ui
 
         public void Tick(float deltaTime)
         {
-            if (Utility.isUnityNull(Target)) return;
+            if (UtilitySystem.isUnityNull(Target)) return;
 
             int activeCount = Target.GetPlayerInputCount();
 

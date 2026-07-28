@@ -74,7 +74,7 @@ namespace CoreEngine.CameraSystem
             _zoomHandler.ProcessZoom(_thirdPersonFollow, deltaTime);
 
             // 3. 회전(Rotation) Worker에게 역할 위임 및 결과 적용
-            if (isMouseLock && !Utility.isUnityNull(TrackingTarget))
+            if (isMouseLock && !UtilitySystem.isUnityNull(TrackingTarget))
             {
                 // 핸들러는 순수하게 '계산된 회전값'만 반환합니다. (Side-Effect 없음)
                 Quaternion newRotation = _rotationHandler.ProcessRotation(lookInput, deltaTime);

@@ -39,7 +39,7 @@ namespace CoreEngine
                         // 에러 로그가 한 번도 출력된 적 없을 때만 출력!
                         if (!_isSpatialCullingErrorLogged)
                         {
-                            Utility.Log("[CoreFacade] 현재 씬이나 프로젝트 환경에 'SpatialCullingManager'가 등록되지 않았습니다! 기본값(Zero)을 반환합니다.", LogColor.Red);
+                            UtilityLog.Log("[CoreFacade] 현재 씬이나 프로젝트 환경에 'SpatialCullingManager'가 등록되지 않았습니다! 기본값(Zero)을 반환합니다.", LogColor.Red);
                             _isSpatialCullingErrorLogged = true; // 플래그 잠금
                         }
                         return null;

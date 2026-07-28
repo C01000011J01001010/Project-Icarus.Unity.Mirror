@@ -19,7 +19,7 @@ public class FileManager : BaseGlobalManager, IGlobalManager
     private Dictionary<string, GameObject> sceneUIPrefabs = new();
     private List<AsyncOperationHandle<GameObject>> sceneUIHandles = new();
 
-    private PathManager pathManager;
+    private Disabled_PathManager pathManager;
 
     public void Exit()
     {

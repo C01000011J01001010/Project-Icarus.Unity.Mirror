@@ -37,7 +37,7 @@ namespace CoreEngine.Interface
 
         public bool TryGet(out TInterface target)
         {
-            if (Utility.isUnityNull(Target))
+            if (UtilitySystem.isUnityNull(Target))
             {
                 target = null;
                 return false;

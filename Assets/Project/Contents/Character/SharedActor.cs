@@ -129,7 +129,7 @@ public class SharedActor : BaseActorNetworked, IFixedTickable
         {
             // 이동하는 방향 바라보고
             Vector3 moveDir = new Vector3(combinedInput.x, 0, combinedInput.y).normalized;
-            Utility.SmoothLookAt(_rigidbody, moveDir, rotationSpeed, fixedDeltaTime);
+            UtilityRigidBody.SmoothLookAt(_rigidbody, moveDir, rotationSpeed, fixedDeltaTime);
 
             // 출발
             _rigidbody.AddForce(moveDir * moveSpeed, ForceMode.Force); // 지속적인 이동은 Force 모드

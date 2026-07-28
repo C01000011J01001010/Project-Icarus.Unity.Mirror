@@ -14,7 +14,7 @@ namespace CoreEngine.Interface
     /// </summary>
     public class InterfaceBinderContainer
     {
-        private List<IBindable> _bindables = new List<IBindable>();
+        private readonly List<IBindable> _bindables = new List<IBindable>();
 
         // 부품 등록
         public void Add(IBindable bindable)

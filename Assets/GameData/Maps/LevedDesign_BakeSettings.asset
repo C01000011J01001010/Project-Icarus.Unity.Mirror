@@ -15,16 +15,16 @@ MonoBehaviour:
   _lastMapDimension: 1
   mapDimension: 1
   projectionPlane: 0
-  depthSteps: 24
-  centerPosition: {x: 228.51, y: 0, z: -198.79}
-  totalMapSize: {x: 2048, y: 2048}
+  depthSteps: 32
+  centerPosition: {x: 13, y: 840.6, z: -81.5}
+  totalMapSize: {x: 1080, y: 720}
   captureOffset: 1000
-  maxDepth: 3000
-  tileSize: {x: 1024, y: 1024}
+  maxDepth: 2713
+  tileSize: {x: 1080, y: 720}
   resolution: 1024
   renderMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 464
   backgroundColor: {r: 0, g: 0, b: 0, a: 1}
   useLayerColor: 1
   layerColors:
@@ -38,7 +38,7 @@ MonoBehaviour:
     color: {r: 1, g: 1, b: 1, a: 1}
     useOutline: 0
   - layerName: Water
-    color: {r: 0.536625, g: 0.8477086, b: 0.97735846, a: 0.5686275}
+    color: {r: 0.536625, g: 0.8477086, b: 0.97735846, a: 0.2784314}
     useOutline: 0
   - layerName: UI
     color: {r: 1, g: 1, b: 1, a: 1}
@@ -49,6 +49,9 @@ MonoBehaviour:
   - layerName: Terrain
     color: {r: 0.5773585, g: 0.5773585, b: 0.5773585, a: 1}
     useOutline: 0
+  - layerName: Test
+    color: {r: 0.97735846, g: 0.5071199, b: 0.5071199, a: 0.50980395}
+    useOutline: 0
   outlineSettings:
   - layerName: Terrain
     outlineColor: {r: 0, g: 0, b: 0, a: 1}
@@ -57,10 +60,3 @@ MonoBehaviour:
     forceEdgeMask:
       serializedVersion: 2
       m_Bits: 16
-  - layerName: Object
-    outlineColor: {r: 0, g: 0, b: 0, a: 1}
-    outlineThickness: 2
-    depthThreshold: 0
-    forceEdgeMask:
-      serializedVersion: 2
-      m_Bits: 64

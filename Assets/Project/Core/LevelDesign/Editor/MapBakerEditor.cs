@@ -9,11 +9,11 @@ namespace CoreEngine.LevelDesign.Editor
     {
         private SerializedObject _profileSO;
 
-        private MapBaker baker;
+        private MapBaker _baker;
 
         private void OnEnable()
         {
-            baker = (MapBaker)target;
+            _baker = (MapBaker)target;
         }
 
 
@@ -21,22 +21,22 @@ namespace CoreEngine.LevelDesign.Editor
         public override void OnInspectorGUI()
         {
             // 🌟 공용 UI 호출 (생성 시 바인딩될 동작을 람다식으로 전달)
-            MapBakeEditorUI.DrawDefaultGUI(serializedObject, ref _profileSO, ref baker.settingsProfile, (newSettings) =>
+            MapBakeEditorUI.DrawDefaultGUI(serializedObject, ref _profileSO, ref _baker.settingsProfile, (newSettings) =>
             {
-                baker.settingsProfile = newSettings;
-                EditorUtility.SetDirty(baker);
+                _baker.settingsProfile = newSettings;
+                EditorUtility.SetDirty(_baker);
             });
 
-            if (baker.settingsProfile == null) return;
+            if (_baker.settingsProfile == null) return;
 
-            MapBakeEditorUI.DrawSharedGUI(_profileSO, baker.settingsProfile);
+            MapBakeEditorUI.DrawSharedGUI(_profileSO, _baker.settingsProfile);
         }
 
         private void OnSceneGUI()
         {
-            if (baker.settingsProfile == null) return;
+            if (_baker.settingsProfile == null) return;
 
-            MapBakeGizmoDrawer.DrawWithHandles(baker.settingsProfile);
+            MapBakeGizmoDrawer.DrawWithHandles(_baker.settingsProfile);
         }
     }
 }

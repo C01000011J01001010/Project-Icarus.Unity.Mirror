@@ -12,25 +12,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e9820fc452122c44da972077f473c995, type: 3}
   m_Name: MapBakeSettings_LevedDesign
   m_EditorClassIdentifier: Assembly-CSharp::CoreEngine.LevelDesign.MapBakeSettingsSO
-  showInteractiveGizmo: 1
-  showCameraGizmo: 0
   saveDirectory: Assets/GameData/Maps/LevedDesign
-  _lastMapDimension: 1
-  mapDimension: 1
+  showInteractiveGizmo: 0
+  showCameraGizmo: 0
   projectionPlane: 0
-  depthSteps: 16
-  finalDepthBrightness: 0.7
-  centerPosition: {x: -94.92993, y: 0, z: 117.769775}
-  totalMapSize: {x: 3000, y: 3000}
+  centerPosition: {x: -78.6637, y: 0, z: -112.651306}
+  totalMapSize: {x: 1800.8274, y: 1718.787}
+  tileSize: {x: 1280, y: 720}
   captureOffset: 500
   maxDepth: 657.3917
-  tileSize: {x: 1280, y: 720}
   resolution: 1024
   renderMask:
     serializedVersion: 2
     m_Bits: 208
-  backgroundColor: {r: 0, g: 0, b: 0, a: 1}
+  backgroundColor: {r: 1, g: 1, b: 1, a: 1}
+  mapTintColor: {r: 0.8207547, g: 0.95624965, b: 1, a: 1}
   useLayerColor: 1
+  depthSteps: 2
+  finalDepthBrightness: 0.617
+  ignoreDepthQuantizationMask:
+    serializedVersion: 2
+    m_Bits: 16
   layerColors:
   - layerName: Default
     color: {r: 1, g: 1, b: 1, a: 1}
@@ -146,14 +148,6 @@ MonoBehaviour:
       serializedVersion: 2
       m_Bits: 0
   - layerName: Object
-    isUse: 1
-    outlineColor: {r: 0, g: 0, b: 0, a: 1}
-    outlineThickness: 2
-    depthThreshold: 0.001
-    forceEdgeMask:
-      serializedVersion: 2
-      m_Bits: 16
-  - layerName: Terrain
     isUse: 0
     outlineColor: {r: 0, g: 0, b: 0, a: 1}
     outlineThickness: 2
@@ -161,6 +155,14 @@ MonoBehaviour:
     forceEdgeMask:
       serializedVersion: 2
       m_Bits: 0
+  - layerName: Terrain
+    isUse: 0
+    outlineColor: {r: 0, g: 0, b: 0, a: 1}
+    outlineThickness: 2
+    depthThreshold: 0.001
+    forceEdgeMask:
+      serializedVersion: 2
+      m_Bits: 16
   - layerName: 
     isUse: 0
     outlineColor: {r: 0, g: 0, b: 0, a: 1}

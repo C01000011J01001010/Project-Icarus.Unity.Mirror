@@ -3,40 +3,28 @@ using UnityEngine;
 
 namespace CoreEngine.LevelDesign
 {
-    public enum MapDimension
-    {
-        _2D,
-        _3D,
-    }
+    #region [Enums] 지형 및 베이킹 옵션 정의
 
-    public enum MapProjectionPlane
-    {
-        XZ, // Top-Down (X, Z 평면)
-        XY  // Side/Front (X, Y 평면)
-    }
+    //public enum MapDimension { _2D, _3D }
+    public enum MapProjectionPlane { XZ, XY }
 
     public enum MapDepthSteps
     {
-        None = 0,    // *요청 반영: 깊이에 따른 명도 양자화 하지 않고 씬 내 원본 매터리얼/이미지 그대로 사용
-        Step_1 = 1,  // *요청 반영: 깊이에 따른 명도 양자화 없이 단색(Layer 색상)으로 렌더링
-        Step_2 = 2,  // *요청 반영: 깊이에 따른 명도 양자화 시작 (2단계)
-        Step_4 = 4,
-        Step_8 = 8,
-        Step_12 = 12,
-        Step_16 = 16,
-        Step_24 = 24,
-        Step_32 = 32,
-        Step_48 = 48,
-        Step_64 = 64,
+        None = 0,   // 명도 양자화 없이 원본 매터리얼 그대로 렌더링
+        Step_1 = 1, // 양자화 없이 단색(Layer 색상)으로 렌더링
+        Step_2 = 2, // 명도 양자화 시작 (2단계)
+        Step_4 = 4, Step_8 = 8, Step_12 = 12, Step_16 = 16,
+        Step_24 = 24, Step_32 = 32, Step_48 = 48, Step_64 = 64,
     }
 
     public enum MapResolution
     {
-        Res_512 = 512,
-        Res_1024 = 1024,
-        Res_2048 = 2048,
-        Res_4096 = 4096
+        Res_512 = 512, Res_1024 = 1024, Res_2048 = 2048, Res_4096 = 4096
     }
+
+    #endregion
+
+    #region [Structs & Classes] 레이어별 세부 설정
 
     [System.Serializable]
     public struct LayerColorPair
@@ -50,102 +38,105 @@ namespace CoreEngine.LevelDesign
     {
         public string layerName;
 
-        // *요청 반영: 외곽선 사용 여부 토글
+        [Tooltip("해당 레이어 오브젝트에 외곽선을 생성할지 여부")]
         public bool isUse;
 
         public Color outlineColor = Color.black;
         [Range(1, 5)] public int outlineThickness = 2;
-
         [Range(0f, 0.05f)] public float depthThreshold = 0.001f;
 
         [Tooltip("이 레이어들에 가려져도 무시하고 그 위에 외곽선을 그립니다. (예: 물에 잠겨도 선을 그리고 싶다면 Water 체크)")]
         public LayerMask forceEdgeMask = 0;
     }
 
+    #endregion
+
     [CreateAssetMenu(fileName = "NewMapBakeSettings", menuName = "CoreEngine/LevelDesign/Map Bake Settings")]
     public class MapBakeSettingsSO : ScriptableObject
     {
-        // 기즈모 토글 변수
-        public bool showInteractiveGizmo = true;
+        // ---------------------------------------------------------
+        // 파일 저장 경로 -> 지금의 ui 유지
+        // ---------------------------------------------------------
+        public string saveDirectory;
 
-        // 카메라 방향 기즈모 토글
-        public bool showCameraGizmo = true; 
+        // ---------------------------------------------------------
+        // 에디터 핸들 -> 지금의 ui 유지
+        // ---------------------------------------------------------
+        public bool showInteractiveGizmo = true; 
+        public bool showCameraGizmo = true;
 
-        [Header("File Path")]
-        [Tooltip("이 맵의 이미지 타일들이 저장된 폴더 경로입니다.")]
-        public string saveDirectory; // 🌟 추가됨
-
-        [Header("Game Dimension")]
-        [SerializeField, HideInInspector] private MapDimension _lastMapDimension;
-        public MapDimension mapDimension = MapDimension._3D;
-
-        [Header("Projection & Depth Settings")]
+        // ---------------------------------------------------------
+        // 카메라 설정
+        // ---------------------------------------------------------
+        // [SerializeField, HideInInspector] private MapDimension _lastMapDimension; // 굳이 필요없는듯
+        // public MapDimension mapDimension = MapDimension._3D; // 굳이 필요없는듯
         public MapProjectionPlane projectionPlane = MapProjectionPlane.XZ;
-
-        public MapDepthSteps depthSteps = MapDepthSteps.Step_8;
-
-        // *요청 반영: 가장 바닥에 있을 때의 최종 밝기(하한선) 지정 변수 추가
-        [Range(0, 1)]
-        [Tooltip("깊이(Depth)가 가장 깊은 바닥의 밝기를 결정합니다. (0=완전 검정, 1=기본색상)")]
-        public float finalDepthBrightness = 0.5f;
-
-        [Header("Global Settings")]
         public Vector3 centerPosition;
         public Vector2 totalMapSize = new Vector2(1024, 1024);
+        public Vector2 tileSize = new Vector2(720, 480);
         public float captureOffset = 500f;
         public float maxDepth = 1000f;
+        
 
-        [Header("Tile Settings (Grid)")]
-        public Vector2 tileSize = new Vector2(720, 480);
-
-        [Header("Render Settings")]
+        // ---------------------------------------------------------
+        // 렌더링 및 캡처 설정
+        // ---------------------------------------------------------
         public MapResolution resolution = MapResolution.Res_512;
         public LayerMask renderMask = -1;
         public Color backgroundColor = Color.black;
+        public Color mapTintColor = Color.white;
         public bool useLayerColor;
 
-        // 🌟 항상 32개의 데이터를 고정으로 가질 리스트들
+        // ---------------------------------------------------------
+        // 명도 양자화 설정
+        // ---------------------------------------------------------
+        public MapDepthSteps depthSteps = MapDepthSteps.Step_8;
+        [Range(0, 1)] public float finalDepthBrightness = 0.5f;
+        public LayerMask ignoreDepthQuantizationMask = 0;
+
+        // ---------------------------------------------------------
+        // 4. 고정 길이 데이터 (32 Layers) - 에디터 자동 동기화 -> 지금의 ui 유지
+        // ---------------------------------------------------------
         [HideInInspector] public List<LayerColorPair> layerColors = new List<LayerColorPair>();
         [HideInInspector] public List<LayerOutlineSetting> outlineSettings = new List<LayerOutlineSetting>();
 
+        // 그리드 분할 계산 프로퍼티
         public int Cols => tileSize.x > 0 ? Mathf.CeilToInt(totalMapSize.x / tileSize.x) : 1;
         public int Rows => tileSize.y > 0 ? Mathf.CeilToInt(totalMapSize.y / tileSize.y) : 1;
 
-        private void Awake()
-        {
-            _lastMapDimension = mapDimension;
-        }
+        //private void Awake()
+        //{
+        //    _lastMapDimension = mapDimension;
+        //}
 
 #if UNITY_EDITOR
         private void OnValidate()
         {
-            DimensionPreset();
-            PreventAlpha0();
+            //ApplyDimensionPreset();
+            PreventAlphaZeroInOutlines();
         }
 
-        public void DimensionPreset()
-        {
-            if (mapDimension != _lastMapDimension)
-            {
-                _lastMapDimension = mapDimension;
+        //private void ApplyDimensionPreset()
+        //{
+        //    if (mapDimension != _lastMapDimension)
+        //    {
+        //        _lastMapDimension = mapDimension;
+        //        if (mapDimension == MapDimension._2D)
+        //        {
+        //            projectionPlane = MapProjectionPlane.XY;
+        //            depthSteps = MapDepthSteps.None;
+        //            useLayerColor = false;
+        //        }
+        //        else if (mapDimension == MapDimension._3D)
+        //        {
+        //            projectionPlane = MapProjectionPlane.XZ;
+        //            depthSteps = MapDepthSteps.Step_8;
+        //            useLayerColor = true;
+        //        }
+        //    }
+        //}
 
-                if (mapDimension == MapDimension._2D)
-                {
-                    projectionPlane = MapProjectionPlane.XY;
-                    depthSteps = MapDepthSteps.None;
-                    useLayerColor = false;
-                }
-
-                if (mapDimension == MapDimension._3D)
-                {
-                    projectionPlane = MapProjectionPlane.XZ;
-                    depthSteps = MapDepthSteps.Step_8;
-                    useLayerColor = true;
-                }
-            }
-        }
-
-        public void PreventAlpha0()
+        private void PreventAlphaZeroInOutlines()
         {
             if (outlineSettings == null) return;
             for (int i = 0; i < outlineSettings.Count; i++)

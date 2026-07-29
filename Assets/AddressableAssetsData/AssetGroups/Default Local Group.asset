@@ -14,13 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.Addressables.Editor::UnityEditor.AddressableAssets.Settings.AddressableAssetGroup
   m_GroupName: Default Local Group
   m_GUID: 82099fb7542f3cf48b1463bbc4bf3998
-  m_SerializeEntries:
-  - m_GUID: 59b70a80a8f0427459be53baf5d60434
-    m_Address: Assets/GameData/Maps/LevedDesign
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - MapTiles_LevelDesign
-    FlaggedDuringContentUpdateRestriction: 0
+  m_SerializeEntries: []
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 6d1f16096612a53409c97844388b8d42, type: 2}
   m_SchemaSet:

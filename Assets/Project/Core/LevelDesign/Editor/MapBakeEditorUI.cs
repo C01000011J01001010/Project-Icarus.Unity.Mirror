@@ -42,6 +42,10 @@ namespace CoreEngine.LevelDesign.Editor
 
             profileSO.Update();
 
+            // 🌟 1. 경로 설정 UI 호출 추가
+            DrawSaveDirectoryGUI(profileSO, settings);
+            EditorGUILayout.Space();
+
             // 1. 일반 및 맵 기본 설정 UI
             DrawGeneralSettingsGUI(profileSO);
             EditorGUILayout.Space();
@@ -82,8 +86,67 @@ namespace CoreEngine.LevelDesign.Editor
             GUI.backgroundColor = Color.white;
         }
 
+        private static void DrawSaveDirectoryGUI(SerializedObject profileSO, MapBakeSettingsSO settings)
+        {
+            EditorGUILayout.LabelField("저장 경로 설정", EditorStyles.boldLabel);
+
+            // 🌟 [1번째 줄] 버튼 2개 나란히 배치
+            EditorGUILayout.BeginHorizontal();
+
+            // 📂 폴더 선택 버튼
+            if (GUILayout.Button("📂 저장 폴더 선택", GUILayout.Height(26)))
+            {
+                string defaultPath = string.IsNullOrEmpty(settings.saveDirectory) ? Application.dataPath : settings.saveDirectory;
+                string absPath = EditorUtility.OpenFolderPanel("저장 위치 선택", defaultPath, "");
+
+                if (!string.IsNullOrEmpty(absPath))
+                {
+                    if (absPath.StartsWith(Application.dataPath))
+                    {
+                        string relPath = "Assets" + absPath.Substring(Application.dataPath.Length);
+
+                        SerializedProperty saveDirProp = profileSO.FindProperty("saveDirectory");
+                        saveDirProp.stringValue = relPath;
+                    }
+                    else
+                    {
+                        EditorUtility.DisplayDialog("경로 오류", "프로젝트 내부(Assets 폴더 하위)를 선택해야 합니다.", "확인");
+                    }
+                }
+            }
+
+            // 🔍 위치 확인 (Ping) 버튼
+            if (GUILayout.Button("🔍 위치 확인 (Ping)", GUILayout.Height(26)))
+            {
+                if (!string.IsNullOrEmpty(settings.saveDirectory))
+                {
+                    UnityEngine.Object folderObj = AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(settings.saveDirectory);
+                    if (folderObj != null)
+                    {
+                        // 🌟 인스펙터 고정을 위해 Selection.activeObject 변경을 제거하고 Ping만 수행!
+                        EditorGUIUtility.PingObject(folderObj);
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"[MapBaker] '{settings.saveDirectory}' 경로의 폴더 에셋을 찾을 수 없습니다.");
+                    }
+                }
+            }
+            EditorGUILayout.EndHorizontal();
+
+            // 🌟 [2번째 줄] 저장 경로 표시 (DisabledGroup으로 키보드 수정 완전 차단)
+            EditorGUI.BeginDisabledGroup(true);
+            SerializedProperty prop = profileSO.FindProperty("saveDirectory");
+            EditorGUILayout.PropertyField(prop, new GUIContent("현재 저장 경로"));
+            EditorGUI.EndDisabledGroup();
+        }
+
         private static void DrawGeneralSettingsGUI(SerializedObject profileSO)
         {
+            EditorGUILayout.PropertyField(profileSO.FindProperty("showInteractiveGizmo"), new GUIContent("씬 뷰 화살표 핸들 켜기"));
+            EditorGUILayout.PropertyField(profileSO.FindProperty("showCameraGizmo"), new GUIContent("씬 뷰 카메라 방향 켜기"));
+
+            EditorGUILayout.Space(5);
             EditorGUILayout.LabelField("기본 및 맵 크기 설정", EditorStyles.boldLabel);
             EditorGUILayout.PropertyField(profileSO.FindProperty("mapDimension"), new GUIContent("게임 차원 모드"));
             EditorGUILayout.PropertyField(profileSO.FindProperty("projectionPlane"), new GUIContent("투영 평면"));
@@ -192,10 +255,18 @@ namespace CoreEngine.LevelDesign.Editor
 
         private static void BakeGridMap(MapBakeSettingsSO settings)
         {
+            // 🌟 경로가 비어있으면 경고 띄우고 중단
+            if (string.IsNullOrEmpty(settings.saveDirectory))
+            {
+                EditorUtility.DisplayDialog("저장 실패", "저장 경로가 비어있습니다. '찾기' 버튼을 눌러 경로를 지정해주세요.", "확인");
+                return;
+            }
+
             string sceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
             if (string.IsNullOrEmpty(sceneName)) sceneName = "UntitledScene";
 
-            string dirPath = $"Assets/GameData/Maps/{sceneName}";
+            // 🌟 하드코딩 제거, 사용자가 지정한 경로 사용
+            string dirPath = settings.saveDirectory;
             if (!Directory.Exists(dirPath)) Directory.CreateDirectory(dirPath);
 
             try
@@ -279,6 +350,7 @@ namespace CoreEngine.LevelDesign.Editor
 
             // 데이터 갱신
             gridData.sceneName = sceneName;
+            gridData.saveDirectory = settings.saveDirectory;
             gridData.totalCols = settings.Cols;
             gridData.totalRows = settings.Rows;
             gridData.tileSize = settings.tileSize;
@@ -304,12 +376,35 @@ namespace CoreEngine.LevelDesign.Editor
             string sceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
             if (string.IsNullOrEmpty(sceneName)) sceneName = "UntitledScene";
 
-            string dirPath = $"Assets/GameData/Maps/{sceneName}";
+            // 🌟 1. 폴더 선택 창 대신 파일 저장 창(SaveFilePanelInProject)을 띄움
+            // 이 함수는 "Assets/..." 형태의 상대 경로를 반환하며, 이름까지 지정할 수 있습니다.
+            string savePath = EditorUtility.SaveFilePanelInProject(
+                "새 세팅 프로필 저장",
+                $"MapBakeSettings_{sceneName}", // 기본 파일명 지정
+                "asset",                     // 확장자 고정
+                "저장할 위치와 파일명을 지정하세요."
+            );
 
-            // 외부 유틸리티 함수(CoreEditor.Utility)를 통해 폴더 및 에셋 자동 생성
-            MapBakeSettingsSO newSettings = CoreEditor.Utility.CreateAssetAtFolder<MapBakeSettingsSO>(dirPath, $"{sceneName}_BakeSettings");
+            // 사용자가 취소를 눌렀을 경우
+            if (string.IsNullOrEmpty(savePath)) return null;
 
-            Debug.Log($"[MapBaker] 새 세팅 프로필 에셋이 생성되었습니다: {dirPath}");
+            // 새로운 SO 인스턴스 메모리에 생성
+            MapBakeSettingsSO newSettings = ScriptableObject.CreateInstance<MapBakeSettingsSO>();
+
+            // 🌟 2. 파일 경로(savePath)에서 폴더 경로(Directory)만 추출하여 세팅에 저장
+            // 윈도우 환경에서 백슬래시(\)가 나올 수 있으므로 슬래시(/)로 치환하여 유니티 표준에 맞춥니다.
+            string dirPath = System.IO.Path.GetDirectoryName(savePath).Replace("\\", "/");
+            newSettings.saveDirectory = dirPath;
+
+            // 🌟 3. 에셋 생성 및 디스크에 저장
+            AssetDatabase.CreateAsset(newSettings, savePath);
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
+
+            // 🌟 4. 인스펙터 고정: Selection을 건드리지 않고 해당 에셋을 반짝(Ping)거리게만 만듦
+            EditorGUIUtility.PingObject(newSettings);
+
+            Debug.Log($"[MapBaker] 새 세팅 프로필 에셋이 생성되었습니다: {savePath}");
             return newSettings;
         }
 

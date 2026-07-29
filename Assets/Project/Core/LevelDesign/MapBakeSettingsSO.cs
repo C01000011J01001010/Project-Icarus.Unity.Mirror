@@ -65,6 +65,16 @@ namespace CoreEngine.LevelDesign
     [CreateAssetMenu(fileName = "NewMapBakeSettings", menuName = "CoreEngine/LevelDesign/Map Bake Settings")]
     public class MapBakeSettingsSO : ScriptableObject
     {
+        // 기즈모 토글 변수
+        public bool showInteractiveGizmo = true;
+
+        // 카메라 방향 기즈모 토글
+        public bool showCameraGizmo = true; 
+
+        [Header("File Path")]
+        [Tooltip("이 맵의 이미지 타일들이 저장된 폴더 경로입니다.")]
+        public string saveDirectory; // 🌟 추가됨
+
         [Header("Game Dimension")]
         [SerializeField, HideInInspector] private MapDimension _lastMapDimension;
         public MapDimension mapDimension = MapDimension._3D;
@@ -89,7 +99,7 @@ namespace CoreEngine.LevelDesign
         public Vector2 tileSize = new Vector2(720, 480);
 
         [Header("Render Settings")]
-        public MapResolution resolution = MapResolution.Res_1024;
+        public MapResolution resolution = MapResolution.Res_512;
         public LayerMask renderMask = -1;
         public Color backgroundColor = Color.black;
         public bool useLayerColor;

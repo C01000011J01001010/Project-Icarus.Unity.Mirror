@@ -8,10 +8,14 @@ namespace CoreEngine.LevelDesign
         [Header("Map Info")]
         public string sceneName; // 로드할 때 폴더 경로를 찾기 위한 이름
 
+        [Header("File Path")]
+        [Tooltip("이 맵의 이미지 타일들이 저장된 폴더 경로입니다.")]
+        public string saveDirectory; // 🌟 추가됨
+
         [Header("Grid System")]
         public int totalCols;    // X축 타일 개수
         public int totalRows;    // Z축 타일 개수
-        public Vector2 tileSize; // 타일 1장당 실제 3D 크기 (예: 1000x1000)
+        public Vector2 tileSize; // 타일 1장당 실제 3D 크기 (예: 720x480)
 
         [Header("World Bounds")]
         public Vector2 worldMinBounds; // 전체 맵의 가장 왼쪽 아래 좌표

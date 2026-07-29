@@ -10,41 +10,44 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e9820fc452122c44da972077f473c995, type: 3}
-  m_Name: LevedDesign_BakeSettings
+  m_Name: MapBakeSettings_LevedDesign
   m_EditorClassIdentifier: Assembly-CSharp::CoreEngine.LevelDesign.MapBakeSettingsSO
+  showInteractiveGizmo: 1
+  showCameraGizmo: 0
+  saveDirectory: Assets/GameData/Maps/LevedDesign
   _lastMapDimension: 1
   mapDimension: 1
   projectionPlane: 0
-  depthSteps: 0
-  finalDepthBrightness: 0.818
-  centerPosition: {x: 228.51, y: 0, z: -198.79}
-  totalMapSize: {x: 2388, y: 2151.64}
-  captureOffset: 1000
-  maxDepth: 1200
+  depthSteps: 8
+  finalDepthBrightness: 0.5
+  centerPosition: {x: -94.92993, y: 0, z: 117.769775}
+  totalMapSize: {x: 5938.955, y: 6128.145}
+  captureOffset: 500
+  maxDepth: 1000
   tileSize: {x: 720, y: 480}
-  resolution: 1024
+  resolution: 512
   renderMask:
     serializedVersion: 2
-    m_Bits: 64
-  backgroundColor: {r: 1, g: 1, b: 1, a: 1}
-  useLayerColor: 0
+    m_Bits: 208
+  backgroundColor: {r: 0, g: 0, b: 0, a: 1}
+  useLayerColor: 1
   layerColors:
   - layerName: Default
-    color: {r: 0.44705883, g: 1, b: 1, a: 1}
+    color: {r: 1, g: 1, b: 1, a: 1}
   - layerName: TransparentFX
     color: {r: 1, g: 1, b: 1, a: 1}
   - layerName: Ignore Raycast
-    color: {r: 0.5471698, g: 0.5275543, b: 0.5275543, a: 1}
+    color: {r: 1, g: 1, b: 1, a: 1}
   - layerName: 
     color: {r: 1, g: 1, b: 1, a: 1}
   - layerName: Water
-    color: {r: 0.31271622, g: 0.86210454, b: 0.9924528, a: 0.54509807}
+    color: {r: 0.41940188, g: 0.87739277, b: 0.9622642, a: 1}
   - layerName: UI
     color: {r: 1, g: 1, b: 1, a: 1}
   - layerName: Object
     color: {r: 1, g: 1, b: 1, a: 1}
   - layerName: Terrain
-    color: {r: 0.5471698, g: 0.5440726, b: 0.5440726, a: 1}
+    color: {r: 0.4943396, g: 0.47661796, b: 0.47661796, a: 1}
   - layerName: 
     color: {r: 1, g: 1, b: 1, a: 1}
   - layerName: 
@@ -117,7 +120,7 @@ MonoBehaviour:
     depthThreshold: 0.001
     forceEdgeMask:
       serializedVersion: 2
-      m_Bits: 16
+      m_Bits: 0
   - layerName: 
     isUse: 0
     outlineColor: {r: 0, g: 0, b: 0, a: 1}
@@ -129,8 +132,8 @@ MonoBehaviour:
   - layerName: Water
     isUse: 0
     outlineColor: {r: 0, g: 0, b: 0, a: 1}
-    outlineThickness: 4
-    depthThreshold: 0.0298
+    outlineThickness: 2
+    depthThreshold: 0.001
     forceEdgeMask:
       serializedVersion: 2
       m_Bits: 0
@@ -149,7 +152,7 @@ MonoBehaviour:
     depthThreshold: 0.001
     forceEdgeMask:
       serializedVersion: 2
-      m_Bits: 0
+      m_Bits: 16
   - layerName: Terrain
     isUse: 0
     outlineColor: {r: 0, g: 0, b: 0, a: 1}
@@ -157,7 +160,7 @@ MonoBehaviour:
     depthThreshold: 0.001
     forceEdgeMask:
       serializedVersion: 2
-      m_Bits: 16
+      m_Bits: 0
   - layerName: 
     isUse: 0
     outlineColor: {r: 0, g: 0, b: 0, a: 1}

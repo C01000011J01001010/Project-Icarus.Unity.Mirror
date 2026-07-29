@@ -64,7 +64,7 @@ MonoBehaviour:
   _initializeOrder: 0
   _preventDespawnOnDisconnect: 0
   _defaultDespawnType: 0
-  _initializedTimestamp: -8584167188126162010
+  _initializedTimestamp: -8584162815155237489
   _localLevelOfDetailCalculationType: 0
   _useLevelOfDetail: 0
   _useRootLevelOfDetail: 1
@@ -123,4 +123,4 @@ MonoBehaviour:
   _addedNetworkObject: {fileID: 1752968200985450229}
   _networkObjectCache: {fileID: 1752968200985450229}
   myScope: 1
-  _movementDirectionMode: 1
+  _movementDirectionMode: 2

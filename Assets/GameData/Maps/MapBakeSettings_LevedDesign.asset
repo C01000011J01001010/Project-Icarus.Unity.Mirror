@@ -18,14 +18,14 @@ MonoBehaviour:
   _lastMapDimension: 1
   mapDimension: 1
   projectionPlane: 0
-  depthSteps: 8
-  finalDepthBrightness: 0.5
+  depthSteps: 16
+  finalDepthBrightness: 0.7
   centerPosition: {x: -94.92993, y: 0, z: 117.769775}
-  totalMapSize: {x: 5938.955, y: 6128.145}
+  totalMapSize: {x: 3000, y: 3000}
   captureOffset: 500
-  maxDepth: 1000
-  tileSize: {x: 720, y: 480}
-  resolution: 512
+  maxDepth: 657.3917
+  tileSize: {x: 1280, y: 720}
+  resolution: 1024
   renderMask:
     serializedVersion: 2
     m_Bits: 208

@@ -15,7 +15,7 @@ MonoBehaviour:
   m_DefaultGroup: 82099fb7542f3cf48b1463bbc4bf3998
   m_currentHash:
     serializedVersion: 2
-    Hash: e34a7db8049c5087fb92730c0b60b04a
+    Hash: 38a33698b708246a1866d17c9069942d
   m_OptimizeCatalogSize: 0
   m_BuildRemoteCatalog: 0
   m_CatalogRequestsTimeout: 0
@@ -100,6 +100,7 @@ MonoBehaviour:
   m_LabelTable:
     m_LabelNames:
     - default
+    - MapTiles_LevelDesign
   m_SchemaTemplates: []
   m_GroupTemplateObjects:
   - {fileID: 11400000, guid: b162770a09f99844dbd0cce86173e95f, type: 2}

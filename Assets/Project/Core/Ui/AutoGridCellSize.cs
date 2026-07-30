@@ -27,10 +27,10 @@ namespace CoreEngine.UI
         [Tooltip("CellSize 계산 방식을 선택합니다.")]
         [SerializeField] private GridCellSizeMode _sizeMode = GridCellSizeMode.MatchRectTransform;
 
-        private GridLayoutGroup _gridLayout;
-        private RectTransform _rectTransform;
-        private Vector2 _lastSize;
-        private GridCellSizeMode _lastMode;
+        [SerializeField] private GridLayoutGroup _gridLayout;
+        [SerializeField] private RectTransform _rectTransform;
+        [SerializeField] private Vector2 _lastSize;
+        [SerializeField] private GridCellSizeMode _lastMode;
 
         public Vector2 LastSize=> _lastSize;
 

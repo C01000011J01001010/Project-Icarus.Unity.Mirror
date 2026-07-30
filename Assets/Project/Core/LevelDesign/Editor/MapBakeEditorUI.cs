@@ -1,10 +1,8 @@
 ﻿#if UNITY_EDITOR
 using System;
-using System.Collections.Generic;
-using System.IO;
 using UnityEditor;
-using UnityEditorInternal;
 using UnityEngine;
+using CoreEditor; // 🌟 갱신된 범용 에디터 유틸리티 네임스페이스 참조
 
 namespace CoreEngine.LevelDesign.Editor
 {
@@ -15,21 +13,36 @@ namespace CoreEngine.LevelDesign.Editor
         public static void DrawDefaultGUI(SerializedObject viewObject, ref SerializedObject profileSO, ref MapBakeSettingsSO settings, Action<MapBakeSettingsSO> onProfileCreated)
         {
             viewObject.Update();
-            EditorGUILayout.PropertyField(viewObject.FindProperty("settingsProfile"), new GUIContent("세팅 프로필 (Profile SO)"));
+
+            SerializedProperty profileProp = viewObject.FindProperty("settingsProfile");
+
+            // 🌟 만능 프로필 생성기 (CoreEditorUtility) 연동
+            UtilitySettingData.DrawProfileSetupGUI<MapBakeSettingsSO>(
+                profileProp,
+                "할당된 세팅 프로필 에셋이 없습니다. 새로 생성하시겠습니까?",
+                "MapBakeSettings",
+                (newSettings, savePath) =>
+                {
+                    // 생성 직후: MapBaker만의 고유한 세팅 (저장 폴더 경로 기록)
+                    string dirPath = System.IO.Path.GetDirectoryName(savePath).Replace("\\", "/");
+                    newSettings.saveDirectory = dirPath;
+
+                    // 외부 콜백 실행 (인스펙터 갱신 등)
+                    onProfileCreated?.Invoke(newSettings);
+                }
+            );
+
             viewObject.ApplyModifiedProperties();
 
             // 최신 세팅 값 동기화
-            settings = viewObject.FindProperty("settingsProfile").objectReferenceValue as MapBakeSettingsSO;
+            settings = profileProp.objectReferenceValue as MapBakeSettingsSO;
 
-            if (settings == null)
+            if (settings != null)
             {
-                DrawProfileCreationPrompt(onProfileCreated);
-                return;
-            }
-
-            if (profileSO == null || profileSO.targetObject != settings)
-            {
-                profileSO = new SerializedObject(settings);
+                if (profileSO == null || profileSO.targetObject != settings)
+                {
+                    profileSO = new SerializedObject(settings);
+                }
             }
         }
 
@@ -37,145 +50,222 @@ namespace CoreEngine.LevelDesign.Editor
         {
             if (profileSO == null || settings == null) return;
 
-            // 레이어 색상 갱신
-            if (settings.useLayerColor) SyncProjectLayers(settings);
+            SyncAllLayersFixed(settings); // 32개 레이어 데이터 동기화 유지
 
             profileSO.Update();
 
-            // 1. 일반 및 맵 기본 설정 UI
+            DrawSaveDirectoryGUI(profileSO, settings);
             DrawGeneralSettingsGUI(profileSO);
-            EditorGUILayout.Space();
-
-            // 2. 투영 및 해상도 렌더 설정 UI
             DrawRenderSettingsGUI(profileSO, settings);
-            EditorGUILayout.Space();
-
-            // 3. 외곽선(Outline) 설정 UI
-            DrawOutlineSettingsGUI(profileSO);
+            DrawOutlineSettingsGUI(profileSO, settings);
 
             profileSO.ApplyModifiedProperties();
 
-            // 4. 베이킹 실행 버튼 UI
-            EditorGUILayout.Space(15);
             DrawBakeActionGUI(settings);
         }
 
         #endregion
 
-
         #region [2] 세부 UI 드로잉 영역 (Sub UI Methods)
 
-        private static void DrawProfileCreationPrompt(Action<MapBakeSettingsSO> onProfileCreated)
+        private static void DrawSaveDirectoryGUI(SerializedObject profileSO, MapBakeSettingsSO settings)
         {
-            EditorGUILayout.Space(5);
-            EditorGUILayout.HelpBox("할당된 세팅 프로필 에셋이 없습니다. 새로 생성하시겠습니까?", MessageType.Warning);
+            DrawSectionHeader("📁 파일 저장 경로");
 
-            GUI.backgroundColor = new Color(0.4f, 0.8f, 1f);
-            if (GUILayout.Button("✨ 새로운 세팅 프로필 에셋 생성 (Create Profile)", GUILayout.Height(35)))
+            EditorGUILayout.BeginHorizontal();
+            if (GUILayout.Button("📂 저장 폴더 선택", GUILayout.Height(26)))
             {
-                MapBakeSettingsSO newSettings = CreateNewProfileAsset();
-                if (newSettings != null)
+                string defaultPath = string.IsNullOrEmpty(settings.saveDirectory) ? Application.dataPath : settings.saveDirectory;
+                string absPath = EditorUtility.OpenFolderPanel("저장 위치 선택", defaultPath, "");
+
+                if (!string.IsNullOrEmpty(absPath))
                 {
-                    onProfileCreated?.Invoke(newSettings);
+                    if (absPath.StartsWith(Application.dataPath))
+                    {
+                        profileSO.FindProperty("saveDirectory").stringValue = "Assets" + absPath.Substring(Application.dataPath.Length);
+                    }
+                    else
+                    {
+                        EditorUtility.DisplayDialog("경로 오류", "프로젝트 내부(Assets 폴더 하위)를 선택해야 합니다.", "확인");
+                    }
                 }
             }
-            GUI.backgroundColor = Color.white;
+
+            if (GUILayout.Button("🔍 위치 확인 (Ping)", GUILayout.Height(26)))
+            {
+                if (!string.IsNullOrEmpty(settings.saveDirectory))
+                {
+                    UnityEngine.Object folderObj = AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(settings.saveDirectory);
+                    if (folderObj != null) EditorGUIUtility.PingObject(folderObj);
+                }
+            }
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUI.BeginDisabledGroup(true);
+            EditorGUILayout.PropertyField(profileSO.FindProperty("saveDirectory"), new GUIContent("현재 저장 경로"));
+            EditorGUI.EndDisabledGroup();
         }
 
         private static void DrawGeneralSettingsGUI(SerializedObject profileSO)
         {
-            EditorGUILayout.LabelField("기본 및 맵 크기 설정", EditorStyles.boldLabel);
-            EditorGUILayout.PropertyField(profileSO.FindProperty("mapDimension"), new GUIContent("게임 차원 모드"));
+            DrawSectionHeader("⚙️ 에디터 핸들 및 뷰 설정");
+            EditorGUILayout.PropertyField(profileSO.FindProperty("showInteractiveGizmo"), new GUIContent("씬 뷰 화살표 핸들 켜기"));
+            EditorGUILayout.PropertyField(profileSO.FindProperty("showCameraGizmo"), new GUIContent("씬 뷰 카메라 방향 켜기"));
+
+            DrawSectionHeader("📷 카메라 및 영역 설정");
             EditorGUILayout.PropertyField(profileSO.FindProperty("projectionPlane"), new GUIContent("투영 평면"));
             EditorGUILayout.PropertyField(profileSO.FindProperty("centerPosition"), new GUIContent("월드 중심 좌표"));
             EditorGUILayout.PropertyField(profileSO.FindProperty("totalMapSize"), new GUIContent("전체 맵 크기"));
             EditorGUILayout.PropertyField(profileSO.FindProperty("tileSize"), new GUIContent("타일 분할 크기"));
+            EditorGUILayout.PropertyField(profileSO.FindProperty("captureOffset"), new GUIContent("카메라 렌더 깊이 (Offset)"));
+            EditorGUILayout.PropertyField(profileSO.FindProperty("maxDepth"), new GUIContent("최대 캡처 깊이 (Far)"));
         }
 
         private static void DrawRenderSettingsGUI(SerializedObject profileSO, MapBakeSettingsSO settings)
         {
-            EditorGUILayout.LabelField("렌더링 및 캡처 설정", EditorStyles.boldLabel);
-            EditorGUILayout.PropertyField(profileSO.FindProperty("captureOffset"), new GUIContent("카메라 렌더 깊이 (Offset)"));
-            EditorGUILayout.PropertyField(profileSO.FindProperty("maxDepth"), new GUIContent("최대 캡처 깊이"));
-            EditorGUILayout.PropertyField(profileSO.FindProperty("depthSteps"), new GUIContent("명도 양자화 단계"));
+            DrawSectionHeader("🎨 렌더링 및 베이스 색상");
             EditorGUILayout.PropertyField(profileSO.FindProperty("resolution"), new GUIContent("타일 해상도"));
             EditorGUILayout.PropertyField(profileSO.FindProperty("renderMask"), new GUIContent("렌더링 마스크"));
             EditorGUILayout.PropertyField(profileSO.FindProperty("backgroundColor"), new GUIContent("배경 색상"));
+            EditorGUILayout.PropertyField(profileSO.FindProperty("mapTintColor"), new GUIContent("맵 전체 테마 색상 (Tint)"));
 
-            SerializedProperty useLayerColorProp = profileSO.FindProperty("useLayerColor");
-            EditorGUILayout.PropertyField(useLayerColorProp, new GUIContent("레이어별 색상 사용"));
+            DrawSectionHeader("🏔️ 명도 양자화 (등고선) 설정");
+            EditorGUILayout.PropertyField(profileSO.FindProperty("depthSteps"), new GUIContent("명도 양자화 단계"));
 
-            if (useLayerColorProp.boolValue)
+            if (settings.depthSteps >= MapDepthSteps.Step_2)
             {
-                EditorGUILayout.HelpBox("프로젝트에 등록된 레이어별로 고유 색상을 지정합니다.", MessageType.Info);
-                DrawLayerColorPalette(profileSO.FindProperty("layerColors"));
+                EditorGUILayout.PropertyField(profileSO.FindProperty("finalDepthBrightness"), new GUIContent("가장 깊은 곳 밝기 제한"));
+                EditorGUILayout.PropertyField(profileSO.FindProperty("ignoreDepthQuantizationMask"), new GUIContent("양자화 예외 대상 (Layer)"));
+            }
+
+            DrawSectionHeader("🌈 레이어별 색상 오버라이드");
+            if (settings.depthSteps != MapDepthSteps.None)
+            {
+                SerializedProperty useLayerColorProp = profileSO.FindProperty("useLayerColor");
+                EditorGUILayout.PropertyField(useLayerColorProp, new GUIContent("레이어별 고유 색상 사용"));
+
+                if (useLayerColorProp.boolValue)
+                {
+                    EditorGUILayout.HelpBox("렌더링 레이어를 지정 색상으로 오버라이드 합니다.", MessageType.Info);
+                    DrawLayerColorPalette(profileSO.FindProperty("layerColors"), settings);
+                }
+                else
+                {
+                    EditorGUILayout.HelpBox("레이어 구별 없이 흑백모드를 사용중입니다." +
+                        "\nTint 설정을 확인해주세요.", MessageType.Info);
+                }
             }
             else
             {
-                string helpMsg = settings.depthSteps != MapDepthSteps.None
-                    ? "흑백 모드입니다. 지형 깊이(Depth)에 따라 명도가 조절됩니다."
-                    : "단색 모드입니다. 캡처된 오브젝트가 깊이와 상관없이 단일 색상으로 렌더링됩니다.";
-                EditorGUILayout.HelpBox(helpMsg, MessageType.Info);
+                EditorGUILayout.HelpBox("현재 명도 양자화가 'None' 상태입니다." +
+                    "\n씬의 원본 머티리얼과 텍스처를 그대로 캡처합니다.", MessageType.Info);
             }
         }
 
-        private static void DrawOutlineSettingsGUI(SerializedObject profileSO)
+        private static void DrawOutlineSettingsGUI(SerializedObject profileSO, MapBakeSettingsSO settings)
         {
-            SerializedProperty outlineSettingsProp = profileSO.FindProperty("outlineSettings");
-            EditorGUILayout.PropertyField(outlineSettingsProp, new GUIContent("외곽선 대상 레이어 목록"), true);
+            DrawSectionHeader("🖌️ 외곽선 설정");
+            EditorGUILayout.HelpBox("체크된 특정 레이어의 테두리에만 외곽선을 렌더링합니다.", MessageType.Info);
 
-            if (outlineSettingsProp.arraySize > 0)
+
+            SerializedProperty outlineSettingsProp = profileSO.FindProperty("outlineSettings");
+            bool isFirst = true;
+
+            IterateActiveLayers(settings, outlineSettingsProp, (index, itemProp) =>
             {
-                EditorGUILayout.HelpBox("추가된 레이어의 오브젝트 테두리에만 외곽선이 렌더링됩니다. (중복 레이어 자동 취소)", MessageType.None);
-            }
+                if (!isFirst) DrawSeparator();
+
+                EditorGUILayout.PropertyField(itemProp, true);
+                isFirst = false;
+            });
         }
 
-        private static void DrawLayerColorPalette(SerializedProperty layerColorsProp)
+        private static void DrawLayerColorPalette(SerializedProperty layerColorsProp, MapBakeSettingsSO settings)
         {
             EditorGUI.indentLevel++;
-            for (int i = 0; i < layerColorsProp.arraySize; i++)
+            IterateActiveLayers(settings, layerColorsProp, (index, pairProp) =>
             {
-                SerializedProperty pair = layerColorsProp.GetArrayElementAtIndex(i);
-                SerializedProperty nameProp = pair.FindPropertyRelative("layerName");
-                SerializedProperty colorProp = pair.FindPropertyRelative("color");
-
+                SerializedProperty nameProp = pairProp.FindPropertyRelative("layerName");
+                SerializedProperty colorProp = pairProp.FindPropertyRelative("color");
                 EditorGUILayout.PropertyField(colorProp, new GUIContent(nameProp.stringValue));
-            }
+            });
             EditorGUI.indentLevel--;
         }
 
         private static void DrawBakeActionGUI(MapBakeSettingsSO settings)
         {
+            DrawSeparator();
+            EditorGUILayout.Space(5);
+
             EditorGUILayout.HelpBox($"총 생성될 타일 개수: {settings.Cols} x {settings.Rows} = {settings.Cols * settings.Rows}개", MessageType.Info);
 
+            GUI.backgroundColor = new Color(0.6f, 0.9f, 0.6f);
             if (GUILayout.Button("🚀 전체 그리드 맵 굽기", GUILayout.Height(40)))
             {
                 BakeGridMap(settings);
+            }
+            GUI.backgroundColor = Color.white;
+        }
+
+        #endregion
+
+        #region [3] UI Custom Rendering Helpers (디자인 유틸리티)
+
+        private static void DrawSectionHeader(string title)
+        {
+            EditorGUILayout.Space(15);
+            EditorGUILayout.LabelField(title, EditorStyles.boldLabel);
+
+            Rect rect = EditorGUILayout.GetControlRect(false, 1);
+            EditorGUI.DrawRect(rect, new Color(0.5f, 0.5f, 0.5f, 1f));
+            EditorGUILayout.Space(5);
+        }
+
+        private static void DrawSeparator()
+        {
+            EditorGUILayout.Space(5);
+            Rect rect = EditorGUILayout.GetControlRect(false, 1);
+            EditorGUI.DrawRect(rect, new Color(0.3f, 0.3f, 0.3f, 1f));
+            EditorGUILayout.Space(5);
+        }
+
+        private static void IterateActiveLayers(MapBakeSettingsSO settings, SerializedProperty arrayProp, Action<int, SerializedProperty> onDrawItem)
+        {
+            for (int i = 0; i < 32; i++)
+            {
+                if ((settings.renderMask.value & (1 << i)) != 0 && !string.IsNullOrEmpty(LayerMask.LayerToName(i)))
+                {
+                    if (i < arrayProp.arraySize)
+                    {
+                        onDrawItem?.Invoke(i, arrayProp.GetArrayElementAtIndex(i));
+                    }
+                }
             }
         }
 
         #endregion
 
-
-        #region [3] 베이킹 프로세스 및 파일 입출력 (Bake Execution & IO)
+        #region [4] 베이킹 프로세스 및 파일 입출력 (Bake Execution & IO)
 
         private static void BakeGridMap(MapBakeSettingsSO settings)
         {
+            if (string.IsNullOrEmpty(settings.saveDirectory))
+            {
+                EditorUtility.DisplayDialog("저장 실패", "저장 경로가 비어있습니다. '찾기' 버튼을 눌러 경로를 지정해주세요.", "확인");
+                return;
+            }
+
             string sceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
             if (string.IsNullOrEmpty(sceneName)) sceneName = "UntitledScene";
 
-            string dirPath = $"Assets/GameData/Maps/{sceneName}";
-            if (!Directory.Exists(dirPath)) Directory.CreateDirectory(dirPath);
+            string dirPath = settings.saveDirectory;
+            if (!System.IO.Directory.Exists(dirPath)) System.IO.Directory.CreateDirectory(dirPath);
 
             try
             {
-                // 1. 개별 타일들 굽기
                 BakeAndSaveTiles(settings, dirPath);
-
-                // 2. 전체 맵(LOD) 굽기 및 저장
                 string lodPath = BakeAndSaveFullLOD(settings, dirPath, sceneName);
 
-                // 3. GridData SO 업데이트 및 연결
                 if (!string.IsNullOrEmpty(lodPath))
                 {
                     UpdateMapGridDataSO(settings, dirPath, sceneName, lodPath);
@@ -204,7 +294,7 @@ namespace CoreEngine.LevelDesign.Editor
                     if (tileTex == null) continue;
 
                     string tilePath = $"{dirPath}/Tile_{c}_{r}.png";
-                    File.WriteAllBytes(tilePath, tileTex.EncodeToPNG());
+                    System.IO.File.WriteAllBytes(tilePath, tileTex.EncodeToPNG());
                     UnityEngine.Object.DestroyImmediate(tileTex);
                 }
             }
@@ -218,12 +308,11 @@ namespace CoreEngine.LevelDesign.Editor
             if (lodTex == null) return null;
 
             string lodPath = $"{dirPath}/{sceneName}_FullLOD.png";
-            File.WriteAllBytes(lodPath, lodTex.EncodeToPNG());
+            System.IO.File.WriteAllBytes(lodPath, lodTex.EncodeToPNG());
             UnityEngine.Object.DestroyImmediate(lodTex);
 
             AssetDatabase.Refresh();
 
-            // 텍스처를 Sprite 타입으로 자동 변환
             TextureImporter importer = (TextureImporter)AssetImporter.GetAtPath(lodPath);
             if (importer != null)
             {
@@ -239,15 +328,14 @@ namespace CoreEngine.LevelDesign.Editor
             string soPath = $"{dirPath}/{sceneName}_MapGridData.asset";
             MapGridDataSO gridData = AssetDatabase.LoadAssetAtPath<MapGridDataSO>(soPath);
 
-            // 없으면 새로 생성
             if (gridData == null)
             {
                 gridData = ScriptableObject.CreateInstance<MapGridDataSO>();
                 AssetDatabase.CreateAsset(gridData, soPath);
             }
 
-            // 데이터 갱신
             gridData.sceneName = sceneName;
+            gridData.saveDirectory = settings.saveDirectory;
             gridData.totalCols = settings.Cols;
             gridData.totalRows = settings.Rows;
             gridData.tileSize = settings.tileSize;
@@ -256,7 +344,6 @@ namespace CoreEngine.LevelDesign.Editor
             gridData.worldMinBounds = new Vector2(settings.centerPosition.x - extents.x, settings.centerPosition.z - extents.y);
             gridData.worldMaxBounds = new Vector2(settings.centerPosition.x + extents.x, settings.centerPosition.z + extents.y);
 
-            // LOD 이미지 참조 연결
             gridData.fullMapLOD = AssetDatabase.LoadAssetAtPath<Texture2D>(lodPath);
 
             EditorUtility.SetDirty(gridData);
@@ -265,68 +352,55 @@ namespace CoreEngine.LevelDesign.Editor
 
         #endregion
 
+        #region [5] 에셋 유틸리티 및 레이어 동기화 (Utilities)
 
-        #region [4] 에셋 유틸리티 및 레이어 동기화 (Utilities)
-
-        private static MapBakeSettingsSO CreateNewProfileAsset()
+        private static void SyncAllLayersFixed(MapBakeSettingsSO settings)
         {
-            string sceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
-            if (string.IsNullOrEmpty(sceneName)) sceneName = "UntitledScene";
+            bool isChanged = false;
 
-            string dirPath = $"Assets/GameData/Maps/{sceneName}";
+            while (settings.layerColors.Count < 32) { settings.layerColors.Add(new LayerColorPair()); isChanged = true; }
+            while (settings.outlineSettings.Count < 32) { settings.outlineSettings.Add(new LayerOutlineSetting()); isChanged = true; }
 
-            // 외부 유틸리티 함수(CoreEditor.Utility)를 통해 폴더 및 에셋 자동 생성
-            MapBakeSettingsSO newSettings = CoreEditor.Utility.CreateAssetAtFolder<MapBakeSettingsSO>(dirPath, $"{sceneName}_BakeSettings");
-
-            Debug.Log($"[MapBaker] 새 세팅 프로필 에셋이 생성되었습니다: {dirPath}");
-            return newSettings;
-        }
-
-        private static void SyncProjectLayers(MapBakeSettingsSO settings)
-        {
-            string[] projectLayers = InternalEditorUtility.layers;
-            if (projectLayers == null || projectLayers.Length == 0) return;
-
-            Dictionary<string, Color> existingColors = new Dictionary<string, Color>();
-            if (settings.layerColors != null)
+            for (int i = 0; i < 32; i++)
             {
-                foreach (var pair in settings.layerColors)
+                string layerName = LayerMask.LayerToName(i);
+
+                LayerColorPair tempColorPair = settings.layerColors[i];
+                bool colorPairChanged = false;
+
+                if (tempColorPair.layerName != layerName)
                 {
-                    if (!string.IsNullOrEmpty(pair.layerName) && !existingColors.ContainsKey(pair.layerName))
+                    tempColorPair.layerName = layerName;
+                    colorPairChanged = true;
+                }
+                if (tempColorPair.color == default(Color))
+                {
+                    tempColorPair.color = Color.white;
+                    colorPairChanged = true;
+                }
+
+                if (colorPairChanged)
+                {
+                    settings.layerColors[i] = tempColorPair;
+                    isChanged = true;
+                }
+
+                if (settings.outlineSettings[i].layerName != layerName)
+                {
+                    settings.outlineSettings[i].layerName = layerName;
+                    if (settings.outlineSettings[i].outlineColor == default(Color))
                     {
-                        existingColors.Add(pair.layerName, pair.color);
+                        settings.outlineSettings[i].outlineColor = Color.black;
+                        settings.outlineSettings[i].outlineColor.a = 1f;
+                        settings.outlineSettings[i].outlineThickness = 2;
+                        settings.outlineSettings[i].depthThreshold = 0.001f;
                     }
-                }
-            }
-            else
-            {
-                settings.layerColors = new List<LayerColorPair>();
-            }
-
-            // 레이어 변경 감지
-            bool needSync = settings.layerColors.Count != projectLayers.Length;
-            if (!needSync)
-            {
-                for (int i = 0; i < projectLayers.Length; i++)
-                {
-                    if (settings.layerColors[i].layerName != projectLayers[i])
-                    {
-                        needSync = true;
-                        break;
-                    }
+                    isChanged = true;
                 }
             }
 
-            // 변경사항이 있을 경우에만 초기화 후 갱신
-            if (needSync)
+            if (isChanged)
             {
-                Undo.RecordObject(settings, "Sync Layer Colors");
-                settings.layerColors.Clear();
-                foreach (string layerName in projectLayers)
-                {
-                    Color col = existingColors.TryGetValue(layerName, out Color savedCol) ? savedCol : Color.white;
-                    settings.layerColors.Add(new LayerColorPair { layerName = layerName, color = col });
-                }
                 EditorUtility.SetDirty(settings);
             }
         }

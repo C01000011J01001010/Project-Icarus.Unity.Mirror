@@ -3,7 +3,7 @@ using System.Linq;
 using System.Reflection;
 using UnityEngine;
 
-namespace CoreEngine.Utility
+namespace CoreEngine
 {
     /// <summary>
     /// 구조체 <-> 바이트 배열 변환을 전담하는 직렬화 유틸리티

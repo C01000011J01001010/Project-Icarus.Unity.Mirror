@@ -4,7 +4,7 @@ using System.Text;
 
 namespace CoreEngine
 {
-    public static class UtilityDisabled
+    public static class Disabled_Utility
     {
 
     }

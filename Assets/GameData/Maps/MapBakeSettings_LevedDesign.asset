@@ -13,23 +13,23 @@ MonoBehaviour:
   m_Name: MapBakeSettings_LevedDesign
   m_EditorClassIdentifier: Assembly-CSharp::CoreEngine.LevelDesign.MapBakeSettingsSO
   saveDirectory: Assets/GameData/Maps/LevedDesign
-  showInteractiveGizmo: 0
-  showCameraGizmo: 0
+  showInteractiveGizmo: 1
+  showCameraGizmo: 1
   projectionPlane: 0
-  centerPosition: {x: -78.6637, y: 0, z: -112.651306}
-  totalMapSize: {x: 1800.8274, y: 1718.787}
-  tileSize: {x: 1280, y: 720}
-  captureOffset: 500
-  maxDepth: 657.3917
-  resolution: 1024
+  centerPosition: {x: -19.624146, y: 0, z: 955.7434}
+  totalMapSize: {x: 3465.7808, y: 3449.2983}
+  tileSize: {x: 720, y: 480}
+  captureOffset: 1099.6697
+  maxDepth: 1369.7615
+  resolution: 512
   renderMask:
     serializedVersion: 2
     m_Bits: 208
   backgroundColor: {r: 1, g: 1, b: 1, a: 1}
-  mapTintColor: {r: 0.8207547, g: 0.95624965, b: 1, a: 1}
-  useLayerColor: 1
-  depthSteps: 2
-  finalDepthBrightness: 0.617
+  mapTintColor: {r: 1, g: 0.99626654, b: 0.99433964, a: 1}
+  useLayerColor: 0
+  depthSteps: 0
+  finalDepthBrightness: 0
   ignoreDepthQuantizationMask:
     serializedVersion: 2
     m_Bits: 16
@@ -43,7 +43,7 @@ MonoBehaviour:
   - layerName: 
     color: {r: 1, g: 1, b: 1, a: 1}
   - layerName: Water
-    color: {r: 0.41940188, g: 0.87739277, b: 0.9622642, a: 1}
+    color: {r: 0.7150943, g: 0.9566448, b: 1, a: 1}
   - layerName: UI
     color: {r: 1, g: 1, b: 1, a: 1}
   - layerName: Object
@@ -51,7 +51,7 @@ MonoBehaviour:
   - layerName: Terrain
     color: {r: 0.4943396, g: 0.47661796, b: 0.47661796, a: 1}
   - layerName: 
-    color: {r: 1, g: 1, b: 1, a: 1}
+    color: {r: 0.5450981, g: 0.2705882, b: 0.07450981, a: 1}
   - layerName: 
     color: {r: 1, g: 1, b: 1, a: 1}
   - layerName: 
@@ -148,7 +148,7 @@ MonoBehaviour:
       serializedVersion: 2
       m_Bits: 0
   - layerName: Object
-    isUse: 0
+    isUse: 1
     outlineColor: {r: 0, g: 0, b: 0, a: 1}
     outlineThickness: 2
     depthThreshold: 0.001

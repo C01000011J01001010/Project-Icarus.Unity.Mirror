@@ -8,7 +8,7 @@ namespace CoreEngine.LevelDesign
         private enum PathState { Moving, Waiting, Finished }
 
         [Header("System Settings")]
-        public UpdateMode updateMode = UpdateMode.Transform;
+        public UpdateMode updateMode = UpdateMode.Rigidbody;
         public LoopMode loopMode = LoopMode.Restart;
 
         [Header("Coordinate Settings")]

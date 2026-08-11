@@ -10,7 +10,9 @@ namespace CoreEngine
         public static T GetOrAddComponent<T>(this GameObject target) where T : Component
         {
             // GetComponent 시도하고 null이면 AddComponent 수행
-            return target.GetComponent<T>() ?? target.AddComponent<T>();
+            T targetComponent = target.GetComponent<T>();
+            if(targetComponent == null) targetComponent = target.AddComponent<T>();
+            return targetComponent;
         }
 
         // 객체 할당(GC) 방지를 위한 정적(Static) 큐 재사용

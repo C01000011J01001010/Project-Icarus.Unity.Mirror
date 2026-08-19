@@ -1,2 +1,0 @@
-Tool -> Fishnet -> utility -> refresh default prefab
-Project창에 DefaultPrefabObjects 검색

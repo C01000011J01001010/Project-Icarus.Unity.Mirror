@@ -1,11 +1,8 @@
 using CoreEngine;
 using CoreEngine.EventBus;
-
 using CoreEngine.Interface;
 using CoreEngine.Manager;
-using System;
 using System.Collections;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -25,16 +22,14 @@ public struct OnMouseClickWingFlappedEvent : IEvent
     public OnMouseClickWingFlappedEvent(bool isLeft)=> this.isLeft = isLeft;
 }
 
-public struct ToggleMouseLockEvent : IEvent
-{
-    public bool IsMouseLock { get; }
-    public ToggleMouseLockEvent(bool isMouseLock) => this.IsMouseLock = isMouseLock;
-}
+
 
 public class UserInputManager : BaseInputManager<UserInputActions>, IManager, IPlayerInputProvider
 {
     UserInputActions.PlayerActions Player;
     UserInputActions.UIActions Ui;
+
+    InterfacePublisher<IPlayerInputProvider> _inputProvider;
     #region Polling
     public Vector2 Move
     { 
@@ -60,6 +55,13 @@ public class UserInputManager : BaseInputManager<UserInputActions>, IManager, IP
         }
     }
     #endregion
+
+    protected override void Awake()
+    {
+        base.Awake();
+        _inputProvider = new InterfacePublisher<IPlayerInputProvider>(this);
+        _inputProvider.Bind();
+    }
 
     public override void Exit()
     {
@@ -102,17 +104,9 @@ public class UserInputManager : BaseInputManager<UserInputActions>, IManager, IP
     }
 
 
-    private void OnMouseLock(InputAction.CallbackContext context)
-    {
-        OnMouseLock(!context.ReadValueAsButton());
-    }
+    
 
-    private void OnMouseLock(bool isMouseLock)
-    {
-        SetCursorState(isMouseLock);
-        // 📡 단발성 이벤트 발행!
-        EventBus<ToggleMouseLockEvent>.Publish(new ToggleMouseLockEvent(isMouseLock));
-    }
+    
 
     private void OnSpaceBarWingFlapped(InputAction.CallbackContext context)
     {

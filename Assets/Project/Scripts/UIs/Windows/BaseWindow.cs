@@ -8,9 +8,9 @@ using UnityEngine.UI;
 /// <summary>
 /// Window 객체 기본 클래스
 /// </summary>
-public abstract class BaseWindow : MonoBehaviour, IInitialize
+public abstract class BaseWindow : MonoBehaviour//, IInitialize
 {
-    IPoolable prefab;
+    //IPoolable prefab;
 
     // 에디터 연결
     public RectTransform contentTrans;

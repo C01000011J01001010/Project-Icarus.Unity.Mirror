@@ -9,6 +9,22 @@
       },
       "hash": "fd8ff1fb700caf062eb5cce364c1d0a85f99ebe6"
     },
+    "com.firstgeargames.fishnet": {
+      "version": "https://github.com/FirstGearGames/FishNet.git?path=Assets/FishNet",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {
+        "com.unity.nuget.newtonsoft-json": "3.2.1",
+        "com.unity.ugui": "1.0.0",
+        "com.unity.modules.animation": "1.0.0",
+        "com.unity.modules.imgui": "1.0.0",
+        "com.unity.modules.particlesystem": "1.0.0",
+        "com.unity.modules.physics": "1.0.0",
+        "com.unity.modules.physics2d": "1.0.0",
+        "com.unity.modules.ui": "1.0.0"
+      },
+      "hash": "3c2c1cb57c7715350b03d9273e4cbcae7f3032f5"
+    },
     "com.unity.2d.sprite": {
       "version": "1.0.0",
       "depth": 0,
@@ -264,6 +280,14 @@
       },
       "url": "https://packages.unity.com"
     },
+    "com.unity.textmeshpro": {
+      "version": "5.0.0",
+      "depth": 1,
+      "source": "builtin",
+      "dependencies": {
+        "com.unity.ugui": "2.0.0"
+      }
+    },
     "com.unity.timeline": {
       "version": "1.8.10",
       "depth": 0,
@@ -294,6 +318,28 @@
         "com.unity.modules.jsonserialize": "1.0.0"
       },
       "url": "https://packages.unity.com"
+    },
+    "com.ycjun.core-framework": {
+      "version": "https://oauth2:glpat-vR1044jAnGxp1xy8gK8uY2M6MQpvOjEKdTpoYnNnOQ8.01.17118uo5l@gitlab.com/ycjun1209/coreframework.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {
+        "com.unity.nuget.newtonsoft-json": "3.2.1",
+        "com.unity.cinemachine": "3.1.3",
+        "com.unity.addressables": "1.21.19",
+        "com.unity.textmeshpro": "3.0.6"
+      },
+      "hash": "d5350c4086326624e80b3a320151932585ac6ed7"
+    },
+    "com.ycjun.core-framework.network.fishnet": {
+      "version": "https://gitlab.com/ycjun1209/coreframework.network.fishnet.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {
+        "com.ycjun.core-framework": "1.0.1",
+        "com.firstgeargames.fishnet": "4.7.2"
+      },
+      "hash": "3b62448f3978af4cf214911e2eb0331c6c85a6e9"
     },
     "com.unity.modules.accessibility": {
       "version": "1.0.0",

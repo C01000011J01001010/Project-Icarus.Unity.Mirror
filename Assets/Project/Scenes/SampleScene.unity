@@ -1142,6 +1142,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1403812043643056339, guid: 1b07c6a55ecb0204793961c5bd26bdd3, type: 3}
+      propertyPath: _globalScene.sceneName
+      value: GlobalScene
+      objectReference: {fileID: 0}
+    - target: {fileID: 1403812043643056339, guid: 1b07c6a55ecb0204793961c5bd26bdd3, type: 3}
+      propertyPath: _globalScene.scenePath
+      value: Assets/Project/Scenes/GlobalScene.unity
+      objectReference: {fileID: 0}
+    - target: {fileID: 1403812043643056339, guid: 1b07c6a55ecb0204793961c5bd26bdd3, type: 3}
+      propertyPath: _globalScene.sceneAsset
+      value: 
+      objectReference: {fileID: 102900000, guid: 282b72738977da644bc7307f70d8f923, type: 3}
     - target: {fileID: 3448503564317118110, guid: 1b07c6a55ecb0204793961c5bd26bdd3, type: 3}
       propertyPath: m_LocalPosition.x
       value: -23.95475

@@ -65,7 +65,7 @@ public struct GraphicOptionChangedEvent : IEvent
     public GraphicOptionChangedEvent(GraphicOptionValues optionValues) { this.optionValues = optionValues; }
 }
 
-public class OptionManager : BaseGlobalManager, IGlobalManager
+public class OptionManager : MonoBehaviour// BaseGlobalManager, IGlobalManager
 {
     public static event DelegateGraphicOptionChanged OnGraphicOptionChanged;
     public static GraphicOptionValues appliedGraphicOption; // 현재 적용중인 그래픽 세팅을 저장
@@ -84,7 +84,7 @@ public class OptionManager : BaseGlobalManager, IGlobalManager
     public IEnumerator Initialize()
     {
         CreateVolume();
-        ApplyGraphicSetting(FileManager.savedGraphicOption);
+        //ApplyGraphicSetting(FileManager.savedGraphicOption);
 
         yield return null;
     }

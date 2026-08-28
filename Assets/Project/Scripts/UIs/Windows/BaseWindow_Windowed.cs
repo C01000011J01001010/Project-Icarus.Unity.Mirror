@@ -3,8 +3,8 @@ using UnityEngine;
 
 public abstract class BaseWindow_Windowed : BaseWindow
 {
-    [SerializeField] protected DragTarget dragTarget_Top;
-    [SerializeField] protected DragTarget dragTarget_Bottom;
+    //[SerializeField] protected DragTarget dragTarget_Top;
+    //[SerializeField] protected DragTarget dragTarget_Bottom;
 
     private RectTransform rectTransform {  get; set; }
     private Vector2 AnchoredStartPos { get; set; }
@@ -14,8 +14,8 @@ public abstract class BaseWindow_Windowed : BaseWindow
         CanvasGroup canvasGroup = GetComponent<CanvasGroup>();
         rectTransform = GetComponent<RectTransform>();
 
-        dragTarget_Top.SetMoveObjAttribute(rectTransform, canvasGroup);
-        dragTarget_Bottom.SetMoveObjAttribute(rectTransform, canvasGroup);
+        //dragTarget_Top.SetMoveObjAttribute(rectTransform, canvasGroup);
+        //dragTarget_Bottom.SetMoveObjAttribute(rectTransform, canvasGroup);
 
         AnchoredStartPos = rectTransform.anchoredPosition;
     }

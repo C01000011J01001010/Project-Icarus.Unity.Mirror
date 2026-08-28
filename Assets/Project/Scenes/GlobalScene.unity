@@ -1290,6 +1290,30 @@ PrefabInstance:
       propertyPath: m_Name
       value: ProjectContext
       objectReference: {fileID: 0}
+    - target: {fileID: 1173322470707460156, guid: 8d94df64944788d4495b1939c0dff321, type: 3}
+      propertyPath: _firstScene.sceneName
+      value: TitleScene
+      objectReference: {fileID: 0}
+    - target: {fileID: 1173322470707460156, guid: 8d94df64944788d4495b1939c0dff321, type: 3}
+      propertyPath: _firstScene.scenePath
+      value: Assets/Project/Scenes/TitleScene.unity
+      objectReference: {fileID: 0}
+    - target: {fileID: 1173322470707460156, guid: 8d94df64944788d4495b1939c0dff321, type: 3}
+      propertyPath: _firstScene.sceneAsset
+      value: 
+      objectReference: {fileID: 102900000, guid: fc986868429c0e44eb547788257b9d42, type: 3}
+    - target: {fileID: 1173322470707460156, guid: 8d94df64944788d4495b1939c0dff321, type: 3}
+      propertyPath: _globalScene.sceneName
+      value: GlobalScene
+      objectReference: {fileID: 0}
+    - target: {fileID: 1173322470707460156, guid: 8d94df64944788d4495b1939c0dff321, type: 3}
+      propertyPath: _globalScene.scenePath
+      value: Assets/Project/Scenes/GlobalScene.unity
+      objectReference: {fileID: 0}
+    - target: {fileID: 1173322470707460156, guid: 8d94df64944788d4495b1939c0dff321, type: 3}
+      propertyPath: _globalScene.sceneAsset
+      value: 
+      objectReference: {fileID: 102900000, guid: 282b72738977da644bc7307f70d8f923, type: 3}
     - target: {fileID: 4758467973336714159, guid: 8d94df64944788d4495b1939c0dff321, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0

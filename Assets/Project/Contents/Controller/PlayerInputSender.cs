@@ -1,8 +1,9 @@
 ﻿using CoreEngine;
-using CoreEngine.Director;
 using CoreEngine.EventBus;
 using CoreEngine.Interface;
 using CoreEngine.Network;
+using CoreEngine.Helpers;
+using CoreEngine.Facades;
 using FishNet.Object; // FishNet 필수 네임스페이스
 using Icarus.Camera;
 using UnityEngine;
@@ -64,8 +65,13 @@ public class PlayerInputSender : BaseActorNetworked, ITickable//, IControllerSet
 
     public MovementDirectionMode _movementDirectionMode;
 
+    //public override void Awake()
+    //{
+    //    base.Awake();
+    //    _binderContainer.Add(_cameraReceiver);
+    //}
 
-    private void Awake()
+    private void Start()
     {
         _binderContainer.Add(_cameraReceiver);
     }
@@ -73,34 +79,30 @@ public class PlayerInputSender : BaseActorNetworked, ITickable//, IControllerSet
     public override void OnStopClient()
     {
         base.OnStopClient();
-        if (IsOwner && !UtilitySystem.isUnityNull(_inputProvider))
-        {
-            EventBus<OnSpaceBarWingFlappedEvent>.Unsubscribe(OnLocalSpaceBarFlapPerformed);
-            EventBus<OnMouseClickWingFlappedEvent>.Unsubscribe(OnLocalMouseFlapPerformed);
-            _binderContainer.UnbindAll();
-        }
+
+        if (!IsOwner) return;
+
+        EventBus<OnSpaceBarWingFlappedEvent>.Unsubscribe(OnLocalSpaceBarFlapPerformed);
+        EventBus<OnMouseClickWingFlappedEvent>.Unsubscribe(OnLocalMouseFlapPerformed);
+        _binderContainer.UnbindAll();
     }
     public override void OnStartClient()
     {
         base.OnStartClient();
-        // 💡 핵심 1: 이 껍데기가 '내 것'일 때만 입력 매니저를 연결합니다.
-        // 다른 유저의 껍데기가 내 키보드 입력을 빼앗아가는 것을 방지합니다.
-        if (IsOwner)
-        {
-            _inputProvider = CoreFacade.GetManager<UserInputManager>();
-            //EventBus<ControllerSettingEvent>.Publish(new ControllerSettingEvent(this));
-            if(!UtilitySystem.isUnityNull(_inputProvider))
-            {
-                EventBus<OnSpaceBarWingFlappedEvent>.Subscribe(OnLocalSpaceBarFlapPerformed);
-                EventBus<OnMouseClickWingFlappedEvent>.Subscribe(OnLocalMouseFlapPerformed);
-                _binderContainer.BindAll();
-            }
-        }
+
+        if(!IsOwner) return;
+
+        _inputProvider = CoreFacade.GetManager<UserInputManager>();
+        if (SystemHelper.isUnityNull(_inputProvider)) return;
+
+        EventBus<OnSpaceBarWingFlappedEvent>.Subscribe(OnLocalSpaceBarFlapPerformed);
+        EventBus<OnMouseClickWingFlappedEvent>.Subscribe(OnLocalMouseFlapPerformed);
+        _binderContainer.BindAll();
     }
 
     public void Tick(float deltaTime)
     {
-        if(!UtilitySystem.isUnityNull(_inputProvider))
+        if(!SystemHelper.isUnityNull(_inputProvider))
             InputMove();
     }
 

@@ -1,5 +1,6 @@
 using CoreEngine;
 using CoreEngine.Interface;
+using CoreEngine.Helpers;
 using Icarus.Character;
 using System.Collections.Generic;
 using UnityEngine;
@@ -44,7 +45,7 @@ namespace Icarus.Ui
 
         public void Tick(float deltaTime)
         {
-            if (UtilitySystem.isUnityNull(Target)) return;
+            if (SystemHelper.isUnityNull(Target)) return;
 
             int activeCount = Target.GetPlayerInputCount();
 

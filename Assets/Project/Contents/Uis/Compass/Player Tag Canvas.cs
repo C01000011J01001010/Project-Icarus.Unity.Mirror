@@ -1,6 +1,7 @@
 using CoreEngine;
 using UnityEngine;
 using UnityEngine.UI;
+using CoreEngine.Extentions;
 
 [RequireComponent(typeof(CanvasGroup), typeof(RectTransform))]
 public class PlayerTagCanvas : MonoBehaviour

@@ -1,168 +1,133 @@
 using CoreEngine;
+using CoreEngine.Actor;
 using CoreEngine.CameraSystem;
-using CoreEngine.Director;
-using CoreEngine.Helpers;
 using CoreEngine.EventBus;
 using CoreEngine.Manager;
-using CoreEngine.Network;
-using FishNet.Component.Transforming;
-using FishNet.Managing.Server;
+using CoreEngine.Manager.Pool;
+using CoreEngine.Network.FishNetExtension;
 using FishNet.Object.Synchronizing;
+using Icarus.Camera;
+using Icarus.Controller;
+using System;
+using Unity.Cinemachine;
 using UnityEngine;
 
-[RequireComponent(typeof(Rigidbody))]
-[RequireComponent(typeof(NetworkTransform))]
-public class SharedActor : BaseActorNetworked, IFixedTickable
+namespace Icarus.Character
 {
-    public FixedTickGroup FixedTickGroup => FixedTickGroup.Physics;
-
-    protected override NetworkTickTarget networkTickTarget => NetworkTickTarget.ServerOnly;
-
-    private Rigidbody _rigidbody;
-    public float moveSpeed = 50f;
-    public float rotationSpeed = 1.0f;
-
-    [Header("🪽 날갯짓 물리 세팅")]
-    public float flapForce = 8f;   // 위로 솟구치는 순간적인 힘 (Impulse)
-    public float flapTorque = 5f;  // 순간적인 회전력 (Impulse)
-
-    [Header("⚖️ 균형(오뚝이) 보정 세팅")]
-    public float pGain = 20f;  // 복원력 (얼마나 강력하게 돌아올 것인가)
-    public float dGain = 5f;   // 제동력 (얼마나 빠르게 멈출 것인가)
-    public float timeDelay = 1f;
-    private float timeCount;
-
-    
-    private readonly SyncDictionary<int, Vector2> _clientInputs = new SyncDictionary<int, Vector2>();
-    public SyncDictionary<int, Vector2> ClientInputs => _clientInputs;
-
-    //public override void Awake()
-    //{
-    //    base.Awake();
-    //    _rigidbody = GetComponent<Rigidbody>();
-    //}
-
-    private void Start()
+    [RequireComponent(typeof(Rigidbody))]
+    public class SharedActor : BaseNetworkActor, IActorHost, IPoolable, IFixedTickable
     {
-        _rigidbody = GetComponent<Rigidbody>();
-    }
+        public FixedTickGroup FixedTickGroup => FixedTickGroup.Physics;
+        protected override NetworkTickTarget networkTickTarget => NetworkTickTarget.ServerOnly;
 
-    protected override void OnEnable()
-    {
-        base.OnEnable();
+        private readonly SyncDictionary<int, Vector2> _clientInputs = new SyncDictionary<int, Vector2>();
+        public SyncDictionary<int, Vector2> ClientInputs => _clientInputs;
 
-        // 카메라한테 내가 등장했음을 알림
-        // "내 캐릭터(Transform)를 비춰줘! 단, ThirdPersonCamera만 타겟을 바꿔!"
-        CameraTargetProvider targetProvider = GetComponentInChildren<CameraTargetProvider>();
-        EventBus<SetCameraTargetEvent>.Publish(new SetCameraTargetEvent(targetProvider.Target, typeof(ThirdPersonCameraController)));
+        public IPoolReleaser Releaser { get; set; }
 
-        // "3인칭 카메라로 시점을 바꿔줘!" (자연스러운 Blending 발생)
-        EventBus<SwitchCameraEvent>.Publish(new SwitchCameraEvent(typeof(ThirdPersonCameraController)));
-    }
+        [Header("🪽 부품(Features) 조립")]
+        [SerializeField] private SharedActorMovementFeature _movementFeature = new();
+        [SerializeField] private SharedActorStateFeature _stateFeature = new();
+        [SerializeField] private SharedActorAnimationFeature _animationFeature = new();
 
-    public override void OnStartClient()
-    {
-        base.OnStartClient();
+        private RepeatEventProvider<SetCameraTargetEvent> _cameraTargetProvider;
+        private RepeatEventProvider<SwitchCameraEvent> _cameraSwitchProvider;
 
-        // 💡 핵심: 내가 방장(호스트/서버)이 아닌 순수 클라이언트라면?
-        if (!base.IsServerInitialized)
+
+        private CameraNetTarget _cameraTarget;
+        private Rigidbody _rb;
+        private bool _isSpawned;
+
+        public override void Awake()
         {
-            // 클라이언트 쪽의 물리 엔진(중력, 관성 등)을 완전히 꺼버립니다.
-            // 이제 클라이언트는 제멋대로 움직이지 않고, 오직 서버가 보내주는 위치로만 이동합니다!
-            _rigidbody.isKinematic = true;
-        }
-    }
+            base.Awake();
+            _rb = GetComponent<Rigidbody>();
 
-    public override void OnStartServer()
-    {
-        ServerManager.Spawn(gameObject);
-
-        // 이동 및 날갯짓 이벤트 모두 구독
-        // 주: 원래 OnStartServer에서 구독을 등록했습니다.
-        EventBus<SharedActorMoveEvent>.Subscribe(OnSharedActorMove);
-        EventBus<SharedActorFlapEvent>.Subscribe(OnSharedActorWingFlap);
-    }
-
-    public override void OnStopServer()
-    {
-        // 수동으로 등록한 이벤트 해제
-        EventBus<SharedActorMoveEvent>.Unsubscribe(OnSharedActorMove);
-        EventBus<SharedActorFlapEvent>.Unsubscribe(OnSharedActorWingFlap);
-    }
-
-    private void OnSharedActorMove(SharedActorMoveEvent evt)
-    {
-        _clientInputs[evt.ClientId] = evt.MoveVector;
-    }
-
-    // 날갯짓 단발성 이벤트 처리 함수
-    private void OnSharedActorWingFlap(SharedActorFlapEvent evt)
-    {
-        if (!IsServerInitialized) return;
-        
-        // 위로 향하는 순간적인 힘 가하기
-        _rigidbody.AddForce(transform.up * flapForce, ForceMode.Impulse);
-
-        float torqueDirection = evt.IsLeft ? -1f : 1f;
-        Vector3 appliedTorque = Vector3.forward * torqueDirection * flapTorque;
-
-        // 회전력 적용
-        _rigidbody.AddTorque(appliedTorque, ForceMode.Impulse);
-
-        timeCount = 0;
-    }
-
-    public void FixedTick(float fixedDeltaTime)
-    {
-        if (!IsServerInitialized) return;
-        
-        Move(fixedDeltaTime);
-
-        StabilizeRotation(fixedDeltaTime);
-
-    }
-
-    public void Move(float fixedDeltaTime)
-    {
-        Vector2 combinedInput = Vector2.zero;
-        foreach (var input in _clientInputs.Values)
-        {
-            combinedInput += input;
+            _movementFeature.Initialize(this);
+            _stateFeature.Initialize(this);
+            _animationFeature.Initialize(this);
         }
 
-        if (combinedInput != Vector2.zero)
+        public void OnSpawn()
         {
-            // 이동하는 방향 바라보고
-            Vector3 moveDir = new Vector3(combinedInput.x, 0, combinedInput.y).normalized;
-            RigidBodyHelper.SmoothLookAt(_rigidbody, moveDir, rotationSpeed, fixedDeltaTime);
+            // Ping-Pong 패턴: 카메라가 먼저 켜졌든 늦게 켜졌든 안전하게 통신
+            _cameraTarget = GetComponentInChildren<CameraNetTarget>();
+            if (_cameraTarget != null)
+            {
+                _cameraTarget.DecoupleAndFollow(transform);
+                Func<SetCameraTargetEvent> cameraTargetEventFunc = () => new SetCameraTargetEvent(_cameraTarget, typeof(ThirdPersonCameraController));
+                _cameraTargetProvider = new RepeatEventProvider<SetCameraTargetEvent>(cameraTargetEventFunc);
+                _cameraTargetProvider.Bind();
 
-            // 출발
-            _rigidbody.AddForce(moveDir * moveSpeed, ForceMode.Force); // 지속적인 이동은 Force 모드
+                Func<SwitchCameraEvent> cameraSwitchEventFunc = () => new SwitchCameraEvent(typeof(ThirdPersonCameraController));
+                _cameraSwitchProvider = new RepeatEventProvider<SwitchCameraEvent>(cameraSwitchEventFunc);
+                _cameraSwitchProvider.Bind();
+            }
+
+            _stateFeature.StartState();
+            _isSpawned = true;
         }
-    }
 
-    
-
-    private void StabilizeRotation(float fixedDeltaTime)
-    {
-        if(timeCount <= timeDelay)
+        public void OnDespawn()
         {
-            timeCount += fixedDeltaTime;
-            return;
+            _isSpawned = false;
+            _clientInputs.Clear();
+            _stateFeature.StopState();
+
+            _cameraTarget?.ReturnToParent(transform);
+            _cameraTargetProvider?.Unbind();
+            _cameraSwitchProvider?.Unbind();
+
+            if (_rb != null)
+            {
+                _rb.linearVelocity = Vector3.zero;
+                _rb.angularVelocity = Vector3.zero;
+            }
         }
-        
 
-        // 1. 회전 오차 계산 (현재 캐릭터 up vs 월드 up)
-        Vector3 error = Vector3.Cross(transform.up, Vector3.up);
+        public override void OnStartServer()
+        {
+            base.OnStartServer();
+            // ServerManager.Spawn() 처리가 완전히 끝나서 서버 권한이 확정된 시점입니다.
+            EventBus<SharedActorMoveEvent>.Subscribe(OnSharedActorMove);
+            EventBus<SharedActorFlapEvent>.Subscribe(OnSharedActorWingFlap);
+        }
 
-        // 2. PD 제어 로직
-        // (오차 * P값) - (현재 각속도 * D값)
-        // - 오차가 클수록 강력하게 회전
-        // - 회전 속도가 빠를수록 반대 방향으로 브레이크
+        public override void OnStopServer()
+        {
+            base.OnStopServer();
+            // ServerManager.Despawn()이 호출되어 객체가 풀로 돌아갈 때 자동으로 귀를 닫습니다.
+            EventBus<SharedActorMoveEvent>.Unsubscribe(OnSharedActorMove);
+            EventBus<SharedActorFlapEvent>.Unsubscribe(OnSharedActorWingFlap);
+        }
 
-        // 중력값이 상관없이 일정한 속도로 처리하도록
-        Vector3 torque = (error * pGain) - (_rigidbody.angularVelocity * dGain);
+        public override void OnStartClient()
+        {
+            base.OnStartClient();
 
-        _rigidbody.AddTorque(torque, ForceMode.Force);
+            if (!base.IsServerInitialized)
+            {
+                _rb.isKinematic = true;
+            }
+        }
+
+        private void OnSharedActorMove(SharedActorMoveEvent evt) => _clientInputs[evt.ClientId] = evt.MoveVector;
+        private void OnSharedActorWingFlap(SharedActorFlapEvent evt) => _movementFeature.ApplyFlap(evt.IsLeft);
+
+        public void FixedTick(float fixedDeltaTime)
+        {
+            if (!this.IsServerInitialized || !_isSpawned) return;
+
+            _stateFeature.FixedTick(fixedDeltaTime);
+            _movementFeature.FixedTick(fixedDeltaTime);
+        }
+
+        public bool TryGetFeature<T>(out T feature) where T : class, IActorFeature
+        {
+            if (_movementFeature is T move) { feature = move; return true; }
+            if (_stateFeature is T state) { feature = state; return true; }
+            if (_animationFeature is T anim) { feature = anim; return true; }
+            feature = null; return false;
+        }
     }
 }

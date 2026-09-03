@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 61804b3b31db0fd48a1e8b8644a8ec25, type: 3}
+  m_Name: CoreEngineSettings
+  m_EditorClassIdentifier: CoreEngine::CoreEngine.Settings.CoreEngineSettingsSO
+  _sceneTracker:
+    globalScene:
+      sceneAsset: {fileID: 102900000, guid: 282b72738977da644bc7307f70d8f923, type: 3}
+      scenePath: Assets/Project/Scenes/GlobalScene.unity
+      sceneName: GlobalScene
+      sceneGUID: 282b72738977da644bc7307f70d8f923
+    extensionSceneList:
+    - sceneAsset: {fileID: 102900000, guid: 21191e88a1644ea408d6ea5fea480b05, type: 3}
+      scenePath: Assets/Project/Scenes/NetworkScene.unity
+      sceneName: NetworkScene
+      sceneGUID: 21191e88a1644ea408d6ea5fea480b05
+    firstScene:
+      sceneAsset: {fileID: 102900000, guid: fc986868429c0e44eb547788257b9d42, type: 3}
+      scenePath: Assets/Project/Scenes/TitleScene.unity
+      sceneName: TitleScene
+      sceneGUID: fc986868429c0e44eb547788257b9d42
+    _lastSyncedScenes:
+    - 282b72738977da644bc7307f70d8f923
+    - 21191e88a1644ea408d6ea5fea480b05
+    - fc986868429c0e44eb547788257b9d42

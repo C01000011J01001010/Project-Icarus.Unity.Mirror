@@ -2,7 +2,9 @@ using CoreEngine;
 using CoreEngine.EventBus;
 using CoreEngine.Interface;
 using CoreEngine.Manager;
+using CoreEngine.Manager.Input;
 using System.Collections;
+using System.Reflection;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -24,49 +26,27 @@ public struct OnMouseClickWingFlappedEvent : IEvent
 
 
 
-public class UserInputManager : BaseInputManager<UserInputActions>, IManager, IPlayerInputProvider
+public class UserInputManager : BaseInputManager<UserInputActions>, IManager, 
+    IMoveInput, ILookInput, IScollDeltaInput
 {
     UserInputActions.PlayerActions Player;
     UserInputActions.UIActions Ui;
 
-    InterfacePublisher<IPlayerInputProvider> _inputProvider;
-    #region Polling
-    public Vector2 Move
-    { 
-        get
-        {
-            return inputAction.Player.Move.ReadValue<Vector2>();
-        }
-    }
-
-    public Vector2 Look
-    {
-        get
-        {
-            return inputAction.Player.Look.ReadValue<Vector2>();
-        }
-    }
-
-    public float ScrollDelta
-    {
-        get
-        {
-            return inputAction.Player.Scroll.ReadValue<Vector2>().y;
-        }
-    }
-    #endregion
-
-    protected override void Awake()
-    {
-        base.Awake();
-        _inputProvider = new InterfacePublisher<IPlayerInputProvider>(this);
-        _inputProvider.Bind();
-    }
+    InterfaceBinderContainer binder = new();
+    InterfacePublisher<IMoveInput> _iMoveInputProvider;
+    InterfacePublisher<ILookInput> _iLookInputProvider;
+    InterfacePublisher<IScollDeltaInput> _IScollDeltaInputProvider;
+    
+    Vector2 IMoveInput.value => inputAction.Player.Move.ReadValue<Vector2>();
+    Vector2 ILookInput.value => inputAction.Player.Look.ReadValue<Vector2>();
+    float IScollDeltaInput.value => inputAction.Player.Scroll.ReadValue<Vector2>().y;
+    
 
     public override void Exit()
     {
         base.Exit();
-        //EventBus<ControllerSettingEvent>.Unsubscribe(OnControllerCall);
+        binder.UnbindAll();
+
         PlayerInputUnsubscribe();
     }
 
@@ -76,10 +56,12 @@ public class UserInputManager : BaseInputManager<UserInputActions>, IManager, IP
         Player = inputAction.Player;
         Ui = inputAction.UI;
 
-        //EventBus<ControllerSettingEvent>.Subscribe(OnControllerCall);
+        binder.Add(new InterfacePublisher<IMoveInput>(this));
+        binder.Add(new InterfacePublisher<ILookInput>(this));
+        binder.Add(new InterfacePublisher<IScollDeltaInput>(this));
+        binder.BindAll();
+
         PlayerInputSubScribe();
-
-
         SwitchMap(InputMapType.Player);
         yield return null;
     }

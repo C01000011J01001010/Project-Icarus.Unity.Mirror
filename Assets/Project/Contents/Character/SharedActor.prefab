@@ -182,7 +182,7 @@ MonoBehaviour:
   _initializeOrder: 0
   _preventDespawnOnDisconnect: 0
   _defaultDespawnType: 1
-  _initializedTimestamp: -8584168199083031974
+  _initializedTimestamp: -8584131279392675466
   _localLevelOfDetailCalculationType: 0
   _useLevelOfDetail: 0
   _useRootLevelOfDetail: 1
@@ -201,7 +201,7 @@ MonoBehaviour:
   _spectatorInterpolation: 2
   _enableTeleport: 0
   _teleportThreshold: 1
-  <PrefabId>k__BackingField: 9
+  <PrefabId>k__BackingField: 0
   <SpawnableCollectionId>k__BackingField: 0
   <AssetPathHash>k__BackingField: 11293758964070851554
   SceneId: 0
@@ -309,16 +309,16 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3c9e6b883b0586d47803979699bc7ecd, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SharedActor
-  _componentIndexCache: 1
+  m_EditorClassIdentifier: Assembly-CSharp::Icarus.Character.SharedActor
+  _componentIndexCache: 255
   _addedNetworkObject: {fileID: 1421060152581575441}
-  _networkObjectCache: {fileID: 1421060152581575441}
-  myScope: 2
+  _networkObjectCache: {fileID: 0}
+  myScope: 0
   _movementFeature:
-    moveSpeed: 50
+    moveSpeed: 20
     rotationSpeed: 1
-    flapForce: 8
-    flapTorque: 5
+    flapForce: 12
+    flapTorque: 1
     pGain: 20
     dGain: 5
     timeDelay: 1

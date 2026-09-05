@@ -9,12 +9,12 @@ namespace Icarus.Character
     public class SharedActorMovementFeature : BaseActorFeature
     {
         [Header("이동 세팅")]
-        [SerializeField] private float moveSpeed = 50f;
+        [SerializeField] private float moveSpeed = 20f;
         [SerializeField] private float rotationSpeed = 1.0f;
 
         [Header("날갯짓 & 균형 세팅")]
-        [SerializeField] private float flapForce = 8f;
-        [SerializeField] private float flapTorque = 5f;
+        [SerializeField] private float flapForce = 12f;
+        [SerializeField] private float flapTorque = 1f;
         [SerializeField] private float pGain = 20f;
         [SerializeField] private float dGain = 5f;
         [SerializeField] private float timeDelay = 1f;

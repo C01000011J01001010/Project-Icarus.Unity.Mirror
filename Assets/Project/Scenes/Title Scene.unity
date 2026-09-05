@@ -1025,12 +1025,16 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8730088018844247496, guid: 3e97cf00a1f291040a80fa618483df54, type: 3}
+      propertyPath: NextScene.sceneGUID
+      value: d43ded959bdc4724484bf7c59f84bf2b
+      objectReference: {fileID: 0}
+    - target: {fileID: 8730088018844247496, guid: 3e97cf00a1f291040a80fa618483df54, type: 3}
       propertyPath: NextScene.sceneName
-      value: LevelDesign
+      value: InGame Scene
       objectReference: {fileID: 0}
     - target: {fileID: 8730088018844247496, guid: 3e97cf00a1f291040a80fa618483df54, type: 3}
       propertyPath: NextScene.scenePath
-      value: Assets/Project/LevelDesign/LevelDesign.unity
+      value: Assets/Project/Scenes/InGame Scene.unity
       objectReference: {fileID: 0}
     - target: {fileID: 8730088018844247496, guid: 3e97cf00a1f291040a80fa618483df54, type: 3}
       propertyPath: NextScene.sceneAsset
